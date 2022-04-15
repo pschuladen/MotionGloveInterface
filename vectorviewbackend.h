@@ -29,6 +29,7 @@ public:
     explicit VectorViewBackend(const QVector3D *vecPointer, QObject *parent = nullptr);
 
     const QVector3D *vectPointer;
+    QVector3D vect;
 
     float xValue() const;
     void setxValue(float newXValue);
@@ -43,7 +44,8 @@ public:
 
 
 public slots:
-    void vectorUpdatet();
+    void vectorUpdatet(); //TODO: not used anymore
+    void vectorChanged(QVector3D vec);
 
 signals:
 

@@ -20,10 +20,21 @@ void QuatViewBackend::vectorUpdatet()
     emit wValueChanged();
 }
 
+void QuatViewBackend::quatChanged(QQuaternion newQuat)
+{
+//    qInfo() << "received quat" << newQuat;
+    quat = newQuat;
+    emit xValueChanged();
+    emit yValueChanged();
+    emit zValueChanged();
+    emit wValueChanged();
+}
+
 
 float QuatViewBackend::wValue() const
 {
-    return quatPointer->scalar();//m_wValue;
+    return quat.scalar();
+//    return quatPointer->scalar();//m_wValue;
 }
 
 void QuatViewBackend::setwValue(float newWValue)
@@ -36,7 +47,8 @@ void QuatViewBackend::setwValue(float newWValue)
 
 float QuatViewBackend::xValue() const
 {
-    return quatPointer->x();//m_xValue;
+    return quat.x();
+//    return quatPointer->x();//m_xValue;
 }
 
 void QuatViewBackend::setxValue(float newXValue)
@@ -49,7 +61,8 @@ void QuatViewBackend::setxValue(float newXValue)
 
 float QuatViewBackend::yValue() const
 {
-    return quatPointer->y();//m_yValue;
+    return quat.y();
+//    return quatPointer->y();//m_yValue;
 }
 
 void QuatViewBackend::setyValue(float newYValue)
@@ -62,7 +75,8 @@ void QuatViewBackend::setyValue(float newYValue)
 
 float QuatViewBackend::zValue() const
 {
-    return quatPointer->z();//m_zValue;
+    return quat.z();
+//    return quatPointer->z();//m_zValue;
 }
 
 void QuatViewBackend::setzValue(float newZValue)

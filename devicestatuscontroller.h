@@ -12,8 +12,11 @@
 #include "oscpp/client.hpp"
 
 #include "devicedatainput.h"
-
+#include "Singleton.h"
 #include "mainbackend.h"
+#include "MotionDeviceStruct.h"
+
+//struct MotionDevice;
 
 class DeviceStatusController : public QObject
 {
@@ -25,14 +28,14 @@ public:
 
     void setEngine(QQmlApplicationEngine *engine);
 
-    struct MotionDevice {
-        QString deviceName;
-        QString address;
-        uint16_t port;
-        uint16_t sendIntervall;
-        bool connectStatus;
-        DeviceDataInput *inputHandler;
-    };
+//    struct MotionDevice {
+//        QString deviceName;
+//        QString address;
+//        uint16_t port;
+//        uint16_t sendIntervall;
+//        bool connectStatus;
+//        DeviceDataInput *inputHandler;
+//    };
 
 
 signals:
@@ -64,5 +67,7 @@ private:
 
 
 };
+
+typedef Singleton<DeviceStatusController> main_devicestatus ;
 
 #endif // DEVICESTATUSCONTROLLER_H

@@ -18,7 +18,8 @@ void VectorViewBackend::setVectPointer(const QVector3D *newVectPointer)
 
 float VectorViewBackend::xValue() const
 {
-    return vectPointer->x();//m_xValue;
+    return vect.x();
+//    return vectPointer->x();//m_xValue;
 }
 
 void VectorViewBackend::setxValue(float newXValue)
@@ -31,7 +32,8 @@ void VectorViewBackend::setxValue(float newXValue)
 
 float VectorViewBackend::yValue() const
 {
-    return vectPointer->y();//m_yValue;
+    return vect.y();
+//    return vectPointer->y();//m_yValue;
 }
 
 void VectorViewBackend::setyValue(float newYValue)
@@ -44,7 +46,8 @@ void VectorViewBackend::setyValue(float newYValue)
 
 float VectorViewBackend::zValue() const
 {
-    return vectPointer->z();//m_zValue;
+    return vect.z();
+//    return vectPointer->z();//m_zValue;
 }
 
 void VectorViewBackend::setzValue(float newZValue)
@@ -57,6 +60,14 @@ void VectorViewBackend::setzValue(float newZValue)
 
 void VectorViewBackend::vectorUpdatet()
 {
+    emit xValueChanged();
+    emit yValueChanged();
+    emit zValueChanged();
+}
+
+void VectorViewBackend::vectorChanged(QVector3D vec)
+{
+    vect = vec;
     emit xValueChanged();
     emit yValueChanged();
     emit zValueChanged();

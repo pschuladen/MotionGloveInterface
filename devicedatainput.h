@@ -12,6 +12,7 @@
 #include "oscpp/server.hpp"
 #include "vectorviewbackend.h"
 #include "quatviewbackend.h"
+#include "valuenotifierclass.h"
 
 #include <QQmlApplicationEngine>
 #include <QQuickItem>
@@ -28,10 +29,15 @@ public:
     QString identifier;
 
 
-    QList<VectorViewBackend*> accelView;
-    QList<VectorViewBackend*> gyrosView;
-    QList<VectorViewBackend*> gravityView;
-    QList<QuatViewBackend*> quaternionView;
+//    QList<VectorViewBackend*> accelView;
+//    QList<VectorViewBackend*> gyrosView;
+//    QList<VectorViewBackend*> gravityView;
+//    QList<QuatViewBackend*> quaternionView;
+
+    QList<ValueNotifierClass*> accelNotify;
+    QList<ValueNotifierClass*> gyrosNotify;
+    QList<ValueNotifierClass*> gravityNotify;
+    QList<ValueNotifierClass*> quaternionNotify;
 
     QList<QVector3D> acceleration;
     QList<QVector3D> gyroscope;
@@ -40,7 +46,8 @@ public:
 
     QList<int> touch;
 
-    void createAllSensorInputViews(QQmlApplicationEngine *engine, QQuickItem *parentView);
+//    void createAllSensorInputViews(QQmlApplicationEngine *engine, QQuickItem *parentView);
+    uint8_t m_nSensors;
 
 
 signals:
@@ -58,7 +65,6 @@ private:
 
     QUdpSocket *socket;
     uint16_t m_port;
-    uint8_t m_nSensors;
 
 //    typedef QHash<QString, QVariant> ;
 
@@ -91,9 +97,9 @@ private:
     void set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args);
     void setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args);
 
-    QQuickItem *sensorViewContainer = nullptr;
+//    QQuickItem *sensorViewContainer = nullptr;
 
-    bool createSensorViewContainer(QQmlApplicationEngine* engine, QQuickItem* parentView);
+//    bool createSensorViewContainer(QQmlApplicationEngine* engine, QQuickItem* parentView);
 
 
 };

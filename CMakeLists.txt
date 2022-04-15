@@ -20,6 +20,8 @@ qt_add_executable(appMotionGloveInterface
     quatviewbackend.h quatviewbackend.cpp
     Singleton.h
     mainbackend.h mainbackend.cpp
+    MotionDeviceStruct.h
+    valuenotifierclass.h valuenotifierclass.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface

@@ -10,6 +10,10 @@
 
 #include "devicestatuscontroller.h"
 #include "devicedatainput.h"
+#include "MotionDeviceStruct.h"
+#include "valuenotifierclass.h"
+#include "vectorviewbackend.h"
+#include "quatviewbackend.h"
 
 class MainBackend : public QObject
 {
@@ -23,18 +27,34 @@ public:
     void setEngine(QQmlApplicationEngine *engine);
 
 private:
+    struct NodesData {
+        QQuickItem* view;
+        QString container;
+        QString oscPath; //TODO: implement
+    };
 
     QQmlApplicationEngine *engine;
     QQuickWindow *mainWindow;
     QQuickItem *deviceStatusView;
 
-    void createInputStatusView(DeviceStatusController::MotionDevice *motionDevice);
+//    QQuickItem *sensorViewContainer = nullptr;
+    QHash<QString, QQuickItem*> sensorInputContainer;
+    QHash<QString, NodesData> inputNodes;
 
+    void createDeviceStatusView(MotionDevice *motionDevice);
+    void createSensorInputViews(MotionDevice *motionDevice);
+
+    enum SenTyp {
+        accel, gyro, grav, quat, touch
+    };
+    void createSensorInputView(QQuickItem *parentView, SenTyp typ, MotionDevice *motionDevice);
+
+    QQuickItem *createSensorViewContainer(MotionDevice * motionDevice);
 signals:
 
 
 public slots:
-    void createNewInputViews(DeviceStatusController::MotionDevice *motionDevice);//QString deviceName, DeviceDataInput *inputHandler);
+    void createNewInputViews(MotionDevice *motionDevice);//QString deviceName, DeviceDataInput *inputHandler);
 
 };
 

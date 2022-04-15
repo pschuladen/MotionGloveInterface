@@ -25,9 +25,10 @@ int main(int argc, char *argv[])
 //    qmlRegisterType<VectorViewBackend>("MotionGloveInterface", 1, 0, "VectorViewBackend");
 //    qmlRegisterType<QuatViewBackend>("MotionGloveInterface", 1, 0, "QuatViewBackend");
 
-
-    DeviceStatusController deviceStatusController;
-    deviceStatusController.setEngine(&engine);
+    DeviceStatusController *devStatusController = main_devicestatus::Instance();
+    devStatusController->setEngine(&engine); //can soon be removed
+//    DeviceStatusController deviceStatusController;
+//    deviceStatusController.setEngine(&engine);
 
 
     return app.exec();

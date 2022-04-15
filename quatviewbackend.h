@@ -27,6 +27,7 @@ class QuatViewBackend : public QObject
     float m_zValue;
 
     QQuaternion *quatPointer;
+    QQuaternion quat;
 
 public:
     explicit QuatViewBackend(QObject *parent = nullptr);
@@ -47,6 +48,8 @@ public:
 
 public slots:
     void vectorUpdatet();
+    void quatChanged(QQuaternion newQuat);
+
 
 signals:
 
