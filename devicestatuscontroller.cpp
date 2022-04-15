@@ -19,18 +19,6 @@ DeviceStatusController::DeviceStatusController(QObject *parent)
 
 }
 
-void DeviceStatusController::setEngine(QQmlApplicationEngine *engine)
-{
-    this->engine = engine;
-    this->mainWindow = qobject_cast<QQuickWindow*>(engine->rootObjects().at(0));
-    this->deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
-
-    //    this->deviceStatusView = mainWindow.findChil
-    //QObject *x = deviceStatusView->
-    //    qInfo() << "Did i found the view?";
-    //    qInfo() << deviceStatusView->objectName();
-    //    qInfo() << deviceStatusView->property("test").toString();//QQmlProperty::read(deviceStatusView, "test");
-}
 
 void DeviceStatusController::setConnectStatus(bool connect, QString device)
 {
@@ -87,12 +75,11 @@ void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &mess
                 }
                 newDevice.deviceName = pingersName;
                 newDevice.inputHandler = new DeviceDataInput(this, pingersName, 51002+discoveredDevices.size());
-//                newDevice.inputHandler->createAllSensorInputViews(engine, mainWindow->findChild<QQuickItem*>("sensorInputView"));
 
                 newDevice.connectStatus = false;
                 discoveredDevices.insert(pingersName, newDevice);
                 qInfo() << "received ping from new device" << pingersName;
-//                createDeviceStatus(pingersName);
+
 
                 emit receivedNewDevice(&newDevice);//pingersName, newDevice.inputHandler);
             }
@@ -107,18 +94,6 @@ void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &mess
     }
 }
 
-void DeviceStatusController::createDeviceStatus(QString deviceName)
-{
-    QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/DeviceStatusView.qml")));
-
-    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDevice.create());
-    newDeviceItem->setProperty("deviceName", deviceName);
-    newDeviceItem->setParentItem(deviceStatusView);
-    newDeviceItem->setObjectName(QString(deviceName+"-view"));
-
-    connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), this, SLOT(setConnectStatus(bool,QString)));
-}
-
 void DeviceStatusController::pingBackToDevice(QString deviceName)
 {
     MotionDevice *device = &discoveredDevices[deviceName];
@@ -129,9 +104,8 @@ void DeviceStatusController::pingBackToDevice(QString deviceName)
             .int32(51002)
             .closeMessage();
     size_t pongSize = pongPacket.size();
-qInfo() << "device addr" << device->address << device->port;
+    qInfo() << "device addr" << device->address << device->port;
     qint64 sendedBytes = socket->writeDatagram(pongBuf.data(), pongSize, QHostAddress(device->address), device->port);
-
 }
 
 

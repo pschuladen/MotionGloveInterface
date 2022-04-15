@@ -26,61 +26,6 @@ DeviceDataInput::DeviceDataInput(QObject *parent, QString identifier, uint16_t p
 
 }
 
-//void DeviceDataInput::createAllSensorInputViews(QQmlApplicationEngine *engine, QQuickItem *parentView)
-//{
-//    if(!sensorViewContainer) {
-//        if(!createSensorViewContainer(engine, parentView)) return;
-//    }
-//    createSensorInputView(engine, sensorViewContainer, quat);
-//    createSensorInputView(engine, sensorViewContainer, accel);
-//    createSensorInputView(engine, sensorViewContainer, gyro);
-//    createSensorInputView(engine, sensorViewContainer, grav);
-//}
-
-//void DeviceDataInput::createSensorInputView(QQmlApplicationEngine* engine, QQuickItem* parentView, SenTyp typ)
-//{
-//    QUrl qmlpath;
-//    if (typ != quat) {qmlpath = QUrl(QStringLiteral("qrc:/MotionGloveInterface/VectorView.qml"));}
-//    else if (typ == quat) {qmlpath = QUrl(QStringLiteral("qrc:/MotionGloveInterface/QuatView.qml"));}
-
-//    for(int i = 0; i < m_nSensors; i++) {
-//        QQmlComponent newSensorView(engine, qmlpath);//(QStringLiteral("qrc:/MotionGloveInterface/VectorView.qml")));
-//        QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newSensorView.create());
-//        VectorViewBackend *conBackend;// = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
-//        QuatViewBackend *quatBackend;
-
-//        QString sensName;
-//        switch (typ) {
-//        case accel:
-//            conBackend = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
-//            conBackend->setVectPointer(&this->acceleration[i]);
-//            this->accelView[i] = conBackend;
-//            sensName = QString("/%2/acc/%1").arg(i).arg(identifier);
-//            break;
-//        case gyro:
-//            conBackend = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
-//            conBackend->setVectPointer(&this->gyroscope[i]);
-//            this->gyrosView[i] = conBackend;
-//            sensName = QString("/%2/gyr/%1").arg(i).arg(identifier);
-//            break;
-//        case grav:
-//            conBackend = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
-//            conBackend->setVectPointer(&this->gravityVector[i]);
-//            this->gravityView[i] = conBackend;
-//            sensName = QString("/%2/gravity/%1").arg(i).arg(identifier);
-//            break;
-//        case quat:
-//            quatBackend = newDeviceItem->findChild<QuatViewBackend*>("quatBackend");
-//            quatBackend->setQuatPointer(&this->quaternion[i]);
-//            this->quaternionView[i] = quatBackend;
-//            sensName = QString("/%2/quat/%1").arg(i).arg(identifier);
-//            break;
-//        }
-//        newDeviceItem->setProperty("sensorName", sensName);
-//        newDeviceItem->setParentItem(parentView);
-//    }
-//}
-
 void DeviceDataInput::readIncomingUdpData()
 {
     QByteArray buffer(socket->pendingDatagramSize(), char());
@@ -133,13 +78,6 @@ void DeviceDataInput::setupOscInputBindings()
     this->gravityNotify.resize(this->m_nSensors);
     this->quaternionNotify.resize(this->m_nSensors);
 
-    //obsolete soon
-//    this->accelView.resize(this->m_nSensors);
-//    this->gyrosView.resize(this->m_nSensors);
-//    this->gravityView.resize(this->m_nSensors);
-//    this->quaternionView.resize(this->m_nSensors);
-
-
     QString oscAddress;
     OscInputStruct oscHandle;
     for(int i = 0; i < m_nSensors; i++) {
@@ -149,19 +87,19 @@ void DeviceDataInput::setupOscInputBindings()
         oscHandle.handleFunction = &DeviceDataInput::oscR_setAcceleration;
         this->oscHandleHash.insert(oscAddress, oscHandle);
         accelNotify[i] = new ValueNotifierClass(this);
-//        this->accelView[i] = new VectorViewBackend(&this->acceleration.at(i) ,this); //TODO: remove those lines
+
 
         oscAddress = QString("/%1/gravity/%2").arg(this->identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGravityVector;
         this->oscHandleHash.insert(oscAddress, oscHandle);
         gravityNotify[i] = new ValueNotifierClass(this);
-//        this->gravityView[i] = new VectorViewBackend(&this->gravityVector.at(i) ,this);
+
 
         oscAddress = QString("/%1/gyr/%2").arg(this->identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGyroscope;
         this->oscHandleHash.insert(oscAddress, oscHandle);
         gyrosNotify[i] = new ValueNotifierClass(this);
-//        this->gyrosView[i] = new VectorViewBackend(&this->gyroscope.at(i) ,this);
+
 
         oscAddress = QString("/%1/quat/%2").arg(this->identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setQuaternion;
@@ -170,7 +108,7 @@ void DeviceDataInput::setupOscInputBindings()
     }
     oscAddress = QString("/%1/touch").arg(this->identifier);
     this->oscFunctionHash.insert(oscAddress, &DeviceDataInput::oscR_setTouch);
-    //    this->oscSensorIndexHash.insert(oscAddress,i);
+
     qInfo() << "function hash map" << oscHandleHash.keys();
 }
 
@@ -178,18 +116,10 @@ void DeviceDataInput::oscR_setAcceleration(DeviceDataInput* who, int sens_index,
 {
     QVector3D *accVector = &who->acceleration[sens_index];
     who->set3dVector(accVector, &args);
-//    ValueNotifierClass *notifier = &who->accelNotify[sens_index];
-//    emit notifier->vectorChanged(*accVector);
+
 
 emit who->accelNotify.at(sens_index)->vectorChanged(*accVector);
-//    emit who->accelNotify.at(sens_index)->vectorChanged;
 
-//    qInfo() << who->identifier << "acceleration" << sens_index << accVector->x() << accVector->y() << accVector->z();
-
-//    who->accelView.at(sens_index)->vectorUpdatet(); //TODO: can be deleted
-//    emit who->accelNotify.at(sens_index).vectorChanged(*accVector);
-
-//    emit who->accelerationChanged(sens_index, accVector); //TODO: can be deleted
 }
 
 void DeviceDataInput::oscR_setGyroscope(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
@@ -197,39 +127,26 @@ void DeviceDataInput::oscR_setGyroscope(DeviceDataInput* who, int sens_index, OS
     QVector3D *gyrVector = &who->gyroscope[sens_index];
     who->set3dVector(gyrVector, &args);
 //    qInfo() << who->identifier << "gyroscope" << sens_index << gyrVector->x() << gyrVector->y() << gyrVector->z();
-//    who->gyrosView.at(sens_index)->vectorUpdatet();
-//    ValueNotifierClass *notifier = &who->gyrosNotify[sens_index];
-//    emit notifier->vectorChanged(*gyrVector);
+
     emit who->gyrosNotify.at(sens_index)->vectorChanged(*gyrVector);
 
-//    emit who->accelerationChanged(sens_index, gyrVector);
 }
 
 void DeviceDataInput::oscR_setGravityVector(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
 {
     QVector3D *gravVector = &who->gravityVector[sens_index];
     who->set3dVector(gravVector, &args);
-//    qInfo() << who->identifier << "gravity" << sens_index << gravVector->x() << gravVector->y() << gravVector->z();
+
     gravVector->normalize();
 
-//    ValueNotifierClass *notifier = &who->gravityNotify[sens_index];
-//    emit notifier->vectorChanged(*gravVector);
     emit who->gravityNotify.at(sens_index)->vectorChanged(*gravVector);
 
-//    who->gravityView.at(sens_index)->vectorUpdatet();
-
-//    emit who->accelerationChanged(sens_index, gravVector);
 }
 
 void DeviceDataInput::oscR_setQuaternion(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
 {
     QQuaternion *quat = &who->quaternion[sens_index];
     who->setQuat(quat, &args);
-//    qInfo() << who->identifier << "quat" << sens_index << &quat << who->quaternionNotify.at(sens_index);
-//    who->quaternionView.at(sens_index)->vectorUpdatet();
-//    emit who->quaternionChanged(sens_index, quat);
-//    ValueNotifierClass *notifier = &who->quaternionNotify[sens_index];
-//    emit notifier->quatChanged(*quat);
     emit who->quaternionNotify.at(sens_index)->quatChanged(*quat);
 }
 
@@ -283,26 +200,6 @@ void DeviceDataInput::setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args)
         }
     }
 }
-
-
-//TODO: can be removed
-//bool DeviceDataInput::createSensorViewContainer(QQmlApplicationEngine *engine, QQuickItem *parentView)
-//{
-//    QUrl qmlpath = QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml"));
-//    QQmlComponent newSensorContainer(engine, qmlpath);
-//    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newSensorContainer.create());
-//    newDeviceItem->setObjectName(QString("%1-inputContainer").arg(identifier));
-//    newDeviceItem->setParentItem(parentView);
-//    QQuickItem *containerObject = newDeviceItem->findChild<QQuickItem*>("objectContainer");
-//    if(containerObject) {
-//        sensorViewContainer = containerObject;
-//        return true;
-//    }
-//    else {
-//        qWarning() << "could not locate view container for SensorInput";
-//        return false;
-//    }
-//}
 
 
 

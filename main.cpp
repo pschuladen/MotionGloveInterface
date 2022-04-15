@@ -8,7 +8,6 @@
 
 int main(int argc, char *argv[])
 {
-
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
@@ -21,15 +20,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());
     engine.load(url);
     main_backend::Instance()->setEngine(&engine);
-
-//    qmlRegisterType<VectorViewBackend>("MotionGloveInterface", 1, 0, "VectorViewBackend");
-//    qmlRegisterType<QuatViewBackend>("MotionGloveInterface", 1, 0, "QuatViewBackend");
-
-    DeviceStatusController *devStatusController = main_devicestatus::Instance();
-    devStatusController->setEngine(&engine); //can soon be removed
-//    DeviceStatusController deviceStatusController;
-//    deviceStatusController.setEngine(&engine);
-
+    main_devicestatus::Instance();
 
     return app.exec();
 }

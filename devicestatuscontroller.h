@@ -48,10 +48,6 @@ public slots:
 private:
     QUdpSocket *socket;
 
-    QQmlApplicationEngine *engine;
-    QQuickWindow *mainWindow;
-    QQuickItem *deviceStatusView;
-
     uint16_t m_port;
 
     void readIncomingUdpData();
@@ -60,8 +56,6 @@ private:
 
 //    QList<QString> discoveredDevices;
     QHash<QString, MotionDevice> discoveredDevices;
-
-    void createDeviceStatus(QString deviceName);
 
     void pingBackToDevice(QString deviceName);
 

@@ -28,12 +28,6 @@ public:
 
     QString identifier;
 
-
-//    QList<VectorViewBackend*> accelView;
-//    QList<VectorViewBackend*> gyrosView;
-//    QList<VectorViewBackend*> gravityView;
-//    QList<QuatViewBackend*> quaternionView;
-
     QList<ValueNotifierClass*> accelNotify;
     QList<ValueNotifierClass*> gyrosNotify;
     QList<ValueNotifierClass*> gravityNotify;
@@ -46,7 +40,6 @@ public:
 
     QList<int> touch;
 
-//    void createAllSensorInputViews(QQmlApplicationEngine *engine, QQuickItem *parentView);
     uint8_t m_nSensors;
 
 
@@ -97,9 +90,6 @@ private:
     void set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args);
     void setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args);
 
-//    QQuickItem *sensorViewContainer = nullptr;
-
-//    bool createSensorViewContainer(QQmlApplicationEngine* engine, QQuickItem* parentView);
 
 
 };
