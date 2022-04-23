@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.5
 //import VectorViewBackend
 import MotionGloveInterface
+//import VectorViewBackend
 
 
 Item {
@@ -11,6 +12,7 @@ Item {
 
     width: valueColumn.implicitWidth
     height: valueColumn.implicitHeight + 10
+    Component.onCompleted: console.log(width, "is the width")
 
 //    onXChanged: {
 //        if (x+width > parent.width) {//parentScrollview.contentWidth) {

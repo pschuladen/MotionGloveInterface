@@ -74,7 +74,7 @@ void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &mess
                     return;
                 }
                 newDevice.deviceName = pingersName;
-                newDevice.inputHandler = new DeviceDataInput(this, pingersName, 51002+discoveredDevices.size());
+                newDevice.inputHandler = new DeviceDataInput(this, pingersName, 51002+discoveredDevices.size(), 2, &newDevice);
 
                 newDevice.connectStatus = false;
                 discoveredDevices.insert(pingersName, newDevice);

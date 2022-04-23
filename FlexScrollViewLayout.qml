@@ -30,7 +30,7 @@ Item {
                         return
                     var obj = children[children.length-1]
                     obj.y = childrenRect.height
-                    console.log("muggauga")
+//                    console.log("muggauga")
                 }
                 width:  childrenRect.width + childrenRect.x + 10
                 height: childrenRect.height + childrenRect.y + 10

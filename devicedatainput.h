@@ -14,17 +14,16 @@
 #include "quatviewbackend.h"
 #include "valuenotifierclass.h"
 
-#include <QQmlApplicationEngine>
-#include <QQuickItem>
-#include <QQmlListProperty>
-#include <QQuickWindow>
-#include <QQmlContext>
+#include "valueviewbackend.h"
+//#include "MotionDeviceStruct.h"
+
+struct MotionDevice;
 
 class DeviceDataInput : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeviceDataInput(QObject *parent = nullptr, QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2);
+    explicit DeviceDataInput(QObject *parent = nullptr, QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2, MotionDevice* deviceDescription = nullptr);
 
     QString identifier;
 
@@ -32,16 +31,15 @@ public:
     QList<ValueNotifierClass*> gyrosNotify;
     QList<ValueNotifierClass*> gravityNotify;
     QList<ValueNotifierClass*> quaternionNotify;
+    ValueNotifierClass *touchNotifier;
 
     QList<QVector3D> acceleration;
     QList<QVector3D> gyroscope;
     QList<QVector3D> gravityVector;
     QList<QQuaternion> quaternion;
-
     QList<int> touch;
 
     uint8_t m_nSensors;
-
 
 signals:
     void accelerationChanged(int sensIndex, QVector3D* acceleration);
@@ -51,10 +49,13 @@ signals:
 
 
 private:
+
+    MotionDevice* deviceDescription;
+
     enum SenTyp {
         accel, gyro, grav, quat
     };
-    void createSensorInputView(QQmlApplicationEngine *engine, QQuickItem *parentView, SenTyp typ);
+//    void createSensorInputView(QQmlApplicationEngine *engine, QQuickItem *parentView, SenTyp typ);
 
     QUdpSocket *socket;
     uint16_t m_port;
@@ -66,10 +67,12 @@ private:
     struct OscInputStruct {
         OscHandleTypeFun handleFunction = &DeviceDataInput::oscR_unMapped;
         int sensorIndex = 0;
+        ValueViewBackend::ValueViewMode sensorType;
     };
+
     OscInputStruct unmappedOsc;
 
-    QHash<QString, void(*)(DeviceDataInput*, int, OSCPP::Server::ArgStream)> oscFunctionHash;
+//    QHash<QString, void(*)(DeviceDataInput*, int, OSCPP::Server::ArgStream)> oscFunctionHash;
     QHash<QString, int> oscSensorIndexHash;
     QHash<QString, OscInputStruct> oscHandleHash;
 
@@ -88,10 +91,37 @@ private:
     static void oscR_unMapped(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args);
 
     void set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args);
+//    QVector3D readOsc3dVector(OSCPP::Server::ArgStream *args);
     void setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args);
 
 
 
+};
+
+struct MotionDevice {
+    struct InputDef {
+        ValueViewBackend::ValueViewMode viewMode;
+        int sensorIndex;
+        InputDef(ValueViewBackend::ValueViewMode _viewMode, int _sensorIndex)
+        {
+            viewMode = _viewMode;
+            sensorIndex = _sensorIndex;
+        }
+    };
+
+    QString deviceName;
+    QString address;
+    uint16_t port;
+    uint16_t sendIntervall;
+    bool connectStatus;
+    DeviceDataInput *inputHandler;
+    QMap<QString, InputDef> inputs;
+
+//    void getInputs() {
+//        for(QString key in inputHandler->)
+//    };
+//    ValueViewBackend::ValueViewMode viewMode;
+//    uint16_t numSensors;
 };
 
 #endif // DEVICEDATAINPUT_H

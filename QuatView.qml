@@ -40,6 +40,11 @@ Item {
             fill: parent
             //        margins: 5
         }
+        Component.onCompleted: {
+            console.log(backen.vname[0], backen.vname[1],backen.vname[2], backen.vname[3])
+        }
+
+
 
         Item {
             anchors {
@@ -98,6 +103,5 @@ Item {
 
             }
         }
-
     }
 }

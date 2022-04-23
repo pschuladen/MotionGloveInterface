@@ -17,7 +17,7 @@ class ValueListModel : public QAbstractItemModel
 
 public:
     enum Roles {
-        NameRole,
+        NameRole = Qt::DisplayRole+1,
         ValueRole,
         MinValueRole,
         MaxValueRole

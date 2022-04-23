@@ -10,9 +10,11 @@ MainBackend::MainBackend(QObject *parent)
 
 void MainBackend::setEngine(QQmlApplicationEngine *engine)
 {
-    this->engine = engine;
-    this->mainWindow = qobject_cast<QQuickWindow*>(engine->rootObjects().at(0));
-    this->deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
+    engine = engine;
+    mainWindow = qobject_cast<QQuickWindow*>(engine->rootObjects().at(0));
+    deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
+    inputDevicesSidebarView = mainWindow->findChild<QQuickItem*>("inputDevicesView");
+
 }
 
 void MainBackend::createDeviceStatusView(MotionDevice *motionDevice)
@@ -55,6 +57,7 @@ void MainBackend::createSensorInputView(QQuickItem *parentView, SenTyp typ, Moti
 
     for(int i = 0; i < inputHandler->m_nSensors; i++) {
         QQmlComponent newSensorView(engine, qmlpath);//(QStringLiteral("qrc:/MotionGloveInterface/VectorView.qml")));
+
         QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newSensorView.create());
         VectorViewBackend *conBackend;// = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
         QuatViewBackend *quatBackend;
@@ -98,6 +101,31 @@ void MainBackend::createSensorInputView(QQuickItem *parentView, SenTyp typ, Moti
         newDeviceItem->setProperty("sensorName", sensName);
         newDeviceItem->setParentItem(parentView);
     }
+}
+
+void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
+{
+    QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
+
+    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDevice.create());
+    newDeviceItem->setProperty("identifier", motionDevice->deviceName);
+    newDeviceItem->setParentItem(inputDevicesSidebarView);
+    newDeviceItem->setObjectName(QString(motionDevice->deviceName+"-view"));
+    inputDevices.insert(motionDevice->deviceName, newDeviceItem);
+    connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), main_devicestatus::Instance(), SLOT(setConnectStatus(bool,QString)));
+}
+
+void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
+{
+    QQuickItem *parentForValueView = inputDevices.value(motionDevice->deviceName, new QQuickItem())->findChild<QQuickItem*>("sensorViewContainer");
+    if(!parentForValueView) {
+        qWarning() << "no suitable view for inputs found";
+        return;
+    }
+//    foreach(const QString &osc, motionDevice->inputs.keys()) {
+//        QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValueView.qml")));
+
+//    }
 }
 
 QQuickItem* MainBackend::createSensorViewContainer(MotionDevice * motionDevice)

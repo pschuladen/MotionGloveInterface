@@ -5,6 +5,8 @@ QuatViewBackend::QuatViewBackend(QObject *parent)
 {
     this->quatPointer = new QQuaternion(1, 0,0,0);
 
+    setVname(QList<QString>({"hallo", "mr", "einstein", "undso"}));
+
 }
 
 void QuatViewBackend::setQuatPointer(QQuaternion *newQuatPointer)
@@ -85,4 +87,17 @@ void QuatViewBackend::setzValue(float newZValue)
         return;
     m_zValue = newZValue;
     emit zValueChanged();
+}
+
+const QList<QString> &QuatViewBackend::vname() const
+{
+    return m_vname;
+}
+
+void QuatViewBackend::setVname(const QList<QString> &newVname)
+{
+    if (m_vname == newVname)
+        return;
+    m_vname = newVname;
+    emit vnameChanged();
 }

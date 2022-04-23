@@ -4,6 +4,7 @@ project(MotionGloveInterface VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON) #added from me
 
 find_package(Qt6 6.2 COMPONENTS Quick Qml REQUIRED)
 
@@ -22,6 +23,8 @@ qt_add_executable(appMotionGloveInterface
     mainbackend.h mainbackend.cpp
     MotionDeviceStruct.h
     valuenotifierclass.h valuenotifierclass.cpp
+    valueviewbackend.h valueviewbackend.cpp
+    genResources.qrc
 )
 
 qt_add_qml_module(appMotionGloveInterface
@@ -35,10 +38,11 @@ qt_add_qml_module(appMotionGloveInterface
                 QuatView.qml
                 SensorInputContainer.qml
                 FlexScrollViewLayout.qml
-
-#    SOURCES
-#        vectorviewbackend.cpp vectorviewbackend.h
+                CreateProcessNodeWindow.qml
+                SensorValuesView.qml
 )
+
+
 
 set_target_properties(appMotionGloveInterface PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

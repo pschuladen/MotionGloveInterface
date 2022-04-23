@@ -15,6 +15,8 @@
 #include "vectorviewbackend.h"
 #include "quatviewbackend.h"
 
+#include "valueviewbackend.h"
+
 class MainBackend : public QObject
 {
     Q_OBJECT
@@ -36,9 +38,11 @@ private:
     QQmlApplicationEngine *engine;
     QQuickWindow *mainWindow;
     QQuickItem *deviceStatusView;
+    QQuickItem *inputDevicesSidebarView;
 
 //    QQuickItem *sensorViewContainer = nullptr;
-    QHash<QString, QQuickItem*> sensorInputContainer;
+    QHash<QString, QQuickItem*> inputDevices; //store devices here
+    QHash<QString, QQuickItem*> sensorInputContainer; // can be deleted?
     QHash<QString, NodesData> inputNodes;
 
     void createDeviceStatusView(MotionDevice *motionDevice);
@@ -49,7 +53,12 @@ private:
     };
     void createSensorInputView(QQuickItem *parentView, SenTyp typ, MotionDevice *motionDevice);
 
+    void createMotionInputDeviceView(MotionDevice *motionDevice);
+    void createValueInputViewsForDevice(MotionDevice *motionDevice);
+
     QQuickItem *createSensorViewContainer(MotionDevice * motionDevice);
+
+
 signals:
 
 

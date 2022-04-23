@@ -12,10 +12,12 @@ class QuatViewBackend : public QObject
     Q_OBJECT
     QML_ELEMENT
 
+
     Q_PROPERTY(float xValue READ xValue NOTIFY xValueChanged)
     Q_PROPERTY(float yValue READ yValue NOTIFY yValueChanged)
     Q_PROPERTY(float zValue READ zValue NOTIFY zValueChanged)
     Q_PROPERTY(float wValue READ wValue NOTIFY wValueChanged)
+    Q_PROPERTY(QList<QString> vname READ vname WRITE setVname NOTIFY vnameChanged)
 //    QML_NAMED_ELEMENT(QuatViewBackend)
 
     float m_wValue;
@@ -28,6 +30,8 @@ class QuatViewBackend : public QObject
 
     QQuaternion *quatPointer;
     QQuaternion quat;
+
+    QList<QString> m_vname;
 
 public:
     explicit QuatViewBackend(QObject *parent = nullptr);
@@ -46,6 +50,9 @@ public:
 
     void setQuatPointer(QQuaternion *newQuatPointer);
 
+    const QList<QString> &vname() const;
+    void setVname(const QList<QString> &newVname);
+
 public slots:
     void vectorUpdatet();
     void quatChanged(QQuaternion newQuat);
@@ -58,6 +65,7 @@ signals:
     void yValueChanged();
     void zValueChanged();
 
+    void vnameChanged();
 };
 
 #endif // QUATVIEWBACKEND_H
