@@ -25,6 +25,7 @@ class MainBackend : public QObject
 
 public:
     explicit MainBackend(QObject *parent = nullptr);
+    typedef ValueViewBackend::ValueViewMode sensType ;
 
     void setEngine(QQmlApplicationEngine *engine);
 
@@ -35,7 +36,7 @@ private:
         QString oscPath; //TODO: implement
     };
 
-    QQmlApplicationEngine *engine;
+    QQmlApplicationEngine *m_engine;
     QQuickWindow *mainWindow;
     QQuickItem *deviceStatusView;
     QQuickItem *inputDevicesSidebarView;

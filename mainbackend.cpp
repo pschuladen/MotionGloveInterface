@@ -10,16 +10,15 @@ MainBackend::MainBackend(QObject *parent)
 
 void MainBackend::setEngine(QQmlApplicationEngine *engine)
 {
-    engine = engine;
+    this->m_engine = engine;
     mainWindow = qobject_cast<QQuickWindow*>(engine->rootObjects().at(0));
     deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
     inputDevicesSidebarView = mainWindow->findChild<QQuickItem*>("inputDevicesView");
-
 }
 
 void MainBackend::createDeviceStatusView(MotionDevice *motionDevice)
 {
-    QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/DeviceStatusView.qml")));
+    QQmlComponent newDevice(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/DeviceStatusView.qml")));
 
     QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDevice.create());
     newDeviceItem->setProperty("deviceName", motionDevice->deviceName);
@@ -56,7 +55,7 @@ void MainBackend::createSensorInputView(QQuickItem *parentView, SenTyp typ, Moti
     else if (typ == quat) {qmlpath = QUrl(QStringLiteral("qrc:/MotionGloveInterface/QuatView.qml"));}
 
     for(int i = 0; i < inputHandler->m_nSensors; i++) {
-        QQmlComponent newSensorView(engine, qmlpath);//(QStringLiteral("qrc:/MotionGloveInterface/VectorView.qml")));
+        QQmlComponent newSensorView(m_engine, qmlpath);//(QStringLiteral("qrc:/MotionGloveInterface/VectorView.qml")));
 
         QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newSensorView.create());
         VectorViewBackend *conBackend;// = newDeviceItem->findChild<VectorViewBackend*>("vectBackend");
@@ -105,12 +104,15 @@ void MainBackend::createSensorInputView(QQuickItem *parentView, SenTyp typ, Moti
 
 void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
 {
-    QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
 
-    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDevice.create());
+
+    QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
+    qInfo() << newDeviceComponent.errors();
+    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDeviceComponent.create());
     newDeviceItem->setProperty("identifier", motionDevice->deviceName);
-    newDeviceItem->setParentItem(inputDevicesSidebarView);
     newDeviceItem->setObjectName(QString(motionDevice->deviceName+"-view"));
+    newDeviceItem->setParentItem(inputDevicesSidebarView);
+    qInfo() << "new Device in engine" << m_engine->objectName();
     inputDevices.insert(motionDevice->deviceName, newDeviceItem);
     connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), main_devicestatus::Instance(), SLOT(setConnectStatus(bool,QString)));
 }
@@ -122,17 +124,39 @@ void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
         qWarning() << "no suitable view for inputs found";
         return;
     }
-//    foreach(const QString &osc, motionDevice->inputs.keys()) {
-//        QQmlComponent newDevice(engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValueView.qml")));
+    QQmlComponent newInput(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValuesView.qml")));
+    foreach(const QString &osc, motionDevice->getSortedInputKeys(false)) {//inputs->keys()) { //
+        QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", motionDevice->inputs->value(osc).sensorType},
+                                                                                                   {"identifier", osc}}));
+        newValDevice->setParentItem(parentForValueView);
+        ValueViewBackend *viewBackend = newValDevice->findChild<ValueViewBackend*>("valuebackend");
+        if (!viewBackend) {
+            qWarning() << "no backend found";
+            return;
+        }
+        sensType sTyp = motionDevice->inputs->value(osc).sensorType;
+        int senIdx = motionDevice->inputs->value(osc).sensorIndex;
 
-//    }
+        if(sTyp == sensType::Accel || sTyp == sensType::Gyro || sTyp==sensType::Grav) {
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::vectorChanged, viewBackend, &ValueViewBackend::vectorChanged);
+        }
+        else if(sTyp == sensType::Quat) {
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::quatChanged, viewBackend, &ValueViewBackend::quatChanged);
+        }
+        else if(sTyp == sensType::Touch) {
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::touchChanged, viewBackend, &ValueViewBackend::touchChanged);
+        }
+        else {
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &ValueViewBackend::valuesChanged);
+        }
+    }
 }
 
 QQuickItem* MainBackend::createSensorViewContainer(MotionDevice * motionDevice)
 {
     QQuickItem *parentView = mainWindow->findChild<QQuickItem*>("sensorInputView");
     QUrl qmlpath = QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml"));
-    QQmlComponent newSensorContainer(engine, qmlpath);
+    QQmlComponent newSensorContainer(m_engine, qmlpath);
     QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newSensorContainer.create());
     newDeviceItem->setObjectName(QString("%1-inputContainer").arg(motionDevice->deviceName));
     newDeviceItem->setParentItem(parentView);
@@ -151,6 +175,9 @@ QQuickItem* MainBackend::createSensorViewContainer(MotionDevice * motionDevice)
 
 void MainBackend::createNewInputViews(MotionDevice *motionDevice)
 {
-    createDeviceStatusView(motionDevice);
-    createSensorInputViews(motionDevice);
+    qInfo() << "begin creating views";
+    createMotionInputDeviceView(motionDevice);
+    createValueInputViewsForDevice(motionDevice);
+//    createDeviceStatusView(motionDevice);
+//    createSensorInputViews(motionDevice);
 }

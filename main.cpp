@@ -14,6 +14,7 @@
 
 int main(int argc, char *argv[])
 {
+//    qputenv("QT_FATAL_WARNINGS","1");
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
@@ -25,13 +26,12 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());
     engine.load(url);
+    engine.setObjectName("MAIN_QML_ENGINE");
+
     main_backend::Instance()->setEngine(&engine);
     main_devicestatus::Instance();
 
-//    QQmlComponent testValView(&engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValuesView.qml")));
-////    ValueViewBackend backend;// = new ValueViewBackend();
-////    backend.setViewmode(ValueViewBackend::ValueViewMode::Quat);
-////    QQuickItem *newValDevice = qobject_cast<QQuickItem*>(testValView.createWithInitialProperties({{"backend", *backend}}));
+//    QQmlComponent testValView(&engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
 
 //    QQuickItem *newValDevice = qobject_cast<QQuickItem*>(testValView.createWithInitialProperties({{"viewmode", ValueViewBackend::ValueViewMode::Quat},
 //                                                                                                  {"identifier", "testNodeXY"}}));

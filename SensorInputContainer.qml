@@ -7,6 +7,7 @@ Item {
     id: root
     property string identifier: "setthisvalue"
     signal connectButtonChanged(connect: bool, deviceN: string);
+//    signal connectButtonChanged(connect: bool, deviceN: string);
 
     width:  childrenRect.width+childrenRect.x
     height: childrenRect.height+childrenRect.y + 10
@@ -139,12 +140,12 @@ Item {
 //                showHideSensorAnimation.start()
 //            }
 
-            Repeater {
-                model: 12
-                delegate: SensorValuesView {
-                    viewmode: ValueViewBackend.Grav
-                }
-            }
+//            Repeater {
+//                model: 12
+//                delegate: SensorValuesView {
+//                    viewmode: ValueViewBackend.Grav
+//                }
+//            }
         }
 
         SequentialAnimation {

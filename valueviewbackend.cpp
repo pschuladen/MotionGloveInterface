@@ -54,7 +54,7 @@ void ValueViewBackend::setViewmode(ValueViewMode newViewmode)
     }
     setValueCount(m_values.size());
 
-    qInfo() << "new viewmode" << newViewmode;
+//    qInfo() << "new viewmode" << newViewmode;
     emit viewmodeChanged();
 }
 
@@ -106,6 +106,7 @@ void ValueViewBackend::setNodeIdentifier(const QString &newNodeIdentifier)
 
 void ValueViewBackend::vectorChanged(QVector3D vec)
 {
+//    qInfo() << "vector changed" << vec;
     m_values[0] = vec.x();
     m_values[1] = vec.y();
     m_values[2] = vec.z();

@@ -63,6 +63,8 @@ public slots:
     void touchChanged(QList<float> touch);
     void newValues(QList<float> newValues);
 
+//    void sensorViewsHidden(bool hidden);
+
 private:
 
     void checkAndEmitValuesChanged();
