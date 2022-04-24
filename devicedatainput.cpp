@@ -1,8 +1,5 @@
 #include "devicedatainput.h"
 
-
-//#include <QFile>
-//#include <QThread>
 DeviceDataInput::DeviceDataInput(QObject *parent, QString identifier, uint16_t port, uint8_t nSensors, MotionDevice* deviceDescription)
     : QObject{parent}
 {
@@ -17,6 +14,8 @@ DeviceDataInput::DeviceDataInput(QObject *parent, QString identifier, uint16_t p
 
     socket = new QUdpSocket(this);
 
+    //TODO: bind on other port if no success
+    //TODO: tell devicestatuscontroller the port
     bool bindSuccess = socket->bind(QHostAddress::Any, m_port);
 
     if(bindSuccess) {
@@ -39,7 +38,6 @@ void DeviceDataInput::readIncomingUdpData()
 
 //    qInfo() <<"udp read" <<buffer;
     handleOscPacket(OSCPP::Server::Packet(buffer.data(), buffer.size()));
-
 }
 
 void DeviceDataInput::handleOscPacket(const OSCPP::Server::Packet &packet)
@@ -61,11 +59,8 @@ void DeviceDataInput::handleOscPacket(const OSCPP::Server::Packet &packet)
 void DeviceDataInput::handleOscMessage(const OSCPP::Server::Message &message)
 {
 //    qInfo() << "handling osc message" << message.address();
-    //    auto hashedFunction = this->oscFunctionHash.value(message.address(), &DeviceDataInput::oscR_unMapped);
-    //    int sensorIndex = this->oscSensorIndexHash.value(message.address(), 0);
-    const OscInputStruct &oscInput = oscHandleHash.value(message.address(), unmappedOsc);
 
-    //    hashedFunction(this, sensorIndex, OSCPP::Server::ArgStream(message.args()));
+    const OscInputStruct &oscInput = oscHandleHash.value(message.address(), unmappedOsc);
     oscInput.handleFunction(this, oscInput.sensorIndex, OSCPP::Server::ArgStream(message.args()));
 }
 
@@ -76,64 +71,43 @@ void DeviceDataInput::setupOscInputBindings()
     gravityVector.resize(m_nSensors);
     quaternion.resize(m_nSensors);
 
-    accelNotify.resize(m_nSensors);
-    gyrosNotify.resize(m_nSensors);
-    gravityNotify.resize(m_nSensors);
-    quaternionNotify.resize(m_nSensors);
-
     QString oscAddress;
     OscInputStruct oscHandle;
     ValueViewBackend::ValueViewMode type;
     for(int i = 0; i < m_nSensors; i++) {
         oscHandle.sensorIndex = i;
 
-//        type = ValueViewBackend::Accel;
         oscAddress = QString("/%1/acc/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setAcceleration;
         oscHandle.sensorType = ValueViewBackend::Accel;
         oscHandleHash.insert(oscAddress, oscHandle);
-//        accelNotify[i] = new ValueNotifierClass(this);
-//        deviceDescription->inputs.insert(oscAddress, ValueViewBackend::Accel);
-//        deviceDescription->inputs.insert(oscAddress, MotionDevice::InputDef(type, i));
-
 
         oscAddress = QString("/%1/gravity/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGravityVector;
         oscHandle.sensorType = ValueViewBackend::Grav;
         oscHandleHash.insert(oscAddress, oscHandle);
-//        gravityNotify[i] = new ValueNotifierClass(this);
-//        deviceDescription->inputs.insert(oscAddress, MotionDevice::InputDef(ValueViewBackend::Grav, i));
-
 
         oscAddress = QString("/%1/gyr/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGyroscope;
         oscHandle.sensorType = ValueViewBackend::Gyro;
         oscHandleHash.insert(oscAddress, oscHandle);
-//        gyrosNotify[i] = new ValueNotifierClass(this);
-//        deviceDescription->inputs.insert(oscAddress, MotionDevice::InputDef(ValueViewBackend::Gyro, i));
-
 
         oscAddress = QString("/%1/quat/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setQuaternion;
         oscHandle.sensorType = ValueViewBackend::Quat;
         oscHandleHash.insert(oscAddress, oscHandle);
-//        quaternionNotify[i] = new ValueNotifierClass(this);
-//        deviceDescription->inputs.insert(oscAddress, MotionDevice::InputDef(ValueViewBackend::Quat, i));
     }
 
     oscAddress = QString("/%1/touch").arg(this->m_identifier);
     oscHandle.handleFunction = &DeviceDataInput::oscR_setTouch;
     oscHandle.sensorType = ValueViewBackend::Touch;
     oscHandleHash.insert(oscAddress, oscHandle);
-//    touchNotifier = new ValueNotifierClass(this);
-//    deviceDescription->inputs.insert(oscAddress, MotionDevice::InputDef(ValueViewBackend::Touch, 0));
 
-    qInfo() << "function hash map" << oscHandleHash.keys();
+//    qInfo() << "function hash map" << oscHandleHash.keys();
 }
 
 void DeviceDataInput::createNotifier()
 {
-//    valueNotifier.resize(ValueViewBackend::ValueViewMode.size())
     foreach(const SensType &t, allSensTypes) {
         QList<ValueNotifierClass*> notifyList;
         notifyList.resize(m_nSensors);
@@ -143,7 +117,7 @@ void DeviceDataInput::createNotifier()
         OscInputStruct oscStruct = oscHandleHash.value(osc);
         valueNotifier[oscStruct.sensorType][oscStruct.sensorIndex] = new ValueNotifierClass(this);
     }
-    qInfo() << "valuenotifier" << valueNotifier.keys() << valueNotifier.value(allSensTypes[1]);
+//    qInfo() << "valuenotifier" << valueNotifier.keys() << valueNotifier.value(allSensTypes[1]);
 }
 
 void DeviceDataInput::oscR_setAcceleration(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
@@ -175,6 +149,7 @@ void DeviceDataInput::oscR_setQuaternion(DeviceDataInput* who, int sens_index, O
 
 void DeviceDataInput::oscR_setTouch(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
 {
+    //TODO: implement touch
 
 }
 
@@ -182,6 +157,7 @@ void DeviceDataInput::oscR_unMapped(DeviceDataInput *who, int sens_index, OSCPP:
 {
 //    qInfo() << "osc unmapped";
     //dummy function as default value for oscFunctionHashMap... does nothing, but prevents crash for unknow osc
+    //could be used for automatically create inputs
 }
 
 void DeviceDataInput::set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args)
@@ -202,8 +178,6 @@ void DeviceDataInput::set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *a
         }
     }
 }
-
-
 
 void DeviceDataInput::setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args)
 {

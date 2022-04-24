@@ -21,7 +21,6 @@ class ValueViewBackend : public QObject
 
     Q_PROPERTY(bool emitvalues READ emitvalues WRITE setEmitvalues NOTIFY emitvaluesChanged)
 
-
 public:
     explicit ValueViewBackend(QObject *parent = nullptr);
 
@@ -34,8 +33,6 @@ public:
     void setViewmode(ValueViewMode newViewmode);
 
     int valueCount() const;
-
-
 
     const QList<float> &values() const;
     void setValues(const QList<float> &newValues);
@@ -62,8 +59,6 @@ public slots:
     void quatChanged(QQuaternion newQuat);
     void touchChanged(QList<float> touch);
     void newValues(QList<float> newValues);
-
-//    void sensorViewsHidden(bool hidden);
 
 private:
 

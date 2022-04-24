@@ -34,7 +34,7 @@ void DeviceStatusController::readIncomingUdpData()
 
     socket->readDatagram(buffer.data(),buffer.size(), &sender, &senderPort);
 
-    qInfo() <<"udp read" <<buffer;
+//    qInfo() <<"udp read" <<buffer;
     handleOscPacket(OSCPP::Server::Packet(buffer.data(), buffer.size()));
 
     //    handlePacket(OSCPP::Server::Packet(buffer.data(), buffer.size()));
@@ -48,7 +48,7 @@ void DeviceStatusController::handleOscPacket(const OSCPP::Server::Packet &packet
 
 void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &message)
 {
-    qInfo() << "handling osc message";
+//    qInfo() << "handling osc message";
     if(message == "/glove/ping") {
         OSCPP::Server::ArgStream oscArgs(message.args());
         if(oscArgs.tag() == 's') {
@@ -80,12 +80,10 @@ void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &mess
                 discoveredDevices.insert(pingersName, newDevice);
                 qInfo() << "received ping from new device" << pingersName;
 
-
                 emit receivedNewDevice(&newDevice);//pingersName, newDevice.inputHandler);
             }
             else {
                 if(discoveredDevices[pingersName].connectStatus) {
-
                     pingBackToDevice(pingersName);
                 }
                 //send ping back if true in hash

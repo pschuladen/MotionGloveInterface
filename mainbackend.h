@@ -21,8 +21,6 @@ class MainBackend : public QObject
 {
     Q_OBJECT
 
-
-
 public:
     explicit MainBackend(QObject *parent = nullptr);
     typedef ValueViewBackend::ValueViewMode sensType ;
@@ -41,31 +39,19 @@ private:
     QQuickItem *deviceStatusView;
     QQuickItem *inputDevicesSidebarView;
 
-//    QQuickItem *sensorViewContainer = nullptr;
     QHash<QString, QQuickItem*> inputDevices; //store devices here
-    QHash<QString, QQuickItem*> sensorInputContainer; // can be deleted?
-    QHash<QString, NodesData> inputNodes;
 
-    void createDeviceStatusView(MotionDevice *motionDevice);
-    void createSensorInputViews(MotionDevice *motionDevice);
+    QHash<QString, NodesData> inputNodes; //TODO: implement?
 
-    enum SenTyp {
-        accel, gyro, grav, quat, touch
-    };
-    void createSensorInputView(QQuickItem *parentView, SenTyp typ, MotionDevice *motionDevice);
 
     void createMotionInputDeviceView(MotionDevice *motionDevice);
     void createValueInputViewsForDevice(MotionDevice *motionDevice);
-
-    QQuickItem *createSensorViewContainer(MotionDevice * motionDevice);
-
 
 signals:
 
 
 public slots:
-    void createNewInputViews(MotionDevice *motionDevice);//QString deviceName, DeviceDataInput *inputHandler);
-
+    void createNewInputViews(MotionDevice *motionDevice);
 };
 
 //global variable

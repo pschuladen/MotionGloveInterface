@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-
+//TODO: delete?
 
 class DeviceData : public QObject
 {

@@ -28,19 +28,9 @@ public:
 
     void setEngine(QQmlApplicationEngine *engine);
 
-//    struct MotionDevice {
-//        QString deviceName;
-//        QString address;
-//        uint16_t port;
-//        uint16_t sendIntervall;
-//        bool connectStatus;
-//        DeviceDataInput *inputHandler;
-//    };
-
-
 signals:
     void receivedPing();
-    void receivedNewDevice(MotionDevice *motionDevice);//QString deviceName, DeviceDataInput *inputHandler);
+    void receivedNewDevice(MotionDevice *motionDevice);
 
 public slots:
     void setConnectStatus(bool connect, QString device);
@@ -54,7 +44,6 @@ private:
     void handleOscPacket(const OSCPP::Server::Packet &packet);
     void handleOscMessage(const OSCPP::Server::Message &message);
 
-//    QList<QString> discoveredDevices;
     QHash<QString, MotionDevice> discoveredDevices;
 
     void pingBackToDevice(QString deviceName);

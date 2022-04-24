@@ -15,7 +15,6 @@
 #include "valuenotifierclass.h"
 
 #include "valueviewbackend.h"
-//#include "MotionDeviceStruct.h"
 
 struct MotionDevice;
 
@@ -25,25 +24,20 @@ class DeviceDataInput : public QObject
 public:
     explicit DeviceDataInput(QObject *parent = nullptr, QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2, MotionDevice* deviceDescription = nullptr);
 
-    typedef ValueViewBackend::ValueViewMode SensType ;
     QString m_identifier;
-    QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::Quat, SensType::Touch};
+    uint8_t m_nSensors;
+
+    typedef ValueViewBackend::ValueViewMode SensType ;
+
+    const QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::Quat, SensType::Touch};
 
     QMap<SensType, QList<ValueNotifierClass*>> valueNotifier;
-
-    QList<ValueNotifierClass*> accelNotify;
-    QList<ValueNotifierClass*> gyrosNotify;
-    QList<ValueNotifierClass*> gravityNotify;
-    QList<ValueNotifierClass*> quaternionNotify;
-    ValueNotifierClass *touchNotifier;
 
     QList<QVector3D> acceleration;
     QList<QVector3D> gyroscope;
     QList<QVector3D> gravityVector;
     QList<QQuaternion> quaternion;
     QList<int> touch;
-
-    uint8_t m_nSensors;
 
     typedef void (*OscHandleTypeFun)(DeviceDataInput*, int, OSCPP::Server::ArgStream);
     struct OscInputStruct {
@@ -53,11 +47,6 @@ public:
     };
 
 signals:
-    void accelerationChanged(int sensIndex, QVector3D* acceleration);
-    void gyroscopeChanged(int sensIndex,QVector3D* gyroscope);
-    void gravityVectorChanged(int sensIndex,QVector3D* gravityVector);
-    void quaternionChanged(int sensIndex,QQuaternion* quaternion);
-
 
 private:
 
@@ -66,19 +55,12 @@ private:
     enum SenTyp {
         accel, gyro, grav, quat
     };
-    //    void createSensorInputView(QQmlApplicationEngine *engine, QQuickItem *parentView, SenTyp typ);
 
     QUdpSocket *socket;
     uint16_t m_port;
 
-    //    typedef QHash<QString, QVariant> ;
-
-    //    QHash<QString, void(*)(int)> oscFunctionHash;
-
     OscInputStruct unmappedOsc;
 
-    //    QHash<QString, void(*)(DeviceDataInput*, int, OSCPP::Server::ArgStream)> oscFunctionHash;
-    QHash<QString, int> oscSensorIndexHash;
     QHash<QString, OscInputStruct> oscHandleHash;
 
     void readIncomingUdpData();
@@ -88,6 +70,7 @@ private:
     void setupOscInputBindings();
     void createNotifier();
 
+    //OSC Callback functions
     static void oscR_setAcceleration(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args);
     static void oscR_setGyroscope(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args);
     static void oscR_setGravityVector(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args);
@@ -99,9 +82,6 @@ private:
     void set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args);
     //    QVector3D readOsc3dVector(OSCPP::Server::ArgStream *args);
     void setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args);
-
-
-
 };
 
 struct MotionDevice {
@@ -124,9 +104,11 @@ struct MotionDevice {
     DeviceDataInput *inputHandler;
     QHash<QString, DeviceDataInput::OscInputStruct> *inputs;
 
-    QList<QString> getSortedInputKeys(bool sortByType=true, QList<SensType> sortOrder={SensType::Quat, SensType::Accel, SensType::Grav, SensType::Gyro, SensType::Touch, SensType::Custom}) {
-        QMap<SensType, QList<QString>> sortMap;
+    QList<QString> getSortedInputKeys(bool sortByType=true,
+                                      QList<SensType> sortOrder={SensType::Quat, SensType::Accel, SensType::Grav, SensType::Gyro, SensType::Touch, SensType::Custom})
+    {
         QList<QString> sortedKeys;
+        QMap<SensType, QList<QString>> sortMap;
         foreach(const SensType &_typ, sortOrder) {
             QList<QString> sortedTypeKeys;
             sortedTypeKeys.resize(inputHandler->m_nSensors);
