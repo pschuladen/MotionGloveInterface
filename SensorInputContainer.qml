@@ -47,6 +47,7 @@ Item {
                 left: header.left
                 leftMargin: 7
             }
+            font.bold: true
         }
         Button {
             id: connectDeviceButton

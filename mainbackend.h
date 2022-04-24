@@ -10,10 +10,7 @@
 
 #include "devicestatuscontroller.h"
 #include "devicedatainput.h"
-#include "MotionDeviceStruct.h"
 #include "valuenotifierclass.h"
-#include "vectorviewbackend.h"
-#include "quatviewbackend.h"
 
 #include "valueviewbackend.h"
 

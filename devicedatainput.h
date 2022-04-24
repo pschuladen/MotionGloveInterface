@@ -10,10 +10,8 @@
 
 #include "oscpp/client.hpp"
 #include "oscpp/server.hpp"
-#include "vectorviewbackend.h"
-#include "quatviewbackend.h"
-#include "valuenotifierclass.h"
 
+#include "valuenotifierclass.h"
 #include "valueviewbackend.h"
 
 struct MotionDevice;
@@ -86,15 +84,6 @@ private:
 
 struct MotionDevice {
     typedef ValueViewBackend::ValueViewMode SensType ;
-    struct InputDef {
-        ValueViewBackend::ValueViewMode viewMode;
-        int sensorIndex;
-        InputDef(ValueViewBackend::ValueViewMode _viewMode, int _sensorIndex)
-        {
-            viewMode = _viewMode;
-            sensorIndex = _sensorIndex;
-        }
-    };
 
     QString deviceName;
     QString address;

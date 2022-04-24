@@ -2,7 +2,11 @@
 #define VALUELISTMODEL_H
 
 #include <QAbstractItemModel>
-
+/*
+ *Possible alternative implementation for valueviewbackend
+ *NOT IMPLEMENTED YET!
+ *
+*/
 struct DataComponent {
     DataComponent(const QString &name) : cName(name) {}
     float cVal;

@@ -10,21 +10,13 @@ find_package(Qt6 6.2 COMPONENTS Quick Qml REQUIRED)
 
 qt_add_executable(appMotionGloveInterface
     main.cpp
-    devicestatuscontroller.h
-    devicestatuscontroller.cpp
-    devicedatainput.h
-    devicedatainput.cpp
-    devicedata.h
-    devicedata.cpp
-    vectorviewbackend.h vectorviewbackend.cpp
+    devicestatuscontroller.h devicestatuscontroller.cpp
+    devicedatainput.h devicedatainput.cpp
     valuelistmodel.h valuelistmodel.cpp
-    quatviewbackend.h quatviewbackend.cpp
     Singleton.h
     mainbackend.h mainbackend.cpp
-    MotionDeviceStruct.h
     valuenotifierclass.h valuenotifierclass.cpp
     valueviewbackend.h valueviewbackend.cpp
-    genResources.qrc
 )
 
 qt_add_qml_module(appMotionGloveInterface
@@ -32,10 +24,7 @@ qt_add_qml_module(appMotionGloveInterface
     VERSION 1.0
     QML_FILES #${application_qml_files}
     main.qml
-                DeviceStatusView.qml
-                VectorView.qml
                 ValueWithSliderView.qml
-                QuatView.qml
                 SensorInputContainer.qml
                 FlexScrollViewLayout.qml
                 CreateProcessNodeWindow.qml

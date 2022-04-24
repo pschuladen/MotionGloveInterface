@@ -1,16 +1,16 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "devicestatuscontroller.h"
-#include "vectorviewbackend.h"
-#include "quatviewbackend.h"
+
 #include <QQmlContext>
-
-#include <QQmlComponent>
-#include <QQuickItem>
-#include "valueviewbackend.h"
-#include <QQuickWindow>
-
 #include "mainbackend.h"
+
+//for test purposes
+//#include <QQmlComponent>
+//#include <QQuickItem>
+//#include "valueviewbackend.h"
+//#include <QQuickWindow>
+
 
 int main(int argc, char *argv[])
 {

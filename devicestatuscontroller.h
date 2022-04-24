@@ -14,7 +14,6 @@
 #include "devicedatainput.h"
 #include "Singleton.h"
 #include "mainbackend.h"
-#include "MotionDeviceStruct.h"
 
 //struct MotionDevice;
 
