@@ -1,6 +1,11 @@
 #ifndef VALUENOTIFIERCLASS_H
 #define VALUENOTIFIERCLASS_H
 
+/*
+ * minimalistic class just for sending signals.
+ * Was created for handling value updates for lists of values to differen receivers.
+*/
+
 #include <QObject>
 #include <QQuaternion>
 #include <QVector3D>

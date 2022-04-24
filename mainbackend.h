@@ -1,6 +1,17 @@
 #ifndef MAINBACKEND_H
 #define MAINBACKEND_H
 
+/*
+ * This class is a Singleton.
+ * always call it through main_backend::Instance()
+ *
+ * It is responsible for creating views and managing connection
+ * between UI and DataBackend.
+ * It keeps track for all created views and corresponding data-objects.
+ * Therefore it also initialises node-connection requests.
+ *
+*/
+
 #include <QObject>
 #include "Singleton.h"
 
@@ -37,9 +48,7 @@ private:
     QQuickItem *inputDevicesSidebarView;
 
     QHash<QString, QQuickItem*> inputDevices; //store devices here
-
     QHash<QString, NodesData> inputNodes; //TODO: implement?
-
 
     void createMotionInputDeviceView(MotionDevice *motionDevice);
     void createValueInputViewsForDevice(MotionDevice *motionDevice);

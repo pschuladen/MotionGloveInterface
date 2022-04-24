@@ -1,6 +1,14 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
+/*
+ * Prototype definition of singleon.
+ * Classes can use this by adding
+ * typedef Singleton<Classname> name_to_call ;
+ * behind the header. The singleton can then be called/created by using
+ * name_to_call::Instance();
+*/
+
 #include <assert.h>
 
 template <class T>

@@ -17,6 +17,7 @@ qt_add_executable(appMotionGloveInterface
     mainbackend.h mainbackend.cpp
     valuenotifierclass.h valuenotifierclass.cpp
     valueviewbackend.h valueviewbackend.cpp
+    dataprocessingnode.h dataprocessingnode.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface

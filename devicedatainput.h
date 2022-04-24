@@ -1,6 +1,18 @@
 #ifndef DEVICEDATAINPUT_H
 #define DEVICEDATAINPUT_H
 
+/*
+ * This class opens a udp-port and accepts osc-sensor messages.
+ * Currently it is especially designed for the gloves of Paul Schuladen
+ * and accepts Quaternion, Acceleration, Gyroscope, GravityVector and Touch.
+ *
+ * The incoming osc-messages were sorted with a hashmap (QHash<QString, OscInputStruct> oscHandleHash)
+ * and the data stored in the corresponding QLists.
+ *
+ * Views and Nodes are notified through signals emitted from the ValueNotifierClass.
+ *
+*/
+
 #include <QObject>
 #include <QVector3D>
 #include <QQuaternion>
@@ -81,6 +93,12 @@ private:
     //    QVector3D readOsc3dVector(OSCPP::Server::ArgStream *args);
     void setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args);
 };
+
+/*
+ * The struct MotionDevce serves as description for inputdevices.
+ * The DeviceStatusController holds a list of MotionDevice Objects
+ * for management.
+*/
 
 struct MotionDevice {
     typedef ValueViewBackend::ValueViewMode SensType ;

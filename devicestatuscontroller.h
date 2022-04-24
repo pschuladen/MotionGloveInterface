@@ -1,6 +1,20 @@
 #ifndef DEVICESTATUSCONTROLLER_H
 #define DEVICESTATUSCONTROLLER_H
 
+/*
+ * Devicestatus controller is a singleton.
+ * always call this object through main_devicestatus::Instance()
+ *
+ * It opens udp-port 55600
+ * glove-Devices can register themselves with
+ * < /glove/ping name 127.0.0.1 55102 50 >
+ * < /glove/ping [deviceName] [deviceAddress] [portDevicesListens] [optional:sensorSendRate] >
+ *
+ * For new Devices the DeviceStatusController create a new DeviceDataInput object, intialises
+ * the creation of views and can answer to /glove/ping -messages with a /pong message if
+ * the connection is set to true (by the UI).
+*/
+
 #include <QObject>
 #include <QUdpSocket>
 #include <QQmlApplicationEngine>
@@ -46,10 +60,9 @@ private:
     QHash<QString, MotionDevice> discoveredDevices;
 
     void pingBackToDevice(QString deviceName);
-
-
 };
 
+//Singleton definition always call this object through main_devicestatus::Instance();
 typedef Singleton<DeviceStatusController> main_devicestatus ;
 
 #endif // DEVICESTATUSCONTROLLER_H

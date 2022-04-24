@@ -6,7 +6,7 @@ Item {
 
     property real cVal: 0.23
     property string vName: "vv"
-    property color cColor: "black"
+    property color cColor: "red"
     property real vMax: 1
     property real vMin: -1
     property string parentIdentifier: "default"
@@ -62,6 +62,10 @@ Item {
                     console.log("released", root.vName)
                 }
 //                drag.hotSpot: 2
+            }
+            border {
+                width: 1
+                color: "black"
             }
 //            DropArea {
 //                onDropped: console.log("Dropped")

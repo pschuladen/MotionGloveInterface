@@ -13,7 +13,7 @@ Item {
     property alias identifier: backend.nodeIdentifier
     property alias backendObject: backend
     //    required property ValueViewBackend backend
-    property bool globalBool_valuesHidden: parent ? parent.globalBoolValuesHidden : false
+    property bool globalBool_valuesHidden: parent ? parent.valuesHiddenBool : false
     property bool viewCollapsed: true
 //    onGlobalShowSensorChanged: console.log("global sensor show changed", globalShowSensor)
 
@@ -80,6 +80,10 @@ Item {
             anchors {
                 verticalCenter: titleLable.verticalCenter
                 horizontalCenter: contentRect.right
+            }
+            border {
+                width: 1
+                color: "black"
             }
         }
 

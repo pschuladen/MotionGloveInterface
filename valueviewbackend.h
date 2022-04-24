@@ -1,6 +1,15 @@
 #ifndef VALUEVIEWBACKEND_H
 #define VALUEVIEWBACKEND_H
 
+/*
+ * Backend for ValueView. It acts similar to a DataModel.
+ * The class can be used in qml and be used for valueUpdates
+ * The number of values is flexible. When used in qml it should be
+ * created with createWithInitialProperties({{"viewmode", ValueViewBackend::ValueViewMode}})
+ * when used with Vectors, Quaternions or Touch.
+ * For a more general version use ValueViewMode::Custom
+*/
+
 #include <QObject>
 #include <QQuaternion>
 #include <QVector3D>
