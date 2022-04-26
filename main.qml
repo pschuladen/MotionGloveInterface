@@ -25,13 +25,27 @@ Window {
 
         Rectangle {
             id: processingGraph
-            color: "#FFA8A8A8"
+            property color bgColor: "#FFA8A8A8"
+            color: dropa.containsDrag ? bgColor.lighter(1.4) :  bgColor
 
             anchors {
                 top: processingNodes.bottom
                 left: inputNodes.right
                 right: outputNodes.left
                 bottom: mainItem.bottom
+            }
+            DropArea {
+                id: dropa
+                anchors.fill: parent
+
+                keys: ["text/plain","text/proceName"]
+
+                onDropped:{
+
+                    dropa.acceptDrop()
+                    console.log("bla", drag.keys)
+                }
+
             }
         }
 
@@ -134,6 +148,9 @@ Window {
                 width: 1
                 color: "black"
             }
+        }
+        ProcessingNodeBase {
+
         }
     }
 }

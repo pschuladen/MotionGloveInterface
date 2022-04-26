@@ -30,6 +30,8 @@ qt_add_qml_module(appMotionGloveInterface
                 FlexScrollViewLayout.qml
                 CreateProcessNodeWindow.qml
                 SensorValuesView.qml
+                ProcessingNodeBase.qml
+                TextNumberField.qml
 )
 
 

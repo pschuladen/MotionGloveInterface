@@ -19,6 +19,7 @@
 class DataProcessingNode : public QObject
 {
     Q_OBJECT
+
 public:
     explicit DataProcessingNode(QObject *parent = nullptr);
 

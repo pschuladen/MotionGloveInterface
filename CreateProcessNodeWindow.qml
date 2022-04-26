@@ -49,13 +49,13 @@ Item {
                     }
                 }
 
-                text: model.name+"wadde"
+                text: model.name
 
                 visible: Drag.active
                 Drag.active: dragHandle.active
                 Drag.onDragStarted: console.log("staaaaart")
 //                Drag.onActiveChanged: console.log("im moooving")
-                Drag.mimeData: {"text/plain": custom}
+                Drag.mimeData: {"text/plain": custom, "text/proceName": custom}
                 Drag.onDragFinished: console.log("drag finished")
 //                Drag.dragType: Drag.Automatic
                 color: "red"

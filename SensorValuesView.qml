@@ -73,10 +73,10 @@ Item {
         }
 
         Rectangle {
-            color: "green"
+            color: "blue"
             width: 10
-            height: 10
-            radius:5
+            height: width
+            radius:width/2
             anchors {
                 verticalCenter: titleLable.verticalCenter
                 horizontalCenter: contentRect.right
