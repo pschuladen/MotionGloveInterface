@@ -6,7 +6,7 @@ Item {
 
     property real cVal: 0.23
     property string vName: "vv"
-    property color cColor: "red"
+    property color cColor: "green"
     property real vMax: 1
     property real vMin: -1
     property string parentIdentifier: "default"

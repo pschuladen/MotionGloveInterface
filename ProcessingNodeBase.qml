@@ -3,14 +3,26 @@ import QtQuick.Controls
 import QtQuick.Shapes
 import QtQuick.Layouts
 
+import MotionGloveInterface
+
 
 Item {
+
+    id: root
+    objectName: uniqueID+"-view"
     //required
     property string uniqueID: "noID" //set this when creating the view
-    objectName: uniqueID
-    id: root
+    property alias valuecount: backend.valuecount
+
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
+
+    ValueViewBackend {
+        id: backend
+        objectName: root.uniqueID+"-backend"
+        viewmode: ValueViewBackend.Custom
+        valuecount: 2
+    }
 
 
     Rectangle {
@@ -165,7 +177,7 @@ Item {
             height: 10
             width: height
             radius: height/2
-            color: "green"
+            color: "white"
             anchors.horizontalCenter: parent.left
             anchors.verticalCenter: parent.verticalCenter
             border {
@@ -178,7 +190,7 @@ Item {
             height: 10
             width: height
             radius: height/2
-            color: "red"
+            color: "white"
             anchors.horizontalCenter: parent.right
             anchors.verticalCenter: parent.verticalCenter
             border {

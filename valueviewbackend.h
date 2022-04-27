@@ -14,6 +14,7 @@
 #include <QQuaternion>
 #include <QVector3D>
 #include <QtQml/qqmlregistration.h>
+#include <QColor>
 
 class ValueViewBackend : public QObject
 {
@@ -27,6 +28,9 @@ class ValueViewBackend : public QObject
     Q_PROPERTY(float maxvalue READ maxvalues WRITE setMaxvalue NOTIFY maxvalueChanged)
     Q_PROPERTY(int valueCount READ valueCount WRITE setValueCount NOTIFY valueCountChanged)
     Q_PROPERTY(ValueViewMode viewmode READ viewmode WRITE setViewmode NOTIFY viewmodeChanged)
+    Q_PROPERTY(QColor dotColor READ dotColor WRITE setDotColor NOTIFY dotColorChanged)
+
+    Q_PROPERTY(int valuecount READ valuecount WRITE setValuecount NOTIFY valuecountChanged)
 
     Q_PROPERTY(bool emitvalues READ emitvalues WRITE setEmitvalues NOTIFY emitvaluesChanged)
 
@@ -63,6 +67,12 @@ public:
     bool emitvalues() const;
     void setEmitvalues(bool newEmitvalues);
 
+    int valuecount() const;
+    void setValuecount(int newValuecount);
+
+    const QColor &dotColor() const;
+    void setDotColor(const QColor &newDotColor);
+
 public slots:
     void vectorChanged(QVector3D vec);
     void quatChanged(QQuaternion newQuat);
@@ -89,6 +99,17 @@ private:
 
     bool m_emitvalues;
 
+    int m_valuecount;
+
+    QMap<ValueViewMode, QColor> modeColorMap = {{ValueViewMode::Custom, QColor("mediumvioletred")},
+                                               {ValueViewMode::Accel, QColor("red")},
+                                               {ValueViewMode::Gyro, QColor("red")},
+                                               {ValueViewMode::Grav, QColor("red")},
+                                               {ValueViewMode::Quat, QColor("blue")},
+                                               {ValueViewMode::Touch, QColor("yellow")}};
+
+    QColor m_dotColor;
+
 signals:
 
     void viewmodeChanged();
@@ -100,6 +121,8 @@ signals:
     void minvalueChanged();
     void maxvalueChanged();
     void emitvaluesChanged();
+    void valuecountChanged();
+    void dotColorChanged();
 };
 
 #endif // VALUEVIEWBACKEND_H

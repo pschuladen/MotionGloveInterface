@@ -14,6 +14,36 @@ void MainBackend::setEngine(QQmlApplicationEngine *engine)
     mainWindow = qobject_cast<QQuickWindow*>(engine->rootObjects().at(0));
     deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
     inputDevicesSidebarView = mainWindow->findChild<QQuickItem*>("inputDevicesView");
+    processingGraphView = mainWindow->findChild<QQuickItem*>("processingGraphView");
+}
+
+void MainBackend::createNewProcessingView(DataProcessingNode::ProcessingType type, QPoint atPosition)//float posX, float posY)
+{
+    qInfo() << "now i should creat a view" << type << "at" << atPosition.x() << atPosition.y();
+
+    QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/ProcessingNodeBase.qml")));
+
+    QString name = QString("proc-%1").arg(processingNodes.size());
+    QQuickItem *newProcessingItem = qobject_cast<QQuickItem*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", name},
+                                                                                                                  {"x", atPosition.x()-40},
+                                                                                                                  {"y", atPosition.y()-20}}));
+    ValueViewBackend *viewBackend = newProcessingItem->findChild<ValueViewBackend*>(name+"-backend");
+    newProcessingItem->setParentItem(processingGraphView);
+//    newProcessingItem->setObjectName(name);
+    DataProcessingNode *newProcessCalculus = new DataProcessingNode();
+    newProcessCalculus->setObjectName(name+"-calculus");
+    ProcessingNode newNode;
+    newNode.processingObject = newProcessCalculus;
+    newNode.viewBackend = viewBackend;
+    processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
+
+    qInfo() << "Node Hash size" << processingNodes.size();
+    qInfo() << "node" << name << processingNodes.values().size();
+    ValueViewBackend *baba = processingNodes[name].viewBackend;
+    qInfo() << "viewba" << baba->objectName();
+
+//    qInfo() << "processing nodes" << processingNodes[name].processingObject->objectName() << processingNodes[name].viewBackend->objectName();
+//    QQuickitem *theView = processingNodes.value(name).viewBackend;
 }
 
 void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)

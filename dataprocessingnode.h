@@ -15,12 +15,21 @@
 */
 
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 
 class DataProcessingNode : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("backendonly")
 
 public:
+    enum ProcessingType {
+        ViewOnly,
+        Scale
+    };
+    Q_ENUM(ProcessingType)
+
     explicit DataProcessingNode(QObject *parent = nullptr);
 
 signals:

@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
+import MotionGloveInterface
+
 Item {
 
     visible: true
@@ -36,12 +38,12 @@ Item {
 //                drag.target: draggableItem
 //                onContainsMouseChanged: console.log("mouse in area")
             }
-            Text {
+            Item {
                 id: draggableItem
                 objectName: "this is a dragitem"
 
                 property bool starting: dragHandle.active
-                property string custom: text
+//                property string custom: text
                 onStartingChanged: {
                     if(starting) {
 
@@ -49,17 +51,17 @@ Item {
                     }
                 }
 
-                text: model.name
+//                text: model.name
 
-                visible: Drag.active
+//                visible: Drag.active
                 Drag.active: dragHandle.active
                 Drag.onDragStarted: console.log("staaaaart")
 //                Drag.onActiveChanged: console.log("im moooving")
-                Drag.mimeData: {"text/plain": custom, "text/proceName": custom}
+                Drag.mimeData: {"text/plain": model.name, "text/procType": model.type}
                 Drag.onDragFinished: console.log("drag finished")
 //                Drag.dragType: Drag.Automatic
-                color: "red"
-                z: 100
+//                color: "red"
+//                z: 0
             }
 
 
@@ -82,14 +84,13 @@ Item {
         id: createProcessModel
         ListElement {
             name: "sum"
+            type: DataProcessingNode.Scale
         }
         ListElement {
             name: "scale"
+            type: DataProcessingNode.Scale
         }
     }
-
-
-
 }
 
 /*##^##

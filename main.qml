@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Qt.labs.platform 1.1
 import QtQuick.Layouts
+import MotionGloveInterface
 
 
 Window {
@@ -25,8 +26,9 @@ Window {
 
         Rectangle {
             id: processingGraph
+            objectName: "processingGraphView"
             property color bgColor: "#FFA8A8A8"
-            color: dropa.containsDrag ? bgColor.lighter(1.4) :  bgColor
+            color: dropa.containsDrag ? bgColor.lighter(1.1) :  bgColor
 
             anchors {
                 top: processingNodes.bottom
@@ -34,18 +36,24 @@ Window {
                 right: outputNodes.left
                 bottom: mainItem.bottom
             }
+            property int tN: 4
+            onTNChanged: console.log("tn changed", tN)
             DropArea {
                 id: dropa
                 anchors.fill: parent
-
-                keys: ["text/plain","text/proceName"]
-
-                onDropped:{
-
-                    dropa.acceptDrop()
-                    console.log("bla", drag.keys)
+                keys: ["text/procType"]
+                onDropped: (drop) => {
+                               drop.acceptProposedAction()
+                               console.log("bla", drop.keys)
+//                               console.log("Dropped Dataaa", drop.getDataAsString("text/proceName"))
+//                               console.log("Dropped source", drop.source)
+//                               console.log("Dropped action", drop.action)
+//                               console.log("Dropped formats", drop.formats)
+                               console.log("Position", Qt.point(drop.x, drop.y))
+                               console.log("funktioniert dieses enum", DataProcessingNode.ViewOnly)
+                               _mbackend.createNewProcessingView(drop.getDataAsString("text/procType"), Qt.point(drop.x, drop.y))
+                               parent.tN = drop.getDataAsString("text/procType")
                 }
-
             }
         }
 
@@ -148,9 +156,6 @@ Window {
                 width: 1
                 color: "black"
             }
-        }
-        ProcessingNodeBase {
-
         }
     }
 }

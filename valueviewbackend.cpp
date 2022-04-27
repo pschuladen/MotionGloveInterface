@@ -52,6 +52,7 @@ void ValueViewBackend::setViewmode(ValueViewMode newViewmode)
         setMinvalue(0);
         break;
     }
+    setDotColor(modeColorMap.value(newViewmode, QColor("white")));
     setValueCount(m_values.size());
 
 //    qInfo() << "new viewmode" << newViewmode;
@@ -185,4 +186,30 @@ void ValueViewBackend::setEmitvalues(bool newEmitvalues)
         return;
     m_emitvalues = newEmitvalues;
     emit emitvaluesChanged();
+}
+
+int ValueViewBackend::valuecount() const
+{
+    return m_valuecount;
+}
+
+void ValueViewBackend::setValuecount(int newValuecount)
+{
+    if (m_valuecount == newValuecount)
+        return;
+    m_valuecount = newValuecount;
+    emit valuecountChanged();
+}
+
+const QColor &ValueViewBackend::dotColor() const
+{
+    return m_dotColor;
+}
+
+void ValueViewBackend::setDotColor(const QColor &newDotColor)
+{
+    if (m_dotColor == newDotColor)
+        return;
+    m_dotColor = newDotColor;
+    emit dotColorChanged();
 }

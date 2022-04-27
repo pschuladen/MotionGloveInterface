@@ -73,7 +73,7 @@ Item {
         }
 
         Rectangle {
-            color: "blue"
+            color: backend.dotColor
             width: 10
             height: width
             radius:width/2
@@ -117,6 +117,7 @@ Item {
                         vMax: backend.maxvalue
                         vMin: backend.minvalue
                         cVal: backend.values[model.index]
+
                     }
                 }
             }
