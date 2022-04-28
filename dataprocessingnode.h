@@ -24,11 +24,11 @@ class DataProcessingNode : public QObject
     QML_UNCREATABLE("backendonly")
 
 public:
-    enum ProcessingType {
-        ViewOnly,
-        Scale
-    };
-    Q_ENUM(ProcessingType)
+//    enum ProcessingType {
+//        ViewOnly,
+//        Scale
+//    };
+//    Q_ENUM(ProcessingType)
 
     explicit DataProcessingNode(QObject *parent = nullptr);
 

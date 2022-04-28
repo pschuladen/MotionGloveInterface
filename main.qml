@@ -42,6 +42,9 @@ Window {
                 id: dropa
                 anchors.fill: parent
                 keys: ["text/procType"]
+                onEntered: (drag) => {console.log("drag entered", drag.keys)}
+//                onContainsDragChanged: console.log("drag entered", drag.formats)
+
                 onDropped: (drop) => {
                                drop.acceptProposedAction()
                                console.log("bla", drop.keys)
@@ -50,7 +53,7 @@ Window {
 //                               console.log("Dropped action", drop.action)
 //                               console.log("Dropped formats", drop.formats)
                                console.log("Position", Qt.point(drop.x, drop.y))
-                               console.log("funktioniert dieses enum", DataProcessingNode.ViewOnly)
+//                               console.log("funktioniert dieses enum", ProcessNodeController.ViewOnly)
                                _mbackend.createNewProcessingView(drop.getDataAsString("text/procType"), Qt.point(drop.x, drop.y))
                                parent.tN = drop.getDataAsString("text/procType")
                 }

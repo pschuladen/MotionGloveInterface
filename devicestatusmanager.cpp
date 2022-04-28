@@ -1,6 +1,6 @@
-#include "devicestatuscontroller.h"
+#include "devicestatusmanager.h"
 
-DeviceStatusController::DeviceStatusController(QObject *parent)
+DeviceStatusManager::DeviceStatusManager(QObject *parent)
     : QObject{parent}
 {
     m_port = 55600;
@@ -9,24 +9,24 @@ DeviceStatusController::DeviceStatusController(QObject *parent)
 
     if(bindSuccess) {
 
-        connect(socket, &QUdpSocket::readyRead, this, &DeviceStatusController::readIncomingUdpData);
+        connect(socket, &QUdpSocket::readyRead, this, &DeviceStatusManager::readIncomingUdpData);
         qDebug() << "SUCESS binding on Port"<< this->m_port;
     }
     else {
         qDebug() << "NO BINDING possible on Port"<< this->m_port;
     }
-    connect(this, &DeviceStatusController::receivedNewDevice, main_backend::Instance(), &MainBackend::createNewInputViews);
+    connect(this, &DeviceStatusManager::receivedNewDevice, main_backend::Instance(), &MainBackend::createNewInputViews);
 
 }
 
 
-void DeviceStatusController::setConnectStatus(bool connect, QString device)
+void DeviceStatusManager::setConnectStatus(bool connect, QString device)
 {
     discoveredDevices[device].connectStatus = connect;
     qInfo() << "Status for" << device << "connection is now" << discoveredDevices[device].connectStatus;
 }
 
-void DeviceStatusController::readIncomingUdpData()
+void DeviceStatusManager::readIncomingUdpData()
 {
     QByteArray buffer(socket->pendingDatagramSize(), char());
     QHostAddress sender;
@@ -41,12 +41,12 @@ void DeviceStatusController::readIncomingUdpData()
 
 }
 
-void DeviceStatusController::handleOscPacket(const OSCPP::Server::Packet &packet)
+void DeviceStatusManager::handleOscPacket(const OSCPP::Server::Packet &packet)
 {
     if(packet.isMessage()) handleOscMessage(OSCPP::Server::Message(packet));
 }
 
-void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &message)
+void DeviceStatusManager::handleOscMessage(const OSCPP::Server::Message &message)
 {
 //    qInfo() << "handling osc message";
     if(message == "/glove/ping") {
@@ -92,7 +92,7 @@ void DeviceStatusController::handleOscMessage(const OSCPP::Server::Message &mess
     }
 }
 
-void DeviceStatusController::pingBackToDevice(QString deviceName)
+void DeviceStatusManager::pingBackToDevice(QString deviceName)
 {
     MotionDevice *device = &discoveredDevices[deviceName];
     qInfo() << "pingback";

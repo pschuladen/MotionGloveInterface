@@ -15,9 +15,10 @@ Item {
     //    required property ValueViewBackend backend
     property bool globalBool_valuesHidden: parent ? parent.valuesHiddenBool : false
     property bool viewCollapsed: true
+    property string sourceObjectId: "unknown"
 //    onGlobalShowSensorChanged: console.log("global sensor show changed", globalShowSensor)
 
-    ValueViewBackend {
+    InputValueViewController {
         id: backend
         objectName: "valuebackend"
         emitvalues: !root.viewCollapsed && !root.globalBool_valuesHidden
@@ -117,7 +118,9 @@ Item {
                         vMax: backend.maxvalue
                         vMin: backend.minvalue
                         cVal: backend.values[model.index]
-
+                        parentIdentifier: backend.nodeIdentifier
+                        vIdx: model.index
+                        sourceObjectId: root.sourceObjectId
                     }
                 }
             }

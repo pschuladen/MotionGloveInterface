@@ -17,33 +17,55 @@ void MainBackend::setEngine(QQmlApplicationEngine *engine)
     processingGraphView = mainWindow->findChild<QQuickItem*>("processingGraphView");
 }
 
-void MainBackend::createNewProcessingView(DataProcessingNode::ProcessingType type, QPoint atPosition)//float posX, float posY)
+void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition)//float posX, float posY)
 {
     qInfo() << "now i should creat a view" << type << "at" << atPosition.x() << atPosition.y();
 
     QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/ProcessingNodeBase.qml")));
-
+    qInfo() << "errorstring" << newProcessingComponent.errorString();
     QString name = QString("proc-%1").arg(processingNodes.size());
+//    ProcessNodeController newC; //= new ProcessNodeController();
     QQuickItem *newProcessingItem = qobject_cast<QQuickItem*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", name},
                                                                                                                   {"x", atPosition.x()-40},
                                                                                                                   {"y", atPosition.y()-20}}));
-    ValueViewBackend *viewBackend = newProcessingItem->findChild<ValueViewBackend*>(name+"-backend");
+
+    ProcessNodeController *viewBackend = newProcessingItem->findChild<ProcessNodeController*>(name+"-viewcontroller");
     newProcessingItem->setParentItem(processingGraphView);
 //    newProcessingItem->setObjectName(name);
-    DataProcessingNode *newProcessCalculus = new DataProcessingNode();
+    ProcessNodeController *newProcessCalculus = new ProcessNodeController();
     newProcessCalculus->setObjectName(name+"-calculus");
     ProcessingNode newNode;
     newNode.processingObject = newProcessCalculus;
-    newNode.viewBackend = viewBackend;
+    newNode.viewController = viewBackend;
     processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
 
     qInfo() << "Node Hash size" << processingNodes.size();
     qInfo() << "node" << name << processingNodes.values().size();
-    ValueViewBackend *baba = processingNodes[name].viewBackend;
+    ProcessNodeController *baba = processingNodes[name].viewController;
     qInfo() << "viewba" << baba->objectName();
 
 //    qInfo() << "processing nodes" << processingNodes[name].processingObject->objectName() << processingNodes[name].viewBackend->objectName();
-//    QQuickitem *theView = processingNodes.value(name).viewBackend;
+    //    QQuickitem *theView = processingNodes.value(name).viewBackend;
+}
+
+bool MainBackend::connectionRequest(QString sourceObjectId, QString senderNodeId, QString receiverNodeId, ProcessNodeController::ValueType valueType, int idx)
+{
+
+    qInfo() << "Connection request" << senderNodeId << receiverNodeId << valueType << idx;
+    qInfo() << "";
+    const MotionDevice &motionDevice = main_devicestatus::Instance()->discoveredDevices.value(sourceObjectId);
+    const ProcessNodeController *prcObject = processingNodes.value(receiverNodeId).processingObject;
+    const ProcessNodeController *prcViewCon = processingNodes.value(receiverNodeId).viewController;
+    const DeviceDataInput::OscInputStruct &oscStr = motionDevice.inputs->value(senderNodeId);
+    ValueNotifierClass *valueNotifier;
+    if (valueType == ProcessNodeController::Single) {
+        valueNotifier = motionDevice.inputHandler->valueNotifier.value(oscStr.sensorType).at(oscStr.sensorIndex)->subNotifier.at(idx);
+        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcObject, &ProcessNodeController::singleValueChanged);
+        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcViewCon, &ProcessNodeController::singleValueChanged);
+    }
+//    const ProcessNodeController &proces = processingNodes.value(receiverNodeId).processingObject;
+
+    return true;
 }
 
 void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
@@ -54,23 +76,24 @@ void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
     newDeviceItem->setProperty("identifier", motionDevice->deviceName);
     newDeviceItem->setObjectName(QString(motionDevice->deviceName+"-view"));
     newDeviceItem->setParentItem(inputDevicesSidebarView);
-    inputDevices.insert(motionDevice->deviceName, newDeviceItem);
+    inputDeviceViews.insert(motionDevice->deviceName, newDeviceItem);
     connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), main_devicestatus::Instance(), SLOT(setConnectStatus(bool,QString)));
 }
 
 void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
 {
-    QQuickItem *parentForValueView = inputDevices.value(motionDevice->deviceName, new QQuickItem())->findChild<QQuickItem*>("sensorViewContainer");
+    QQuickItem *parentForValueView = inputDeviceViews.value(motionDevice->deviceName, new QQuickItem())->findChild<QQuickItem*>("sensorViewContainer");
     if(!parentForValueView) {
         qWarning() << "no suitable view for inputs found";
         return;
     }
     QQmlComponent newInput(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValuesView.qml")));
-    foreach(const QString &osc, motionDevice->getSortedInputKeys(false)) {//inputs->keys()) { //
+    foreach(const QString &osc, motionDevice->getSortedInputKeys(true)) {//inputs->keys()) { //
         QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", motionDevice->inputs->value(osc).sensorType},
-                                                                                                   {"identifier", osc}}));
+                                                                                                   {"identifier", osc},
+                                                                                                   {"sourceObjectId", motionDevice->deviceName}}));
         newValDevice->setParentItem(parentForValueView);
-        ValueViewBackend *viewBackend = newValDevice->findChild<ValueViewBackend*>("valuebackend");
+        InputValueViewController *viewBackend = newValDevice->findChild<InputValueViewController*>("valuebackend");
         if (!viewBackend) {
             qWarning() << "no backend found";
             return;
@@ -79,16 +102,16 @@ void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
         int senIdx = motionDevice->inputs->value(osc).sensorIndex;
 
         if(sTyp == sensType::Accel || sTyp == sensType::Gyro || sTyp==sensType::Grav) {
-            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::vectorChanged, viewBackend, &ValueViewBackend::vectorChanged);
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::vectorChanged, viewBackend, &InputValueViewController::vectorChanged);
         }
         else if(sTyp == sensType::Quat) {
-            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::quatChanged, viewBackend, &ValueViewBackend::quatChanged);
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::quatChanged, viewBackend, &InputValueViewController::quatChanged);
         }
         else if(sTyp == sensType::Touch) {
-            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::touchChanged, viewBackend, &ValueViewBackend::touchChanged);
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::touchChanged, viewBackend, &InputValueViewController::touchChanged);
         }
         else {
-            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &ValueViewBackend::valuesChanged);
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &InputValueViewController::valuesChanged);
         }
     }
 }

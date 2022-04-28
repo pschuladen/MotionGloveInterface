@@ -1,5 +1,5 @@
-#ifndef VALUEVIEWBACKEND_H
-#define VALUEVIEWBACKEND_H
+#ifndef INPUTVALUEVIEWCONTROLLER_H
+#define INPUTVALUEVIEWCONTROLLER_H
 
 /*
  * Backend for ValueView. It acts similar to a DataModel.
@@ -15,8 +15,9 @@
 #include <QVector3D>
 #include <QtQml/qqmlregistration.h>
 #include <QColor>
+#include <QQmlEngine>
 
-class ValueViewBackend : public QObject
+class InputValueViewController : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
@@ -30,12 +31,12 @@ class ValueViewBackend : public QObject
     Q_PROPERTY(ValueViewMode viewmode READ viewmode WRITE setViewmode NOTIFY viewmodeChanged)
     Q_PROPERTY(QColor dotColor READ dotColor WRITE setDotColor NOTIFY dotColorChanged)
 
-    Q_PROPERTY(int valuecount READ valuecount WRITE setValuecount NOTIFY valuecountChanged)
+//    Q_PROPERTY(int valuecount READ valuecount WRITE setValuecount NOTIFY valuecountChanged)
 
     Q_PROPERTY(bool emitvalues READ emitvalues WRITE setEmitvalues NOTIFY emitvaluesChanged)
 
 public:
-    explicit ValueViewBackend(QObject *parent = nullptr);
+    explicit InputValueViewController(QObject *parent = nullptr);
 
     enum ValueViewMode {
         Custom, Accel, Gyro, Grav, Quat, Touch
@@ -46,6 +47,7 @@ public:
     void setViewmode(ValueViewMode newViewmode);
 
     int valueCount() const;
+    void setValueCount(int newValueCount);
 
     const QList<float> &values() const;
     void setValues(const QList<float> &newValues);
@@ -56,7 +58,6 @@ public:
     const QString &nodeIdentifier() const;
     void setNodeIdentifier(const QString &newNodeIdentifier);
 
-    void setValueCount(int newValueCount);
 
     float minvalues() const;
     void setMinvalue(float newMinvalue);
@@ -67,8 +68,8 @@ public:
     bool emitvalues() const;
     void setEmitvalues(bool newEmitvalues);
 
-    int valuecount() const;
-    void setValuecount(int newValuecount);
+//    int valuecount() const;
+//    void setValuecount(int newValuecount);
 
     const QColor &dotColor() const;
     void setDotColor(const QColor &newDotColor);
@@ -125,4 +126,4 @@ signals:
     void dotColorChanged();
 };
 
-#endif // VALUEVIEWBACKEND_H
+#endif // INPUTVALUEVIEWCONTROLLER_H

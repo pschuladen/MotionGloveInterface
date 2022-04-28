@@ -22,11 +22,12 @@
 #include <QQmlApplicationEngine>
 #include <QtQml/qqmlregistration.h>
 
-#include "devicestatuscontroller.h"
+#include "devicestatusmanager.h"
 #include "devicedatainput.h"
 #include "valuenotifierclass.h"
 
-#include "valueviewbackend.h"
+#include "inputvalueviewcontroller.h"
+#include "processnodecontroller.h"
 #include "dataprocessingnode.h"
 
 class MainBackend : public QObject
@@ -36,11 +37,12 @@ class MainBackend : public QObject
 public:
 
     explicit MainBackend(QObject *parent = nullptr);
-    typedef ValueViewBackend::ValueViewMode sensType ;
+    typedef InputValueViewController::ValueViewMode sensType ;
 
     void setEngine(QQmlApplicationEngine *engine);
 
-    Q_INVOKABLE void createNewProcessingView(DataProcessingNode::ProcessingType type, QPoint point=QPoint(10,10));
+    Q_INVOKABLE void createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition=QPoint(10,10));
+    Q_INVOKABLE bool connectionRequest(QString sourceObjectId, QString senderNodeId, QString receiverNodeId, ProcessNodeController::ValueType valueType, int idx);
 
 private:
     struct NodesData {
@@ -55,11 +57,12 @@ private:
     QQuickItem *inputDevicesSidebarView;
     QQuickItem *processingGraphView;
 
-    QHash<QString, QQuickItem*> inputDevices; //store devices here
+    QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
+//    QMap<QString, DeviceDataInput*> inputDevices;
     QHash<QString, NodesData> inputNodes; //TODO: implement?
     struct ProcessingNode {
-        ValueViewBackend* viewBackend;
-        DataProcessingNode* processingObject;
+        ProcessNodeController* viewController;
+        ProcessNodeController* processingObject;
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
     };
     QHash<QString, ProcessingNode> processingNodes;

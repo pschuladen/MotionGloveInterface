@@ -1,18 +1,18 @@
-#include "valueviewbackend.h"
+#include "inputvalueviewcontroller.h"
 
-ValueViewBackend::ValueViewBackend(QObject *parent)
+InputValueViewController::InputValueViewController(QObject *parent)
     : QObject{parent}
 {
 
 
 }
 
-ValueViewBackend::ValueViewMode ValueViewBackend::viewmode() const
+InputValueViewController::ValueViewMode InputValueViewController::viewmode() const
 {
     return m_viewmode;
 }
 
-void ValueViewBackend::setViewmode(ValueViewMode newViewmode)
+void InputValueViewController::setViewmode(ValueViewMode newViewmode)
 {
     if (m_viewmode == newViewmode)
         return;
@@ -59,18 +59,18 @@ void ValueViewBackend::setViewmode(ValueViewMode newViewmode)
     emit viewmodeChanged();
 }
 
-int ValueViewBackend::valueCount() const
+int InputValueViewController::valueCount() const
 {
     return m_valueCount;
 }
 
 
-const QList<float> &ValueViewBackend::values() const
+const QList<float> &InputValueViewController::values() const
 {
     return m_values;
 }
 
-void ValueViewBackend::setValues(const QList<float> &newValues)
+void InputValueViewController::setValues(const QList<float> &newValues)
 {
     if (m_values == newValues)
         return;
@@ -79,12 +79,12 @@ void ValueViewBackend::setValues(const QList<float> &newValues)
 //    emit valuesChanged();
 }
 
-const QList<QString> &ValueViewBackend::valname() const
+const QList<QString> &InputValueViewController::valname() const
 {
     return m_valname;
 }
 
-void ValueViewBackend::setValname(const QList<QString> &newValname)
+void InputValueViewController::setValname(const QList<QString> &newValname)
 {
     if (m_valname == newValname)
         return;
@@ -92,12 +92,12 @@ void ValueViewBackend::setValname(const QList<QString> &newValname)
     emit valnameChanged();
 }
 
-const QString &ValueViewBackend::nodeIdentifier() const
+const QString &InputValueViewController::nodeIdentifier() const
 {
     return m_nodeIdentifier;
 }
 
-void ValueViewBackend::setNodeIdentifier(const QString &newNodeIdentifier)
+void InputValueViewController::setNodeIdentifier(const QString &newNodeIdentifier)
 {
     if (m_nodeIdentifier == newNodeIdentifier)
         return;
@@ -105,7 +105,7 @@ void ValueViewBackend::setNodeIdentifier(const QString &newNodeIdentifier)
     emit nodeIdentifierChanged();
 }
 
-void ValueViewBackend::vectorChanged(QVector3D vec)
+void InputValueViewController::vectorChanged(QVector3D vec)
 {
 //    qInfo() << "vector changed" << vec;
     m_values[0] = vec.x();
@@ -114,7 +114,7 @@ void ValueViewBackend::vectorChanged(QVector3D vec)
     checkAndEmitValuesChanged();
 }
 
-void ValueViewBackend::quatChanged(QQuaternion newQuat)
+void InputValueViewController::quatChanged(QQuaternion newQuat)
 {
     m_values[0] = newQuat.x();
     m_values[1] = newQuat.y();
@@ -123,24 +123,24 @@ void ValueViewBackend::quatChanged(QQuaternion newQuat)
     checkAndEmitValuesChanged();
 }
 
-void ValueViewBackend::touchChanged(QList<float> touch)
+void InputValueViewController::touchChanged(QList<float> touch)
 {
     setValues(touch);
 }
 
-void ValueViewBackend::newValues(QList<float> newValues)
+void InputValueViewController::newValues(QList<float> newValues)
 {
     setValues(newValues);
 }
 
-void ValueViewBackend::checkAndEmitValuesChanged()
+void InputValueViewController::checkAndEmitValuesChanged()
 {
     if(emitvalues()) {
         emit valuesChanged();
     }
 }
 
-void ValueViewBackend::setValueCount(int newValueCount)
+void InputValueViewController::setValueCount(int newValueCount)
 {
     if (m_valueCount == newValueCount)
         return;
@@ -148,12 +148,12 @@ void ValueViewBackend::setValueCount(int newValueCount)
     emit valueCountChanged();
 }
 
-float ValueViewBackend::minvalues() const
+float InputValueViewController::minvalues() const
 {
     return m_minvalue;
 }
 
-void ValueViewBackend::setMinvalue(float newMinvalue)
+void InputValueViewController::setMinvalue(float newMinvalue)
 {
     if (qFuzzyCompare(m_minvalue, newMinvalue))
         return;
@@ -161,12 +161,12 @@ void ValueViewBackend::setMinvalue(float newMinvalue)
     emit minvalueChanged();
 }
 
-float ValueViewBackend::maxvalues() const
+float InputValueViewController::maxvalues() const
 {
     return m_maxvalue;
 }
 
-void ValueViewBackend::setMaxvalue(float newMaxvalue)
+void InputValueViewController::setMaxvalue(float newMaxvalue)
 {
     if (qFuzzyCompare(m_maxvalue, newMaxvalue))
         return;
@@ -174,12 +174,12 @@ void ValueViewBackend::setMaxvalue(float newMaxvalue)
     emit maxvalueChanged();
 }
 
-bool ValueViewBackend::emitvalues() const
+bool InputValueViewController::emitvalues() const
 {
     return m_emitvalues;
 }
 
-void ValueViewBackend::setEmitvalues(bool newEmitvalues)
+void InputValueViewController::setEmitvalues(bool newEmitvalues)
 {
 //    qInfo() << "backend emitvalues set" << newEmitvalues;
     if (m_emitvalues == newEmitvalues)
@@ -188,25 +188,25 @@ void ValueViewBackend::setEmitvalues(bool newEmitvalues)
     emit emitvaluesChanged();
 }
 
-int ValueViewBackend::valuecount() const
-{
-    return m_valuecount;
-}
+//int InputValueViewController::valuecount() const
+//{
+//    return m_valuecount;
+//}
 
-void ValueViewBackend::setValuecount(int newValuecount)
-{
-    if (m_valuecount == newValuecount)
-        return;
-    m_valuecount = newValuecount;
-    emit valuecountChanged();
-}
+//void InputValueViewController::setValuecount(int newValuecount)
+//{
+//    if (m_valuecount == newValuecount)
+//        return;
+//    m_valuecount = newValuecount;
+//    emit valuecountChanged();
+//}
 
-const QColor &ValueViewBackend::dotColor() const
+const QColor &InputValueViewController::dotColor() const
 {
     return m_dotColor;
 }
 
-void ValueViewBackend::setDotColor(const QColor &newDotColor)
+void InputValueViewController::setDotColor(const QColor &newDotColor)
 {
     if (m_dotColor == newDotColor)
         return;

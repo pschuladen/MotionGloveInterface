@@ -31,7 +31,6 @@ Item {
                 text: model.name
             }
             MouseArea {
-
                 id: moAr
                 anchors.fill: parent
                 hoverEnabled: true
@@ -67,7 +66,7 @@ Item {
 
             DragHandler {
                 id: dragHandle
-                target: null
+                target: draggableItem
                 onActiveChanged: {
                     if (active) {
 
@@ -75,6 +74,7 @@ Item {
 
                     console.log("drag changed", model.name)}
                 cursorShape: Qt.CrossCursor
+
             }
 
 
@@ -84,11 +84,11 @@ Item {
         id: createProcessModel
         ListElement {
             name: "sum"
-            type: DataProcessingNode.Scale
+            type: ProcessNodeController.Scale
         }
         ListElement {
             name: "scale"
-            type: DataProcessingNode.Scale
+            type: ProcessNodeController.ViewOnly
         }
     }
 }

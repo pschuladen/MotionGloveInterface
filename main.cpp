@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "devicestatuscontroller.h"
+#include "devicestatusmanager.h"
 
 #include <QQmlContext>
 #include "mainbackend.h"
@@ -24,12 +24,19 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
+
+    // Somehow necessary to gt rid of qml-warnings with module. Documentation states this is kind of registration is not necessary ?!
+    qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
+    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController");
+
+
     engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());
     engine.load(url);
     engine.setObjectName("MAIN_QML_ENGINE");
 
     main_backend::Instance()->setEngine(&engine);
     main_devicestatus::Instance();
+
 
 //    QQmlComponent testValView(&engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
 

@@ -1,5 +1,5 @@
-#ifndef DEVICESTATUSCONTROLLER_H
-#define DEVICESTATUSCONTROLLER_H
+#ifndef DEVICESTATUSMANAGER_H
+#define DEVICESTATUSMANAGER_H
 
 /*
  * Devicestatus controller is a singleton.
@@ -31,15 +31,17 @@
 
 //struct MotionDevice;
 
-class DeviceStatusController : public QObject
+class DeviceStatusManager : public QObject
 {
     Q_OBJECT
 
 
 public:
-    explicit DeviceStatusController(QObject *parent = nullptr);
+    explicit DeviceStatusManager(QObject *parent = nullptr);
 
     void setEngine(QQmlApplicationEngine *engine);
+
+    QHash<QString, MotionDevice> discoveredDevices;
 
 signals:
     void receivedPing();
@@ -57,12 +59,12 @@ private:
     void handleOscPacket(const OSCPP::Server::Packet &packet);
     void handleOscMessage(const OSCPP::Server::Message &message);
 
-    QHash<QString, MotionDevice> discoveredDevices;
+
 
     void pingBackToDevice(QString deviceName);
 };
 
 //Singleton definition always call this object through main_devicestatus::Instance();
-typedef Singleton<DeviceStatusController> main_devicestatus ;
+typedef Singleton<DeviceStatusManager> main_devicestatus ;
 
-#endif // DEVICESTATUSCONTROLLER_H
+#endif // DEVICESTATUSMANAGER_H

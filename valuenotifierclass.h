@@ -9,23 +9,32 @@
 #include <QObject>
 #include <QQuaternion>
 #include <QVector3D>
-#include "valueviewbackend.h"
+#include "inputvalueviewcontroller.h"
 
 class ValueNotifierClass : public QObject
 {
     Q_OBJECT
 public:
-    typedef ValueViewBackend::ValueViewMode sensType ;
-    explicit ValueNotifierClass(QObject *parent = nullptr, sensType = sensType::Custom);
+    typedef InputValueViewController::ValueViewMode SensType ;
+    explicit ValueNotifierClass(QObject *parent = nullptr, SensType sType = SensType::Custom, int valueNumber = 0);
+//    void valueChanged(QQuaternion quat);
+//    void valueChanged(QQuaternion quat);
+    void callQuatChanged(QQuaternion quat);
+    void callVectorChanged(QVector3D vect);
+    void callTouchChanged(QList<float> touch);
+    void callValuesChanged(QList<float> values);
 
-//    void valueChanged(QQuaternion quat);
-//    void valueChanged(QQuaternion quat);
+    QList<ValueNotifierClass*> subNotifier;
+private:
+    int m_numberValues;
 
 signals:
      void quatChanged(QQuaternion quat);
      void vectorChanged(QVector3D vect);
      void touchChanged(QList<float> touch);
      void valuesChanged(QList<float> values);
+     void singleValueChanged(float value);
+//     void valueChanged()
 
 };
 

@@ -24,7 +24,7 @@
 #include "oscpp/server.hpp"
 
 #include "valuenotifierclass.h"
-#include "valueviewbackend.h"
+#include "inputvalueviewcontroller.h"
 
 struct MotionDevice;
 
@@ -37,7 +37,7 @@ public:
     QString m_identifier;
     uint8_t m_nSensors;
 
-    typedef ValueViewBackend::ValueViewMode SensType ;
+    typedef InputValueViewController::ValueViewMode SensType ;
 
     const QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::Quat, SensType::Touch};
 
@@ -53,7 +53,7 @@ public:
     struct OscInputStruct {
         OscHandleTypeFun handleFunction = &DeviceDataInput::oscR_unMapped;
         int sensorIndex = 0;
-        ValueViewBackend::ValueViewMode sensorType;
+        InputValueViewController::ValueViewMode sensorType;
     };
 
 signals:
@@ -101,7 +101,7 @@ private:
 */
 
 struct MotionDevice {
-    typedef ValueViewBackend::ValueViewMode SensType ;
+    typedef InputValueViewController::ValueViewMode SensType ;
 
     QString deviceName;
     QString address;

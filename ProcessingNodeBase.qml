@@ -12,16 +12,18 @@ Item {
     objectName: uniqueID+"-view"
     //required
     property string uniqueID: "noID" //set this when creating the view
-    property alias valuecount: backend.valuecount
+//    property alias valuecount: backend.valuecount
+
+
 
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
 
-    ValueViewBackend {
+    ProcessNodeController {
         id: backend
-        objectName: root.uniqueID+"-backend"
-        viewmode: ValueViewBackend.Custom
-        valuecount: 2
+        objectName: root.uniqueID+"-viewcontroller"
+//        viewmode: ValueViewBackend.Custom
+//        valuecount: 2
     }
 
 
@@ -59,6 +61,16 @@ Item {
                 left: outerShape.left
                 margins: 5
             }
+        }
+        Text {
+            id: testValueView
+            text: backend.singleInputValue.toFixed(2)
+            anchors {
+                verticalCenter: processingTitleLabel.verticalCenter
+                right: outerShape.right
+                rightMargin: 5
+            }
+            horizontalAlignment: Text.AlignRight
         }
 
         Rectangle {
@@ -182,7 +194,20 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             border {
                 width: 1
-                color: "black"
+                color: inDrop.containsDrag ? "cyan" : "black"
+            }
+            DropArea {
+                id: inDrop
+                anchors.fill: parent
+                keys: ["nodeId", "valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]
+                onEntered:(drag) =>  console.log(drag.keys)
+                onDropped: (drop) => {
+                               if(_mbackend.connectionRequest(drop.getDataAsString("sourceObjectId"),
+                                                              drop.getDataAsString("nodeId"), root.uniqueID,
+                                                           drop.getDataAsString("valueType"), drop.getDataAsString("valueIndex"))) {
+                                   drop.acceptProposedAction()
+                               }
+                           }
             }
         }
         Rectangle {
