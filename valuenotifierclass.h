@@ -2,9 +2,11 @@
 #define VALUENOTIFIERCLASS_H
 
 /*
- * minimalistic class just for sending signals.
+ * (minimalistic class just for sending signals.)
  * Was created for handling value updates for lists of values to different receivers.
- * Also acts as Interface class maybe?
+ * Includes subnotifier which are used for connecting single components of e.g. 3d-vectors
+ * and value lists to receivers.
+ * Also acts as Interface/Base class for processnodes
 */
 
 #include <QObject>
@@ -43,6 +45,7 @@ public:
     void callValuesChanged(const QList<float> values, int frame=-1);
 
     QList<ValueNotifierClass*> subNotifier; //TODO: make this private
+    void createSubnotifier(TypeHelper::ValueType valueType);
 
 private:
     int m_numberValues;

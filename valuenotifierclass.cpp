@@ -4,30 +4,7 @@ ValueNotifierClass::ValueNotifierClass(QObject *parent, TypeHelper::ValueType va
     : QObject{parent}
 {
     m_indexInObject = indexForObject;
-    int _nVals = 0;
-    switch(valueType) {
-    case TypeHelper::Undefined:
-        qWarning() << "undefined value notifier";
-        break;
-    case TypeHelper::Vector:
-        _nVals = 3;
-        break;
-    case TypeHelper::Quat:
-        _nVals = 4;
-        break;
-    case TypeHelper::List:
-        _nVals = valueNumber;
-        break;
-    case TypeHelper::SingleValue:
-        break;
-    case TypeHelper::BoolValue:
-        break;
-    case TypeHelper::Trigger:
-        break;
-
-    }
-    m_numberValues = _nVals;
-    createSubnotifier(_nVals);
+    createSubnotifier(valueType);
 }
 
 ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
@@ -54,8 +31,6 @@ ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject 
     case SensType::Custom:
         int _nVals = valueNumber;
         break;
-        //        default:
-        //            break;
     }
     createSubnotifier(_nVals);
 }
@@ -70,62 +45,89 @@ void ValueNotifierClass::createSubnotifier(int numberOfSubs)
     }
 }
 
-void ValueNotifierClass::callQuatChanged(const QQuaternion quat)
+void ValueNotifierClass::createSubnotifier(TypeHelper::ValueType valueType)
 {
-    emit quatChanged(quat);
-    emit subNotifier.at(0)->singleValueChanged(quat.x());
-    emit subNotifier.at(1)->singleValueChanged(quat.y());
-    emit subNotifier.at(2)->singleValueChanged(quat.z());
-    emit subNotifier.at(3)->singleValueChanged(quat.scalar());
+    int _nVals = 0;
+    switch(valueType) {
+    case TypeHelper::Undefined:
+        qWarning() << "undefined value notifier";
+        break;
+    case TypeHelper::Vector:
+        _nVals = 3;
+        break;
+    case TypeHelper::Quat:
+        _nVals = 4;
+        break;
+    case TypeHelper::List:
+        _nVals = 6;
+        break;
+    case TypeHelper::SingleValue:
+        break;
+    case TypeHelper::BoolValue:
+        break;
+    case TypeHelper::Trigger:
+        break;
+    }
+    createSubnotifier(_nVals);
+
 }
 
-void ValueNotifierClass::callVectorChanged(const QVector3D vect)
+void ValueNotifierClass::callQuatChanged(const QQuaternion quat, int frame)
+{
+    emit quatChanged(quat, frame);
+    emit subNotifier.at(0)->singleValueChanged(quat.x(), frame);
+    emit subNotifier.at(1)->singleValueChanged(quat.y(), frame);
+    emit subNotifier.at(2)->singleValueChanged(quat.z(), frame);
+    emit subNotifier.at(3)->singleValueChanged(quat.scalar(), frame);
+}
+
+void ValueNotifierClass::callVectorChanged(const QVector3D vect, int frame)
 {
     emit vectorChanged(vect);
-    emit subNotifier.at(0)->singleValueChanged(vect.x());
-    emit subNotifier.at(1)->singleValueChanged(vect.y());
-    emit subNotifier.at(2)->singleValueChanged(vect.z());
+    emit subNotifier.at(0)->singleValueChanged(vect.x(), frame);
+    emit subNotifier.at(1)->singleValueChanged(vect.y(), frame);
+    emit subNotifier.at(2)->singleValueChanged(vect.z(), frame);
 }
 
-void ValueNotifierClass::callTouchChanged(const QList<float> touch)
+void ValueNotifierClass::callTouchChanged(const QList<float> touch, int frame)
 {
     emit touchChanged(touch);
     for(int i = 0; i < m_numberValues; i++) {
-        emit subNotifier.at(i)->singleValueChanged(touch.at(i));
+        emit subNotifier.at(i)->singleValueChanged(touch.at(i), frame);
     }
 }
 
-void ValueNotifierClass::callValuesChanged(const QList<float> values)
+void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
 {
     emit valuesChanged(values);
     for(int i= 0; i < values.size(); i++) {
-        emit subNotifier.at(i)->singleValueChanged(values[i]);
+        emit subNotifier.at(i)->singleValueChanged(values[i], frame);
     }
 }
 
 void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)
 {
-
+    if(m_autoEmit) callQuatChanged(quat, frame);
 }
 
 void ValueNotifierClass::slot_vectorChanged(QVector3D vect, int frame)
 {
-
+    if(m_autoEmit) callVectorChanged(vect, frame);
 }
 
 void ValueNotifierClass::slot_touchChanged(QList<float> touch, int frame)
 {
-
+    if(m_autoEmit) callTouchChanged(touch, frame);
 }
 
 void ValueNotifierClass::slot_valuesChanged(QList<float> values, int frame)
 {
-
+    if(m_autoEmit) callValuesChanged(values, frame);
 }
 
 void ValueNotifierClass::slot_singleValueChanged(float value, int frame)
 {
-
+    if(m_autoEmit) emit singleValueChanged(value, frame);
 }
 
 void ValueNotifierClass::slot_boolValueChanged(bool value, int frame)

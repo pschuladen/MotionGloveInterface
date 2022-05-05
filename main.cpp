@@ -6,6 +6,7 @@
 #include "mainbackend.h"
 
 #include "oscoutputdevice.h"
+#include "pn_scale.h"
 
 
 //for test purposes
@@ -30,9 +31,10 @@ int main(int argc, char *argv[])
 
     // Somehow necessary to gt rid of qml-warnings with module. Documentation states this is kind of registration is not necessary ?!
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
-    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController");
-    qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "value types only");
+    qmlRegisterType<PN_Scale>("MotionGloveInterface", 1, 0, "PN_Scale");
+    qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
 
+    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 
 
     engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());

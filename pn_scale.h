@@ -1,10 +1,11 @@
-#ifndef PROC_SCALE_H
-#define PROC_SCALE_H
+#ifndef PN_SCALE_H
+#define PN_SCALE_H
 
-#include <QObject>
-#include "processnodecontroller.h"
+//#include <QObject>
+//#include "processnodecontroller.h"
+#include "processnode.h"
 
-class Proc_Scale : public ProcessNodeController
+class PN_Scale : public ProcessNode
 {
     Q_OBJECT
     QML_ELEMENT
@@ -13,7 +14,6 @@ class Proc_Scale : public ProcessNodeController
     Q_PROPERTY(float inHigh READ inHigh WRITE setInHigh NOTIFY inHighChanged)
     Q_PROPERTY(float outLow READ outLow WRITE setOutLow NOTIFY outLowChanged)
     Q_PROPERTY(float outHigh READ outHigh WRITE setOutHigh NOTIFY outHighChanged)
-
 
     float m_inLow;
 
@@ -24,13 +24,7 @@ class Proc_Scale : public ProcessNodeController
     float m_outHigh;
 
 public:
-    explicit Proc_Scale(QObject *parent = nullptr, bool isProcessing=false);
-
-//    virtual QVector3D processVector(QVector3D vector, int frame=-1) override;
-//    virtual QQuaternion processQuat(QQuaternion quat, int frame=-1) override;
-//    virtual float processSingleValue(float value, int frame=-1) override;
-//    virtual QList<float> processValueList(QList<float> values, int frame=-1) override;
-
+    explicit PN_Scale(QObject *parent = nullptr);
 
     float inLow() const;
     void setInLow(float newInLow);
@@ -44,8 +38,17 @@ public:
     float outHigh() const;
     void setOutHigh(float newOutHigh);
 
+    bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+    bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0);
+
 private:
-    virtual float simpleProcessingFunction(float value) override;
+    virtual float process(float value) override;
+    virtual quint8 process(quint8 value) override;
+
+    QList<PN_Scale*> subProcessor;
+    static void connectPropertiesToProcessor(PN_Scale *propertyMaster, PN_Scale *propertySlave);
+    static void setInitialProperties(PN_Scale *propertyMaster, PN_Scale *propertySlave);
+
 
 signals:
 
@@ -53,6 +56,7 @@ signals:
     void inHighChanged();
     void outLowChanged();
     void outHighChanged();
+
 };
 
-#endif // PROC_SCALE_H
+#endif // PN_SCALE_H

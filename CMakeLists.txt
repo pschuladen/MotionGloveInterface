@@ -23,7 +23,7 @@ qt_add_executable(appMotionGloveInterface
     processnodecontroller.h processnodecontroller.cpp
     oscoutputdevice.h oscoutputdevice.cpp
     typehelper.h typehelper.cpp
-    proc_scale.h proc_scale.cpp
+    pn_scale.h pn_scale.cpp
     processnode.h processnode.cpp
 )
 

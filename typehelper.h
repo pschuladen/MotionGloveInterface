@@ -2,7 +2,6 @@
 #define TYPEHELPER_H
 
 #include <QtCore>
-//#include <QMap>
 
 struct TypeHelper
 {
@@ -10,10 +9,10 @@ struct TypeHelper
 public:
     TypeHelper();
 
-    enum SensorType {Custom, Accel, Gyro, Grav, RotQuat, Touch};
+    enum SensorType: quint8 {Custom, Accel, Gyro, Grav, RotQuat, Touch};
     Q_ENUM(SensorType);
 
-    enum ValueType {
+    enum ValueType: quint8 { // TODO: add touchvalues
         Undefined, Vector, Quat, List,
         SingleValue, BoolValue, Trigger
     };
@@ -21,16 +20,12 @@ public:
 
     static const ValueType valueTypeForSensor(SensorType styp);
 
-//    const QMap<SensorType, ValueType> sensorToValueTypeMap = {
-//        {SensorType::Custom, ValueType::Undefined},
-//        {SensorType::Accel, ValueType::Vector},
-//        {SensorType::Gyro, ValueType::Vector},
-//        {SensorType::Grav, ValueType::Vector},
-//        {SensorType::RotQuat, ValueType::Quat},
-//        {SensorType::Touch, ValueType::List}
-//    };
 
+};
 
+struct TouchValues {
+    quint8 tval[6];
+    quint8 nvals = 6;
 };
 
 #endif // TYPEHELPER_H
