@@ -15,7 +15,7 @@ void PN_Scale::setInLow(float newInLow)
     if (qFuzzyCompare(m_inLow, newInLow))
         return;
     m_inLow = newInLow;
-    emit inLowChanged();
+    emit inLowChanged(newInLow);
 }
 
 float PN_Scale::inHigh() const
@@ -28,7 +28,7 @@ void PN_Scale::setInHigh(float newInHigh)
     if (qFuzzyCompare(m_inHigh, newInHigh))
         return;
     m_inHigh = newInHigh;
-    emit inHighChanged();
+    emit inHighChanged(newInHigh);
 }
 
 float PN_Scale::outLow() const
@@ -41,7 +41,7 @@ void PN_Scale::setOutLow(float newOutLow)
     if (qFuzzyCompare(m_outLow, newOutLow))
         return;
     m_outLow = newOutLow;
-    emit outLowChanged();
+    emit outLowChanged(newOutLow);
 }
 
 float PN_Scale::outHigh() const
@@ -54,7 +54,7 @@ void PN_Scale::setOutHigh(float newOutHigh)
     if (qFuzzyCompare(m_outHigh, newOutHigh))
         return;
     m_outHigh = newOutHigh;
-    emit outHighChanged();
+    emit outHighChanged(newOutHigh);
 }
 
 bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)

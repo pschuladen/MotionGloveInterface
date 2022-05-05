@@ -49,6 +49,11 @@ float ProcessNode::process(float value)
     return value;
 }
 
+quint8 ProcessNode::process(quint8 value)
+{
+    return value;
+}
+
 void ProcessNode::slot_quatChanged(QQuaternion quat, int frame)
 {
     if(connectedValueType == TypeHelper::Quat) {
