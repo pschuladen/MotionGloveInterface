@@ -5,8 +5,16 @@
 #include <QtQml/qqmlregistration.h>
 #include <QColor>
 
-#include "dataprocessingnode.h"
+#include <QQuaternion>
+#include <QVector3D>
+#include <QList>
 
+#include "dataprocessingnode.h"
+//#include "valuenotifierclass.h"
+
+#include "typehelper.h"
+
+class ValueNotifierClass;
 class ProcessNodeController : public QObject
 {
     Q_OBJECT
@@ -27,9 +35,7 @@ class ProcessNodeController : public QObject
     Q_PROPERTY(float singleInputValue READ singleInputValue WRITE setSingleInputValue NOTIFY singleInputValueChanged)
 
 
-
 public:
-
     explicit ProcessNodeController(QObject *parent = nullptr);
 
     enum ProcessingType {
@@ -38,14 +44,22 @@ public:
     };
     Q_ENUM(ProcessingType)
 
-    enum ValueType {
-        Undefined,
-        Vector,
-        Quat,
-        List,
-        Single
-    };
-    Q_ENUM(ValueType)
+    ProcessingType m_processType;
+    virtual QVector3D processVector(QVector3D vector, int frame=-1);
+    virtual QQuaternion processQuat(QQuaternion quat, int frame=-1);
+    virtual float processSingleValue(float value, int frame=-1);
+    virtual QList<float> processValueList(QList<float> values, int frame=-1);
+    virtual bool processBoolValue(bool boolVal, int frame=-1); //TODO: implement
+
+
+//    enum ValueType {
+//        Undefined,
+//        Vector,
+//        Quat,
+//        List,
+//        Single
+//    };
+//    Q_ENUM(ValueType)
 //    enum ValueSubType {
 //        Any, X, Y, Z,
 //    }
@@ -83,7 +97,13 @@ public:
     float singleInputValue() const;
     void setSingleInputValue(float newSingleInputValue);
 
+    QList<ValueNotifierClass*> valueNotifier;
+
 private:
+    void createNotifier(int n);
+
+    virtual float simpleProcessingFunction(float value);
+
     QList<QColor> m_connectorColor;
 
     int m_numberInputs;
@@ -102,12 +122,13 @@ private:
 
     bool m_objectIsView;
 
-    ProcessNodeController::ProcessingType m_processType;
+//    ProcessNodeController::ProcessingType m_processType;
 
     float m_singleInputValue;
 
 public slots:
     void singleValueChanged(float value);
+    bool connectionRequest(int index, TypeHelper::ValueType valueType);
 
 signals:
 

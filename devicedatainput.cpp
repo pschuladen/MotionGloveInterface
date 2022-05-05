@@ -79,28 +79,28 @@ void DeviceDataInput::setupOscInputBindings()
 
         oscAddress = QString("/%1/acc/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setAcceleration;
-        oscHandle.sensorType = InputValueViewController::Accel;
+        oscHandle.sensorType = TypeHelper::Accel;
         oscHandleHash.insert(oscAddress, oscHandle);
 
         oscAddress = QString("/%1/gravity/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGravityVector;
-        oscHandle.sensorType = InputValueViewController::Grav;
+        oscHandle.sensorType = TypeHelper::Grav;
         oscHandleHash.insert(oscAddress, oscHandle);
 
         oscAddress = QString("/%1/gyr/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setGyroscope;
-        oscHandle.sensorType = InputValueViewController::Gyro;
+        oscHandle.sensorType = TypeHelper::Gyro;
         oscHandleHash.insert(oscAddress, oscHandle);
 
         oscAddress = QString("/%1/quat/%2").arg(this->m_identifier).arg(i);
         oscHandle.handleFunction = &DeviceDataInput::oscR_setQuaternion;
-        oscHandle.sensorType = InputValueViewController::Quat;
+        oscHandle.sensorType = TypeHelper::RotQuat;
         oscHandleHash.insert(oscAddress, oscHandle);
     }
 
     oscAddress = QString("/%1/touch").arg(this->m_identifier);
     oscHandle.handleFunction = &DeviceDataInput::oscR_setTouch;
-    oscHandle.sensorType = InputValueViewController::Touch;
+    oscHandle.sensorType = TypeHelper::Touch;
     oscHandleHash.insert(oscAddress, oscHandle);
 
 //    qInfo() << "function hash map" << oscHandleHash.keys();
@@ -115,7 +115,7 @@ void DeviceDataInput::createNotifier()
     }
     foreach(const QString &osc, oscHandleHash.keys()) {
         OscInputStruct oscStruct = oscHandleHash.value(osc);
-        valueNotifier[oscStruct.sensorType][oscStruct.sensorIndex] = new ValueNotifierClass(this, oscStruct.sensorType);
+        valueNotifier[oscStruct.sensorType][oscStruct.sensorIndex] = new ValueNotifierClass(oscStruct.sensorType, this);
     }
 //    qInfo() << "valuenotifier" << valueNotifier.keys() << valueNotifier.value(allSensTypes[1]);
 }
@@ -142,7 +142,7 @@ void DeviceDataInput::oscR_setGravityVector(DeviceDataInput* who, int sens_index
 void DeviceDataInput::oscR_setQuaternion(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)
 {
     who->setQuat(&who->quaternion[sens_index], &args);
-    who->valueNotifier.value(SensType::Quat).at(sens_index)->callQuatChanged(who->quaternion[sens_index]);
+    who->valueNotifier.value(SensType::RotQuat).at(sens_index)->callQuatChanged(who->quaternion[sens_index]);
 }
 
 void DeviceDataInput::oscR_setTouch(DeviceDataInput* who, int sens_index, OSCPP::Server::ArgStream args)

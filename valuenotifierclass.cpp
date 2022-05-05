@@ -1,10 +1,41 @@
 #include "valuenotifierclass.h"
 
-ValueNotifierClass::ValueNotifierClass(QObject *parent, SensType sType,  int valueNumber)
+ValueNotifierClass::ValueNotifierClass(QObject *parent, TypeHelper::ValueType valueType,  int valueNumber, int indexForObject)
     : QObject{parent}
 {
+    m_indexInObject = indexForObject;
     int _nVals = 0;
-    switch(sType) {
+    switch(valueType) {
+    case TypeHelper::Undefined:
+        qWarning() << "undefined value notifier";
+        break;
+    case TypeHelper::Vector:
+        _nVals = 3;
+        break;
+    case TypeHelper::Quat:
+        _nVals = 4;
+        break;
+    case TypeHelper::List:
+        _nVals = valueNumber;
+        break;
+    case TypeHelper::SingleValue:
+        break;
+    case TypeHelper::BoolValue:
+        break;
+    case TypeHelper::Trigger:
+        break;
+
+    }
+    m_numberValues = _nVals;
+    createSubnotifier(_nVals);
+}
+
+ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
+{
+    setParent(parent);
+    int _nVals = 0;
+    switch (sensType) {
+
     case SensType::Accel:
         _nVals = 3;
         break;
@@ -14,7 +45,7 @@ ValueNotifierClass::ValueNotifierClass(QObject *parent, SensType sType,  int val
     case SensType::Grav:
         _nVals = 3;
         break;
-    case SensType::Quat:
+    case SensType::RotQuat:
         _nVals = 4;
         break;
     case SensType::Touch:
@@ -23,19 +54,23 @@ ValueNotifierClass::ValueNotifierClass(QObject *parent, SensType sType,  int val
     case SensType::Custom:
         int _nVals = valueNumber;
         break;
-//    default:
-//        break;
+        //        default:
+        //            break;
     }
-    m_numberValues = _nVals;
-    subNotifier.resize(_nVals);
-    for(int i = 0; i < _nVals; i++) {
-//        qInfo() << "subnr " << i;
+    createSubnotifier(_nVals);
+}
+
+void ValueNotifierClass::createSubnotifier(int numberOfSubs)
+{
+    subNotifier.resize(numberOfSubs);
+    for(int i = 0; i < numberOfSubs; i++) {
+        //        qInfo() << "subnr " << i;
         ValueNotifierClass *subNotify = new ValueNotifierClass(this);
         subNotifier.insert(i, subNotify);
     }
 }
 
-void ValueNotifierClass::callQuatChanged(QQuaternion quat)
+void ValueNotifierClass::callQuatChanged(const QQuaternion quat)
 {
     emit quatChanged(quat);
     emit subNotifier.at(0)->singleValueChanged(quat.x());
@@ -44,7 +79,7 @@ void ValueNotifierClass::callQuatChanged(QQuaternion quat)
     emit subNotifier.at(3)->singleValueChanged(quat.scalar());
 }
 
-void ValueNotifierClass::callVectorChanged(QVector3D vect)
+void ValueNotifierClass::callVectorChanged(const QVector3D vect)
 {
     emit vectorChanged(vect);
     emit subNotifier.at(0)->singleValueChanged(vect.x());
@@ -52,7 +87,7 @@ void ValueNotifierClass::callVectorChanged(QVector3D vect)
     emit subNotifier.at(2)->singleValueChanged(vect.z());
 }
 
-void ValueNotifierClass::callTouchChanged(QList<float> touch)
+void ValueNotifierClass::callTouchChanged(const QList<float> touch)
 {
     emit touchChanged(touch);
     for(int i = 0; i < m_numberValues; i++) {
@@ -60,7 +95,45 @@ void ValueNotifierClass::callTouchChanged(QList<float> touch)
     }
 }
 
-void ValueNotifierClass::callValuesChanged(QList<float> values)
+void ValueNotifierClass::callValuesChanged(const QList<float> values)
+{
+    emit valuesChanged(values);
+    for(int i= 0; i < values.size(); i++) {
+        emit subNotifier.at(i)->singleValueChanged(values[i]);
+    }
+}
+
+void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)
 {
 
+}
+
+void ValueNotifierClass::slot_vectorChanged(QVector3D vect, int frame)
+{
+
+}
+
+void ValueNotifierClass::slot_touchChanged(QList<float> touch, int frame)
+{
+
+}
+
+void ValueNotifierClass::slot_valuesChanged(QList<float> values, int frame)
+{
+
+}
+
+void ValueNotifierClass::slot_singleValueChanged(float value, int frame)
+{
+
+}
+
+void ValueNotifierClass::slot_boolValueChanged(bool value, int frame)
+{
+    //TODO: implement
+}
+
+void ValueNotifierClass::slot_trigger(int frame)
+{
+    //TODO: implement
 }

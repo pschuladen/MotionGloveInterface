@@ -26,6 +26,8 @@
 #include "valuenotifierclass.h"
 #include "inputvalueviewcontroller.h"
 
+#include "typehelper.h"
+
 struct MotionDevice;
 
 class DeviceDataInput : public QObject
@@ -37,9 +39,9 @@ public:
     QString m_identifier;
     uint8_t m_nSensors;
 
-    typedef InputValueViewController::ValueViewMode SensType ;
-
-    const QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::Quat, SensType::Touch};
+//    typedef InputValueViewController::ValueViewMode SensType ;
+    typedef TypeHelper::SensorType SensType ;
+    const QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::RotQuat, SensType::Touch};
 
     QMap<SensType, QList<ValueNotifierClass*>> valueNotifier;
 
@@ -53,7 +55,8 @@ public:
     struct OscInputStruct {
         OscHandleTypeFun handleFunction = &DeviceDataInput::oscR_unMapped;
         int sensorIndex = 0;
-        InputValueViewController::ValueViewMode sensorType;
+//        InputValueViewController::ValueViewMode sensorType;
+        TypeHelper::SensorType sensorType;
     };
 
 signals:
@@ -62,9 +65,9 @@ private:
 
     MotionDevice* m_deviceDescription;
 
-    enum SenTyp {
-        accel, gyro, grav, quat
-    };
+//    enum SenTyp {
+//        accel, gyro, grav, quat
+//    };
 
     QUdpSocket *socket;
     uint16_t m_port;
@@ -101,7 +104,8 @@ private:
 */
 
 struct MotionDevice {
-    typedef InputValueViewController::ValueViewMode SensType ;
+//    typedef InputValueViewController::ValueViewMode SensType ;
+    typedef TypeHelper::SensorType SensType ;
 
     QString deviceName;
     QString address;
@@ -112,7 +116,7 @@ struct MotionDevice {
     QHash<QString, DeviceDataInput::OscInputStruct> *inputs;
 
     QList<QString> getSortedInputKeys(bool sortByType=true,
-                                      QList<SensType> sortOrder={SensType::Quat, SensType::Accel, SensType::Grav, SensType::Gyro, SensType::Touch, SensType::Custom})
+                                      QList<SensType> sortOrder={SensType::RotQuat, SensType::Accel, SensType::Grav, SensType::Gyro, SensType::Touch, SensType::Custom})
     {
         QList<QString> sortedKeys;
         QMap<SensType, QList<QString>> sortMap;

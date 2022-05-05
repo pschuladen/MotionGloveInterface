@@ -30,6 +30,8 @@
 #include "processnodecontroller.h"
 #include "dataprocessingnode.h"
 
+#include "typehelper.h"
+
 class MainBackend : public QObject
 {
     Q_OBJECT
@@ -42,7 +44,10 @@ public:
     void setEngine(QQmlApplicationEngine *engine);
 
     Q_INVOKABLE void createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition=QPoint(10,10));
-    Q_INVOKABLE bool connectionRequest(QString sourceObjectId, QString senderNodeId, QString receiverNodeId, ProcessNodeController::ValueType valueType, int idx);
+    Q_INVOKABLE bool connectionRequest(QString sourceObjectId, QString senderNodeId,int sourceIdx, QString receiverNodeId, int targetIdx, TypeHelper::ValueType valueType);
+
+    Q_INVOKABLE bool createOscOutputDevice();
+
 
 private:
     struct NodesData {

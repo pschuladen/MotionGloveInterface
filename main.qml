@@ -16,6 +16,8 @@ Window {
     title: qsTr("Motion Glove Interface")
     color: "black"
 
+    Component.onCompleted: console.log(TypeHelper.Accel)
+
     Item {
         id: mainItem
         objectName: "mainRootItem"
@@ -144,6 +146,11 @@ Window {
                 width: 1
                 color: "black"
             }
+           Button {
+               text: "click"
+anchors.verticalCenter: outputControl.verticalCenter
+           }
+
         }
         Rectangle {
             // create OSC-outputs and instruments here
@@ -159,6 +166,31 @@ Window {
                 width: 1
                 color: "black"
             }
+            ColumnLayout {
+                id: outputNodesRow
+                anchors{
+                    top: parent.top
+                    left: parent.left
+                    right:parent.right
+                    margins: 5
+                }
+                height: childrenRect.height
+
+
+                OscOutputDeviceView {
+                    Layout.fillWidth: true
+                }
+            }
+            Button {
+                text: "create Osc-Out"
+                anchors {
+                    horizontalCenter: outputNodesRow.horizontalCenter
+                    top: outputNodesRow.bottom
+                }
+                onClicked: _mbackend.createOscOutputDevice()
+
+            }
+
         }
     }
 }

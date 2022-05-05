@@ -129,7 +129,7 @@ Item {
 //                Drag.onActiveChanged: console.log("im moooving")
                 Drag.mimeData: {"text/plain": root.vName,
                                 "nodeId": root.parentIdentifier,
-                                "valueType": ProcessNodeController.Single,
+                                "valueType": TypeHelper.SingleValue,//ProcessNodeController.Single,
                                 "valueIndex": root.vIdx,
                                 "sourceObjectId": sourceObjectId}
                 Drag.onDragFinished: console.log("drag finished")

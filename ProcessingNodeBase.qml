@@ -186,6 +186,7 @@ Item {
         }
         Rectangle {
             id: inputPlug
+            property int plugIndex: 0
             height: 10
             width: height
             radius: height/2
@@ -203,8 +204,9 @@ Item {
                 onEntered:(drag) =>  console.log(drag.keys)
                 onDropped: (drop) => {
                                if(_mbackend.connectionRequest(drop.getDataAsString("sourceObjectId"),
-                                                              drop.getDataAsString("nodeId"), root.uniqueID,
-                                                           drop.getDataAsString("valueType"), drop.getDataAsString("valueIndex"))) {
+                                                              drop.getDataAsString("nodeId"), drop.getDataAsString("valueIndex"),
+                                                              root.uniqueID, inputPlug.plugIndex,
+                                                           drop.getDataAsString("valueType"))) {
                                    drop.acceptProposedAction()
                                }
                            }

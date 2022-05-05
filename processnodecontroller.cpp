@@ -7,6 +7,45 @@ ProcessNodeController::ProcessNodeController(QObject *parent)
     m_objectIsView = true;
 }
 
+QVector3D ProcessNodeController::processVector(QVector3D vector, int frame)
+{
+    Q_UNUSED(frame)
+    vector.setX(simpleProcessingFunction(vector.x()));
+    vector.setY(simpleProcessingFunction(vector.y()));
+    vector.setZ(simpleProcessingFunction(vector.z()));
+    return vector;
+}
+
+QQuaternion ProcessNodeController::processQuat(QQuaternion quat, int frame)
+{
+    Q_UNUSED(frame)
+    quat.setX(simpleProcessingFunction(quat.x()));
+    quat.setY(simpleProcessingFunction(quat.y()));
+    quat.setZ(simpleProcessingFunction(quat.z()));
+    quat.setScalar(simpleProcessingFunction(quat.scalar()));
+    return quat;
+}
+
+float ProcessNodeController::processSingleValue(float value, int frame)
+{
+    Q_UNUSED(frame)
+    return simpleProcessingFunction(value);
+}
+
+QList<float> ProcessNodeController::processValueList(QList<float> values, int frame)
+{
+    Q_UNUSED(frame)
+    for(int i = 0; i < values.size(); i++) {
+        values[i] = simpleProcessingFunction(values[i]);
+    }
+    return values;
+}
+
+bool ProcessNodeController::processBoolValue(bool boolVal, int frame)
+{
+    return boolVal;
+}
+
 const QList<QColor> &ProcessNodeController::connectorColor() const
 {
     return m_connectorColor;
@@ -147,9 +186,30 @@ void ProcessNodeController::setSingleInputValue(float newSingleInputValue)
     emit singleInputValueChanged();
 }
 
+void ProcessNodeController::createNotifier(int n)
+{
+    ValueNotifierClass *vv;
+//    valueNotifier.append()
+}
+
+float ProcessNodeController::simpleProcessingFunction(float value)
+{
+    return value;
+}
+
 void ProcessNodeController::singleValueChanged(float value)
 {
     setSingleInputValue(value);
     qInfo() << "single value set" << value;
 
+}
+
+bool ProcessNodeController::connectionRequest(int index, TypeHelper::ValueType valueType)
+{
+    if(valueNotifier.size() != index - 1) {
+        return false;
+    }
+
+
+    return true;
 }

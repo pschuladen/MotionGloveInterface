@@ -21,6 +21,10 @@ qt_add_executable(appMotionGloveInterface
     inputvalueviewcontroller.h inputvalueviewcontroller.cpp
     dataprocessingnode.h dataprocessingnode.cpp
     processnodecontroller.h processnodecontroller.cpp
+    oscoutputdevice.h oscoutputdevice.cpp
+    typehelper.h typehelper.cpp
+    proc_scale.h proc_scale.cpp
+    processnode.h processnode.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface
@@ -35,6 +39,8 @@ qt_add_qml_module(appMotionGloveInterface
                 SensorValuesView.qml
                 ProcessingNodeBase.qml
                 TextNumberField.qml
+                OscOutputView.qml
+                OscOutputDeviceView.qml
 )
 
 

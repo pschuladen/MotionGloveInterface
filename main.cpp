@@ -5,6 +5,9 @@
 #include <QQmlContext>
 #include "mainbackend.h"
 
+#include "oscoutputdevice.h"
+
+
 //for test purposes
 //#include <QQmlComponent>
 //#include <QQuickItem>
@@ -28,6 +31,8 @@ int main(int argc, char *argv[])
     // Somehow necessary to gt rid of qml-warnings with module. Documentation states this is kind of registration is not necessary ?!
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
     qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController");
+    qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "value types only");
+
 
 
     engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());
@@ -36,6 +41,9 @@ int main(int argc, char *argv[])
 
     main_backend::Instance()->setEngine(&engine);
     main_devicestatus::Instance();
+
+    OscOutputDevice test;
+
 
 
 //    QQmlComponent testValView(&engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
