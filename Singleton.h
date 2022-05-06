@@ -6,7 +6,7 @@
  * Classes can use this by adding
  * typedef Singleton<Classname> name_to_call ;
  * behind the header. The singleton can then be called/created by using
- * name_to_call::Instance();
+ * name_to_call::Instance(); see end of mainbackend-header and main.cpp.
 */
 
 #include <assert.h>

@@ -21,7 +21,7 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
 {
     qInfo() << "now i should creat a view" << type << "at" << atPosition.x() << atPosition.y();
 
-    QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/ProcessingNodeBase.qml")));
+    QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml")));
     qInfo() << "errorstring" << newProcessingComponent.errorString();
     QString name = QString("proc-%1").arg(processingNodes.size());
 //    ProcessNodeController newC; //= new ProcessNodeController();
@@ -29,20 +29,26 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
                                                                                                                   {"x", atPosition.x()-40},
                                                                                                                   {"y", atPosition.y()-20}}));
 
-    ProcessNodeController *viewBackend = newProcessingItem->findChild<ProcessNodeController*>(name+"-viewcontroller");
+    ProcessNode *viewBackend = newProcessingItem->findChild<ProcessNode*>(name+"-viewcontroller");
     newProcessingItem->setParentItem(processingGraphView);
+    qInfo() << viewBackend << viewBackend->parent();
+    ProcessNode *processController = viewBackend->createProcessControl(name);
+    qInfo() << processController << processController->parent();
+
+
 //    newProcessingItem->setObjectName(name);
-    ProcessNodeController *newProcessCalculus = new ProcessNodeController();
-    newProcessCalculus->setObjectName(name+"-calculus");
+//    ProcessNodeController *newProcessCalculus = new ProcessNodeController();
+//    newProcessCalculus->setObjectName(name+"-calculus");
     ProcessingNode newNode;
-    newNode.processingObject = newProcessCalculus;
+    newNode.processingController = processController;
     newNode.viewController = viewBackend;
+    newNode.qmlView = newProcessingItem;
     processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
 
     qInfo() << "Node Hash size" << processingNodes.size();
     qInfo() << "node" << name << processingNodes.values().size();
-    ProcessNodeController *baba = processingNodes[name].viewController;
-    qInfo() << "viewba" << baba->objectName();
+//    ProcessNodeController *baba = processingNodes[name].viewController;
+//    qInfo() << "viewba" << baba->objectName();
 
 //    qInfo() << "processing nodes" << processingNodes[name].processingObject->objectName() << processingNodes[name].viewBackend->objectName();
     //    QQuickitem *theView = processingNodes.value(name).viewBackend;
@@ -51,21 +57,21 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
 bool MainBackend::connectionRequest(QString sourceObjectId, QString senderNodeId,int sourceIdx, QString receiverNodeId, int targetIdx, TypeHelper::ValueType valueType)
 {
 
-    qInfo() << "Connection request" << senderNodeId << receiverNodeId << valueType << sourceIdx;
-    qInfo() << "";
-    const MotionDevice &motionDevice = main_devicestatus::Instance()->discoveredDevices.value(sourceObjectId);
-    const ProcessNodeController *prcObject = processingNodes.value(receiverNodeId).processingObject;
-    const ProcessNodeController *prcViewCon = processingNodes.value(receiverNodeId).viewController;
-    const DeviceDataInput::OscInputStruct &oscStr = motionDevice.inputs->value(senderNodeId);
-    ValueNotifierClass *valueNotifier;
-    if (valueType == TypeHelper::SingleValue) {
-        valueNotifier = motionDevice.inputHandler->valueNotifier.value(oscStr.sensorType).at(oscStr.sensorIndex)->subNotifier.at(sourceIdx);
-        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcObject, &ProcessNodeController::singleValueChanged);
-        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcViewCon, &ProcessNodeController::singleValueChanged);
-    }
-//    const ProcessNodeController &proces = processingNodes.value(receiverNodeId).processingObject;
+//    qInfo() << "Connection request" << senderNodeId << receiverNodeId << valueType << sourceIdx;
+//    qInfo() << "";
+//    const MotionDevice &motionDevice = main_devicestatus::Instance()->discoveredDevices.value(sourceObjectId);
+//    const ProcessNodeController *prcObject = processingNodes.value(receiverNodeId).processingController;
+//    const ProcessNodeController *prcViewCon = processingNodes.value(receiverNodeId).viewController;
+//    const DeviceDataInput::OscInputStruct &oscStr = motionDevice.inputs->value(senderNodeId);
+//    ValueNotifierClass *valueNotifier;
+//    if (valueType == TypeHelper::SingleValue) {
+//        valueNotifier = motionDevice.inputHandler->valueNotifier.value(oscStr.sensorType).at(oscStr.sensorIndex)->subNotifier.at(sourceIdx);
+//        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcObject, &ProcessNodeController::singleValueChanged);
+//        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcViewCon, &ProcessNodeController::singleValueChanged);
+//    }
+////    const ProcessNodeController &proces = processingNodes.value(receiverNodeId).processingObject;
 
-    return true;
+    return false;
 }
 
 bool MainBackend::createOscOutputDevice()

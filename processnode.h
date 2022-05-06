@@ -4,19 +4,48 @@
 #include "valuenotifierclass.h"
 #include "QtQml/qqmlregistration.h"
 
+/*
+ * This is the base class for processing nodes. It
+ * should be seen as virtual class and not actually be instantiated.
+ * It inherits from ValueNotifierClass which basicallly provides Signal/Slots
+ * for all Data-types used in this program.
+ * Child classes start with "PN_" and implement processing functions.
+ *
+ * Usually several objects of childclasses were created:
+ * ViewControler -> ProcessController -> (multiple)Processor
+ * Parameter for processing were set in the ViewController signaled
+ * to the ProcessController which can hold several Processors that
+ * do the processing e.g. of different source-signals.
+ * Make sure that all relevant parameter were reached through.
+ *
+ * Childclasses with simple functions just have to override the process
+ * function, handle there properties and newConnections (create subProcessors).
+ *
+ * This slots were automatically mapped to the process function (splitting the
+ * types to single values) and emit the result as signal.
+*/
+
 class ProcessNode : public ValueNotifierClass
 {
     Q_OBJECT
 public:
     explicit ProcessNode(QObject *parent = nullptr);
 
-    virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
-    virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
 
     enum ProcessRole {
         ViewController, ProcessController, Processor
     };
     ProcessRole processRole = ViewController;
+
+    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
+
+    virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
+    virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
+    // there is something doppeltgemoppelt
+    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+    virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
+
+    virtual ProcessNode* createProcessControl(QString objectname_id);
 
 private:
     virtual float process(float value); //child classes override this for the processing

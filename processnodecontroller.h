@@ -1,6 +1,11 @@
 #ifndef PROCESSNODECONTROLLER_H
 #define PROCESSNODECONTROLLER_H
 
+/*
+ * This class is obsolete and will be deleted soon.
+*/
+
+
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 #include <QColor>

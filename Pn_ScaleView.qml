@@ -19,11 +19,16 @@ Item {
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
 
-    ProcessNodeController {
+    PN_Scale {
         id: backend
         objectName: root.uniqueID+"-viewcontroller"
 //        viewmode: ValueViewBackend.Custom
 //        valuecount: 2
+        inLow: inLowField.value
+        inHigh: inHighField.value
+        outLow: outLowField.value
+        outHigh: outHighField.value
+
     }
 
 
@@ -64,7 +69,7 @@ Item {
         }
         Text {
             id: testValueView
-            text: backend.singleInputValue.toFixed(2)
+            text: "notext"//backend.singleInputValue.toFixed(2)
             anchors {
                 verticalCenter: processingTitleLabel.verticalCenter
                 right: outerShape.right
@@ -128,6 +133,7 @@ Item {
                 id: inputControls
                 anchors.fill: parent
                 TextNumberField {
+                    id: inLowField
                     Layout.alignment: Qt.AlignRight
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
@@ -142,6 +148,7 @@ Item {
                    Layout.fillWidth: true
                 }
                 TextNumberField {
+                    id: inHighField
                     Layout.alignment: Qt.AlignRight
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
@@ -166,6 +173,7 @@ Item {
                 anchors.fill: parent
 
                 TextNumberField {
+                    id: outLowField
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true
@@ -178,6 +186,7 @@ Item {
                     Layout.fillWidth: true
                 }
                 TextNumberField {
+                    id: outHighField
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true

@@ -54,6 +54,26 @@ quint8 ProcessNode::process(quint8 value)
     return value;
 }
 
+void ProcessNode::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
+{
+    connectedValueType = newConnectedValueType;
+}
+
+bool ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+{
+    return false;
+}
+
+bool ProcessNode::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
+{
+    return false;
+}
+
+ProcessNode *ProcessNode::createProcessControl(QString objectname_id)
+{
+    return nullptr;
+}
+
 void ProcessNode::slot_quatChanged(QQuaternion quat, int frame)
 {
     if(connectedValueType == TypeHelper::Quat) {

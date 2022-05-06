@@ -22,9 +22,10 @@
 #include <QQmlApplicationEngine>
 #include <QtQml/qqmlregistration.h>
 
-#include "devicestatusmanager.h"
+#include "devicestatusmanager.h" //recursive inclusion und so...
 #include "devicedatainput.h"
-#include "valuenotifierclass.h"
+#include "valuenotifierclass.h" //kann weg
+#include "processnode.h"
 
 #include "inputvalueviewcontroller.h"
 #include "processnodecontroller.h"
@@ -66,8 +67,9 @@ private:
 //    QMap<QString, DeviceDataInput*> inputDevices;
     QHash<QString, NodesData> inputNodes; //TODO: implement?
     struct ProcessingNode {
-        ProcessNodeController* viewController;
-        ProcessNodeController* processingObject;
+        ProcessNode* viewController;
+        ProcessNode* processingController;
+        QQuickItem* qmlView;
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
     };
     QHash<QString, ProcessingNode> processingNodes;
