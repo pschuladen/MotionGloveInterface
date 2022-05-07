@@ -1,58 +1,56 @@
 #include "inputvalueviewcontroller.h"
 
 InputValueViewController::InputValueViewController(QObject *parent)
-    : QObject{parent}
 {
-
-
+    setParent(parent);
 }
 
-InputValueViewController::ValueViewMode InputValueViewController::viewmode() const
+TypeHelper::SensorType InputValueViewController::viewmode() const
 {
     return m_viewmode;
 }
 
-void InputValueViewController::setViewmode(ValueViewMode newViewmode)
+void InputValueViewController::setViewmode(TypeHelper::SensorType newViewmode)
 {
     if (m_viewmode == newViewmode)
         return;
     m_viewmode = newViewmode;
 
     switch(newViewmode) {
-    case ValueViewMode::Custom:
+    case TypeHelper::Custom:
         break;
-    case ValueViewMode::Accel:
+    case TypeHelper::Accel:
         setValname({"X", "Y", "Z"});
         m_values.resize(3);
         setMaxvalue(100);
         setMinvalue(-100);
         break;
-    case ValueViewMode::Gyro:
+    case TypeHelper::Gyro:
         setValname({"X", "Y", "Z"});
         m_values.resize(3);
         setMaxvalue(100);
         setMinvalue(-100);
         break;
-    case ValueViewMode::Grav:
+    case TypeHelper::Grav:
         setValname({"X", "Y", "Z"});
         m_values.resize(3);
         setMaxvalue(1);
         setMinvalue(-1);
         break;
-    case ValueViewMode::Quat:
+    case TypeHelper::RotQuat:
         setValname({"X", "Y", "Z", "W"});
         m_values.resize(4);
         setMaxvalue(1);
         setMinvalue(-1);
         break;
-    case ValueViewMode::Touch:
+    case TypeHelper::Touch:
         setValname({"t1", "t2", "t3", "t4", "t5", "t6"});
         m_values.resize(6);
         setMaxvalue(100);
         setMinvalue(0);
         break;
     }
-    setDotColor(modeColorMap.value(newViewmode, QColor("white")));
+    setDotColor(TypeHelper::getColorForValueType(TypeHelper::valueTypeForSensor(newViewmode)));//modeColorMap.value(newViewmode, QColor("white")));
     setValueCount(m_values.size());
 
 //    qInfo() << "new viewmode" << newViewmode;
@@ -136,7 +134,7 @@ void InputValueViewController::newValues(QList<float> newValues)
 void InputValueViewController::checkAndEmitValuesChanged()
 {
     if(emitvalues()) {
-        emit valuesChanged();
+        emit viewValuesChanged();
     }
 }
 

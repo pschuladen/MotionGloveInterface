@@ -2,6 +2,7 @@
 #define TYPEHELPER_H
 
 #include <QtCore>
+#include <QColor>
 
 struct TypeHelper
 {
@@ -12,15 +13,29 @@ public:
     enum SensorType: quint8 {Custom, Accel, Gyro, Grav, RotQuat, Touch};
     Q_ENUM(SensorType);
 
-    enum ValueType: quint8 { // TODO: add touchvalues
+    enum ValueType: quint8 { // TODO: add touchvalues as type?
         Undefined, Vector, Quat, List,
         SingleValue, BoolValue, Trigger
     };
     Q_ENUM(ValueType);
-
     static const ValueType valueTypeForSensor(SensorType styp);
+    Q_INVOKABLE static QColor getColorForValueType(TypeHelper::ValueType vtype);
 
 
+    enum NodeConnectionType: quint8 {
+        InputToProcess,
+        ProcessToProcess,
+        InputToOutput,
+        InputToAudio,
+        ProcessToOutput,
+        ProcessToAudio
+    };
+    Q_ENUM(NodeConnectionType);
+
+    enum NodeType: quint8 {
+        Input, Process, Output, Audio
+    };
+    Q_ENUM(NodeType);
 };
 
 struct TouchValues {

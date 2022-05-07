@@ -1,6 +1,8 @@
 #ifndef DATAPROCESSINGNODE_H
 #define DATAPROCESSINGNODE_H
 /*
+ * This class is OSBSOLETE and will be deleted soon.
+ *
  * This class provides mechanism for processing the sensor data.
  * (This is the base class?)
  * It provides all processing methods.

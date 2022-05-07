@@ -72,6 +72,15 @@ void ValueNotifierClass::createSubnotifier(TypeHelper::ValueType valueType)
 
 }
 
+ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
+{
+    if(idx < 0) return this;
+
+    else if(idx < subNotifier.size()) return subNotifier.at(idx);
+
+    else return nullptr;
+}
+
 void ValueNotifierClass::callQuatChanged(const QQuaternion quat, int frame)
 {
     emit quatChanged(quat, frame);
@@ -103,6 +112,11 @@ void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
     for(int i= 0; i < values.size(); i++) {
         emit subNotifier.at(i)->singleValueChanged(values[i], frame);
     }
+}
+
+bool ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+{
+    return false;
 }
 
 void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)

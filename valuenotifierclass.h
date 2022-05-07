@@ -16,16 +16,6 @@
 #include "typehelper.h"
 
 
-//forward Declaration
-//class ProcessNodeController : public QObject {
-//public:
-//    virtual QVector3D processVector(QVector3D vector, int frame=-1);
-//    virtual QQuaternion processQuat(QQuaternion quat, int frame=-1);
-//    virtual float processSingleValue(float value, int frame=-1);
-//    virtual QList<float> processValueList(QList<float> values, int frame=-1);
-//    virtual bool processBoolValue(bool boolVal, int frame=-1);
-//};
-
 
 class ValueNotifierClass : public QObject
 {
@@ -44,8 +34,12 @@ public:
     void callTouchChanged(const QList<float> touch, int frame=-1);
     void callValuesChanged(const QList<float> values, int frame=-1);
 
+    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+
     QList<ValueNotifierClass*> subNotifier; //TODO: make this private
     void createSubnotifier(TypeHelper::ValueType valueType);
+
+    virtual ValueNotifierClass* getNotifier(int idx=-1);
 
 private:
     int m_numberValues;

@@ -9,7 +9,6 @@ PN_Scale::PN_Scale(TypeHelper::ValueType type, QObject *parent)
 {
     setParent(parent);
     setConnectedValueType(type);
-
 }
 
 float PN_Scale::inLow() const
@@ -77,8 +76,9 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
     setInitialProperties(this, newSub);
     connectPropertiesToProcessor(this, newSub);
     subProcessor.append(newSub);
+    appendToConnectedTypes(type);
 
-    return true;
+    return setConnectionFromSender(sender, type, nValuesInList);
 }
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
@@ -105,6 +105,7 @@ float PN_Scale::process(float value)
         else return result;
 
     }
+    qInfo() <<"process result " << ((value-inLow()) * multi()) + outLow();
     return ((value-inLow()) * multi()) + outLow();
 }
 
@@ -135,25 +136,26 @@ void PN_Scale::setMulti(float newMulti)
 
 bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ)
 {
-
         if(typ == TypeHelper::Undefined || typ == TypeHelper::Quat) return false;
         else return true;
-
 }
 
 void PN_Scale::connectPropertiesToProcessor(PN_Scale *propertyMaster, PN_Scale *propertySlave)
 {
+//TODO: differentiate between ProcessorRoles
     connect(propertyMaster, &PN_Scale::inLowChanged, propertySlave, &PN_Scale::setInLow);
     connect(propertyMaster, &PN_Scale::inHighChanged, propertySlave, &PN_Scale::setInHigh);
     connect(propertyMaster, &PN_Scale::outLowChanged, propertySlave, &PN_Scale::setOutLow);
     connect(propertyMaster, &PN_Scale::outHighChanged, propertySlave, &PN_Scale::setOutHigh);
     connect(propertyMaster, &PN_Scale::clipOutputChanged, propertySlave, &PN_Scale::setClipOutput);
+    // has to be in another way...
+    connect(propertySlave, &PN_Scale::connectedTypesChanged, propertyMaster, &PN_Scale::setConnectedTypes);
 }
 
 void PN_Scale::setInitialProperties(PN_Scale *propertyMaster, PN_Scale *propertySlave)
 {
 //    propertySlave->setProperty()
-
+//TODO: differentiate between ProcessorRoles
     propertySlave->setInLow(propertyMaster->inLow());
     propertySlave->setInHigh(propertyMaster->inHigh());
     propertySlave->setOutLow(propertyMaster->outLow());

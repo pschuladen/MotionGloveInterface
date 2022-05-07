@@ -19,6 +19,8 @@ Item {
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
 
+    Component.onCompleted: console.log("processnode rect", width, height)
+
     PN_Scale {
         id: backend
         objectName: root.uniqueID+"-viewcontroller"
@@ -36,6 +38,8 @@ Item {
         id: outerShape
         width: outputRect.x + outputRect.width + inputRect.x//childrenRect.width + childrenRect.x*2
         height: outputRect.y + outputRect.height + processingTitleLabel.y//childrenRect.height + childrenRect.y*2
+        implicitHeight: height
+        implicitWidth: width
 
         color: "lightgrey"
         border {
@@ -64,18 +68,26 @@ Item {
             anchors {
                 top: outerShape.top
                 left: outerShape.left
-                margins: 5
+                margins: 7
             }
         }
         Text {
             id: testValueView
-            text: "notext"//backend.singleInputValue.toFixed(2)
+            text: "clip"//backend.singleInputValue.toFixed(2)
             anchors {
                 verticalCenter: processingTitleLabel.verticalCenter
-                right: outerShape.right
+                right: clipValueCheckbox.left
                 rightMargin: 5
             }
             horizontalAlignment: Text.AlignRight
+        }
+        CheckBox {
+            id: clipValueCheckbox
+            anchors {
+                verticalCenter: processingTitleLabel.verticalCenter
+                right: outerShape.right
+                rightMargin: 7
+            }
         }
 
         Rectangle {
@@ -133,7 +145,7 @@ Item {
                 id: inputControls
                 anchors.fill: parent
                 TextNumberField {
-                    id: inLowField
+                    id: inHighField
                     Layout.alignment: Qt.AlignRight
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
@@ -148,7 +160,7 @@ Item {
                    Layout.fillWidth: true
                 }
                 TextNumberField {
-                    id: inHighField
+                    id: inLowField
                     Layout.alignment: Qt.AlignRight
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
@@ -173,7 +185,7 @@ Item {
                 anchors.fill: parent
 
                 TextNumberField {
-                    id: outLowField
+                    id: outHighField
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true
@@ -186,53 +198,61 @@ Item {
                     Layout.fillWidth: true
                 }
                 TextNumberField {
-                    id: outHighField
+                    id: outLowField
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true
                 }
             }
         }
-        Rectangle {
-            id: inputPlug
-            property int plugIndex: 0
-            height: 10
-            width: height
-            radius: height/2
-            color: "white"
-            anchors.horizontalCenter: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            border {
-                width: 1
-                color: inDrop.containsDrag ? "cyan" : "black"
-            }
-            DropArea {
-                id: inDrop
-                anchors.fill: parent
-                keys: ["nodeId", "valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]
-                onEntered:(drag) =>  console.log(drag.keys)
-                onDropped: (drop) => {
-                               if(_mbackend.connectionRequest(drop.getDataAsString("sourceObjectId"),
-                                                              drop.getDataAsString("nodeId"), drop.getDataAsString("valueIndex"),
-                                                              root.uniqueID, inputPlug.plugIndex,
-                                                           drop.getDataAsString("valueType"))) {
-                                   drop.acceptProposedAction()
-                               }
-                           }
-            }
-        }
-        Rectangle {
-            id: outputPlug
-            height: 10
-            width: height
-            radius: height/2
-            color: "white"
-            anchors.horizontalCenter: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            border {
-                width: 1
-                color: "black"
-            }
-        }
+//        Rectangle {
+//            id: inputPlug
+//            property int plugIndex: 0
+//            height: 10
+//            width: height
+//            radius: height/2
+//            color: "white"
+//            anchors.horizontalCenter: parent.left
+//            anchors.verticalCenter: parent.verticalCenter
+//            border {
+//                width: 1
+//                color: inDrop.containsDrag ? "cyan" : "black"
+//            }
+//            DropArea {
+//                id: inDrop
+//                anchors.fill: parent
+//                keys: ["nodeId", "valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]
+//                onEntered:(drag) =>  console.log(drag.keys)
+//                onDropped: (drop) => {
+//                               if(_mbackend.connectionRequest(drop.getDataAsString("sourceObjectId"),
+//                                                              drop.getDataAsString("nodeId"), drop.getDataAsString("valueIndex"),
+//                                                              root.uniqueID, inputPlug.plugIndex,
+//                                                           drop.getDataAsString("valueType"))) {
+//                                   drop.acceptProposedAction()
+//                               }
+//                           }
+//            }
+//        }
+//        Rectangle {
+//            id: outputPlug
+//            height: 10
+//            width: height
+//            radius: height/2
+//            color: "white"
+//            anchors.horizontalCenter: parent.right
+//            anchors.verticalCenter: parent.verticalCenter
+//            border {
+//                width: 1
+//                color: "black"
+//            }
+//        }
+    }
+
+    AttachedConnectorView {
+        anchors.fill: parent
+//        Component.onCompleted: console.log("parentsize", parent.width, parent.height)
+        uniqueID: root.uniqueID
+        connectedTypes: backend.connectedTypes//[TypeHelper.Quat, TypeHelper.Vector, TypeHelper.List]
+//        numConnections:
     }
 }

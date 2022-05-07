@@ -131,3 +131,22 @@ void ProcessNode::slot_trigger(int frame)
 {
 
 }
+
+const QList<TypeHelper::ValueType> &ProcessNode::connectedTypes() const
+{
+    return m_connectedTypes;
+}
+
+void ProcessNode::setConnectedTypes(const QList<TypeHelper::ValueType> &newConnectedTypes)
+{
+    if (m_connectedTypes == newConnectedTypes)
+        return;
+    m_connectedTypes = newConnectedTypes;
+    emit connectedTypesChanged(m_connectedTypes);
+}
+
+void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
+{
+    m_connectedTypes.append(appendType);
+    emit connectedTypesChanged(m_connectedTypes);
+}

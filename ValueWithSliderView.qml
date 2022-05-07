@@ -20,8 +20,6 @@ Item {
 
 
 
-
-
     Row {
         id: row
 
@@ -133,6 +131,7 @@ Item {
                                 "valueIndex": root.vIdx,
                                 "sourceObjectId": sourceObjectId}
                 Drag.onDragFinished: console.log("drag finished")
+
 
 //                Drag.dragType: Drag.Automatic
 //                color: "red"

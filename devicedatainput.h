@@ -44,6 +44,7 @@ public:
     const QList<SensType> allSensTypes = {SensType::Custom, SensType::Accel, SensType::Gyro, SensType::Grav, SensType::RotQuat, SensType::Touch};
 
     QMap<SensType, QList<ValueNotifierClass*>> valueNotifier;
+    ValueNotifierClass *getNotifier(SensType sensType, int sensIndex, int subIndex);
 
     QList<QVector3D> acceleration;
     QList<QVector3D> gyroscope;
@@ -58,6 +59,8 @@ public:
 //        InputValueViewController::ValueViewMode sensorType;
         TypeHelper::SensorType sensorType;
     };
+
+
 
 signals:
 
@@ -114,6 +117,15 @@ struct MotionDevice {
     bool connectStatus;
     DeviceDataInput *inputHandler;
     QHash<QString, DeviceDataInput::OscInputStruct> *inputs;
+
+    ValueNotifierClass *getValueNotifierForPath(const QString oscPath, int valueIndex=-1) const {
+        if(inputHandler != nullptr) {
+            return inputHandler->getNotifier(inputs->value(oscPath).sensorType,
+                                      inputs->value(oscPath).sensorIndex,
+                                      valueIndex);
+        }
+        return nullptr;
+    }
 
     QList<QString> getSortedInputKeys(bool sortByType=true,
                                       QList<SensType> sortOrder={SensType::RotQuat, SensType::Accel, SensType::Grav, SensType::Gyro, SensType::Touch, SensType::Custom})

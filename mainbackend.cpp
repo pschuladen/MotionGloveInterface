@@ -44,6 +44,7 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
     newNode.viewController = viewBackend;
     newNode.qmlView = newProcessingItem;
     processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
+    allConnectableObjects.insert(name, ConnectableObject(processController, newProcessingItem));
 
     qInfo() << "Node Hash size" << processingNodes.size();
     qInfo() << "node" << name << processingNodes.values().size();
@@ -54,24 +55,38 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
     //    QQuickitem *theView = processingNodes.value(name).viewBackend;
 }
 
-bool MainBackend::connectionRequest(QString sourceObjectId, QString senderNodeId,int sourceIdx, QString receiverNodeId, int targetIdx, TypeHelper::ValueType valueType)
+bool MainBackend::connectionRequest(const QString sourceObjectId, const QString senderNodeId,int sourceValueIdx,
+                                    const QString receiverNodeId, int targetValueIdx, TypeHelper::ValueType valueType)
 {
+    qInfo() << "Connection request" << sourceObjectId << senderNodeId << sourceValueIdx << receiverNodeId << targetValueIdx << valueType;
+    qInfo() << "registered objects for" << receiverNodeId
+            << processingNodes.value(receiverNodeId).processingController
+            << processingNodes.value(receiverNodeId).viewController
+           << processingNodes.value(receiverNodeId).qmlView;
 
-//    qInfo() << "Connection request" << senderNodeId << receiverNodeId << valueType << sourceIdx;
-//    qInfo() << "";
+    if(allConnectableObjects.contains(senderNodeId) && allConnectableObjects.contains(receiverNodeId)) {
+        //TODO: create ConnectionView/Object
+
+        return allConnectableObjects[receiverNodeId].notifier->newConnectionFromSender(allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx), valueType);
+    }
+    return false;
+
+
 //    const MotionDevice &motionDevice = main_devicestatus::Instance()->discoveredDevices.value(sourceObjectId);
-//    const ProcessNodeController *prcObject = processingNodes.value(receiverNodeId).processingController;
-//    const ProcessNodeController *prcViewCon = processingNodes.value(receiverNodeId).viewController;
+//    ProcessNode *prcObject = processingNodes.value(receiverNodeId).processingController;
+////    const ProcessNode *prcViewCon = processingNodes.value(receiverNodeId).viewController;
 //    const DeviceDataInput::OscInputStruct &oscStr = motionDevice.inputs->value(senderNodeId);
-//    ValueNotifierClass *valueNotifier;
-//    if (valueType == TypeHelper::SingleValue) {
-//        valueNotifier = motionDevice.inputHandler->valueNotifier.value(oscStr.sensorType).at(oscStr.sensorIndex)->subNotifier.at(sourceIdx);
-//        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcObject, &ProcessNodeController::singleValueChanged);
-//        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcViewCon, &ProcessNodeController::singleValueChanged);
-//    }
+//    ValueNotifierClass *valueNotifier = motionDevice.getValueNotifierForPath(senderNodeId, sourceValueIdx);
+//    bool connectionAccepted = prcObject->newConnectionFromSender(valueNotifier, valueType);
+////    if (valueType == TypeHelper::SingleValue) {
+////        valueNotifier = motionDevice.inputHandler->valueNotifier.value(oscStr.sensorType).at(oscStr.sensorIndex)->subNotifier.at(sourceIdx);
+
+////        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcObject, &ProcessNodeController::singleValueChanged);
+////        connect(valueNotifier, &ValueNotifierClass::singleValueChanged, prcViewCon, &ProcessNodeController::singleValueChanged);
+////    }
 ////    const ProcessNodeController &proces = processingNodes.value(receiverNodeId).processingObject;
 
-    return false;
+//    return connectionAccepted;
 }
 
 bool MainBackend::createOscOutputDevice()
@@ -124,8 +139,9 @@ void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
             connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::touchChanged, viewBackend, &InputValueViewController::touchChanged);
         }
         else {
-            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &InputValueViewController::valuesChanged);
+            connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &InputValueViewController::viewValuesChanged);
         }
+        allConnectableObjects.insert(osc, ConnectableObject(motionDevice->getValueNotifierForPath(osc), newValDevice));
     }
 }
 

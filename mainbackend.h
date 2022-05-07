@@ -56,6 +56,7 @@ private:
         QString container;
         QString oscPath; //TODO: implement
     };
+    QHash<QString, NodesData> inputNodes; //TODO: implement?
 
     QQmlApplicationEngine *m_engine;
     QQuickWindow *mainWindow;
@@ -65,14 +66,34 @@ private:
 
     QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
 //    QMap<QString, DeviceDataInput*> inputDevices;
-    QHash<QString, NodesData> inputNodes; //TODO: implement?
     struct ProcessingNode {
         ProcessNode* viewController;
         ProcessNode* processingController;
         QQuickItem* qmlView;
+        ProcessingNode(ProcessNode* _viewContr, ProcessNode *_processContr, QQuickItem *_qmlV)
+            : viewController{_viewContr}, processingController{_processContr}, qmlView{_qmlV} {}
+        ProcessingNode() {}
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
     };
     QHash<QString, ProcessingNode> processingNodes;
+
+    struct ConnectableObject {
+        ValueNotifierClass *notifier;
+        QQuickItem *qmlView;
+        ConnectableObject(ValueNotifierClass *_notifier, QQuickItem *_qmlView)
+            :notifier{_notifier}, qmlView{_qmlView} {}
+        ConnectableObject() {}
+    };
+    QMap<QString, ConnectableObject> allConnectableObjects;
+
+    struct ValueConnection {
+        QQuickItem *connectionView;
+        QQuickItem *sourceConnector;
+        QQuickItem *receiveConnector;
+        ValueConnection(QQuickItem *_conView, QQuickItem *_sourCon, QQuickItem *_recCon)
+            : connectionView{_conView}, sourceConnector{_sourCon}, receiveConnector{_recCon} {}
+    };
+    QMap<QString, ValueConnection> allConnections;
 
     void createMotionInputDeviceView(MotionDevice *motionDevice);
     void createValueInputViewsForDevice(MotionDevice *motionDevice);

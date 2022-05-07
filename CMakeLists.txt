@@ -41,6 +41,7 @@ qt_add_qml_module(appMotionGloveInterface
                 TextNumberField.qml
                 OscOutputView.qml
                 OscOutputDeviceView.qml
+                AttachedConnectorView.qml
 )
 
 

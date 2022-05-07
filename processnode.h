@@ -31,6 +31,8 @@ class ProcessNode : public ValueNotifierClass
 public:
     explicit ProcessNode(QObject *parent = nullptr);
 
+//    Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged)
+    Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged);
 
     enum ProcessRole {
         ViewController, ProcessController, Processor
@@ -42,10 +44,13 @@ public:
     virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
     // there is something doppeltgemoppelt
-    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override;
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
 
     virtual ProcessNode* createProcessControl(QString objectname_id);
+
+    const QList<TypeHelper::ValueType> &connectedTypes() const;
+    void appendToConnectedTypes(TypeHelper::ValueType appendType);
 
 private:
     virtual float process(float value); //child classes override this for the processing
@@ -54,7 +59,10 @@ private:
     //this should in theory already be used in ValueNotifierClass
     TypeHelper::ValueType connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
 
+    QList<TypeHelper::ValueType> m_connectedTypes;
+
 public slots:
+    void setConnectedTypes(const QList<TypeHelper::ValueType> &newConnectedTypes);
     virtual void slot_quatChanged(QQuaternion quat, int frame=-1) override;
     virtual void slot_vectorChanged(QVector3D vect, int frame=-1) override;
     virtual void slot_touchChanged(QList<float> touch, int frame=-1) override;
@@ -62,6 +70,8 @@ public slots:
     virtual void slot_singleValueChanged(float value, int frame=-1) override;
     virtual void slot_boolValueChanged(bool value, int frame=-1) override;
     virtual void slot_trigger(int frame=-1) override;
+signals:
+    void connectedTypesChanged(QList<TypeHelper::ValueType> connectedTypes);
 };
 
 #endif // PROCESSNODE_H

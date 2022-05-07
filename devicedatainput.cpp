@@ -28,6 +28,16 @@ DeviceDataInput::DeviceDataInput(QObject *parent, QString identifier, uint16_t p
 
 }
 
+ValueNotifierClass *DeviceDataInput::getNotifier(SensType sensType, int sensIndex, int subIndex)
+{
+    if(subIndex == -1) {
+        return valueNotifier.value(sensType).at(sensIndex);
+    }
+    else {
+        return valueNotifier.value(sensType).at(sensIndex)->subNotifier.at(subIndex);
+    }
+}
+
 void DeviceDataInput::readIncomingUdpData()
 {
     QByteArray buffer(socket->pendingDatagramSize(), char());

@@ -16,19 +16,21 @@
 #include <QtQml/qqmlregistration.h>
 #include <QColor>
 #include <QQmlEngine>
+#include "typehelper.h"
+#include "valuenotifierclass.h"
 
-class InputValueViewController : public QObject
+class InputValueViewController : public ValueNotifierClass
 {
     Q_OBJECT
     QML_ELEMENT
 
     Q_PROPERTY(QString nodeIdentifier READ nodeIdentifier WRITE setNodeIdentifier NOTIFY nodeIdentifierChanged)
     Q_PROPERTY(QList<QString> valname READ valname WRITE setValname NOTIFY valnameChanged)
-    Q_PROPERTY(QList<float> values READ values WRITE setValues NOTIFY valuesChanged)
+    Q_PROPERTY(QList<float> values READ values WRITE setValues NOTIFY viewValuesChanged)
     Q_PROPERTY(float minvalue READ minvalues WRITE setMinvalue NOTIFY minvalueChanged)
     Q_PROPERTY(float maxvalue READ maxvalues WRITE setMaxvalue NOTIFY maxvalueChanged)
     Q_PROPERTY(int valueCount READ valueCount WRITE setValueCount NOTIFY valueCountChanged)
-    Q_PROPERTY(ValueViewMode viewmode READ viewmode WRITE setViewmode NOTIFY viewmodeChanged)
+    Q_PROPERTY(TypeHelper::SensorType viewmode READ viewmode WRITE setViewmode NOTIFY viewmodeChanged)
     Q_PROPERTY(QColor dotColor READ dotColor WRITE setDotColor NOTIFY dotColorChanged)
 
 //    Q_PROPERTY(int valuecount READ valuecount WRITE setValuecount NOTIFY valuecountChanged)
@@ -43,8 +45,8 @@ public:
     };
     Q_ENUM(ValueViewMode);
 
-    ValueViewMode viewmode() const;
-    void setViewmode(ValueViewMode newViewmode);
+    TypeHelper::SensorType viewmode() const;
+    void setViewmode(TypeHelper::SensorType newViewmode);
 
     int valueCount() const;
     void setValueCount(int newValueCount);
@@ -84,7 +86,7 @@ private:
 
     void checkAndEmitValuesChanged();
 
-    ValueViewMode m_viewmode;
+    TypeHelper::SensorType m_viewmode;
 
     int m_valueCount;
 
@@ -102,12 +104,12 @@ private:
 
     int m_valuecount;
 
-    QMap<ValueViewMode, QColor> modeColorMap = {{ValueViewMode::Custom, QColor("mediumvioletred")},
-                                               {ValueViewMode::Accel, QColor("red")},
-                                               {ValueViewMode::Gyro, QColor("red")},
-                                               {ValueViewMode::Grav, QColor("red")},
-                                               {ValueViewMode::Quat, QColor("blue")},
-                                               {ValueViewMode::Touch, QColor("yellow")}};
+//    QMap<TypeHelper::SensorType, QColor> modeColorMap = {{TypeHelper::Custom, QColor("mediumvioletred")},
+//                                               {TypeHelper::Accel, QColor("red")},
+//                                               {TypeHelper::Gyro, QColor("red")},
+//                                               {TypeHelper::Grav, QColor("red")},
+//                                               {TypeHelper::RotQuat, QColor("blue")},
+//                                               {TypeHelper::Touch, QColor("yellow")}};
 
     QColor m_dotColor;
 
@@ -116,7 +118,7 @@ signals:
     void viewmodeChanged();
     void valueCountChanged();
 
-    void valuesChanged();
+    void viewValuesChanged();
     void valnameChanged();
     void nodeIdentifierChanged();
     void minvalueChanged();

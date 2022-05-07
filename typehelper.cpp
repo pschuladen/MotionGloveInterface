@@ -23,3 +23,26 @@ const TypeHelper::ValueType TypeHelper::valueTypeForSensor(SensorType styp)
         return ValueType::Undefined;
     }
 }
+
+QColor TypeHelper::getColorForValueType(ValueType vtype)
+{
+
+    switch (vtype) {
+    case TypeHelper::Undefined:
+        return QColor("white");
+    case TypeHelper::Vector:
+        return QColor("red");
+    case TypeHelper::Quat:
+        return QColor("blue");
+    case TypeHelper::List:
+        return QColor("yellow");
+    case TypeHelper::SingleValue:
+        return QColor("green");
+    case TypeHelper::BoolValue:
+        return QColor("deepskyblue");
+    case TypeHelper::Trigger:
+        return QColor("darkred");
+    }
+    return QColor();
+
+}

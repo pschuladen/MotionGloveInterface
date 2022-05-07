@@ -14,13 +14,18 @@
 //#include <QQuickItem>
 //#include "valueviewbackend.h"
 //#include <QQuickWindow>
-void registerQmlTypes() {
+void registerQmlTypes(QQmlApplicationEngine *engine) {
 
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
     qmlRegisterType<PN_Scale>("MotionGloveInterface", 1, 0, "PN_Scale");
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
 
+    //necessary for calling static functions from typehelper
+    TypeHelper typhelper;
+    engine->rootContext()->setContextProperty("_typehelper", QVariant::fromValue<TypeHelper>(typhelper));
+
     qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
+    engine->rootContext()->setContextProperty("_mbackend", main_backend::Instance());
 }
 
 
@@ -38,9 +43,9 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
 
     // Somehow necessary to gt rid of qml-warnings with module. Documentation states this is kind of registration is not necessary ?!
-    registerQmlTypes();
 
-    engine.rootContext()->setContextProperty("_mbackend", main_backend::Instance());
+    registerQmlTypes(&engine);
+
     engine.load(url);
     engine.setObjectName("MAIN_QML_ENGINE");
 
