@@ -23,6 +23,7 @@ Item {
         objectName: "valuebackend"
         emitvalues: !root.viewCollapsed && !root.globalBool_valuesHidden
     }
+    Component.onCompleted: console.log(backend.valname, backend.nodeIdentifier)
 
     Rectangle {
         id: contentRect
@@ -73,20 +74,32 @@ Item {
             color: "#861919"
         }
 
-        Rectangle {
-            color: backend.dotColor
-            width: 10
-            height: width
-            radius:width/2
+        OutputConnector {
             anchors {
                 verticalCenter: titleLable.verticalCenter
                 horizontalCenter: contentRect.right
             }
-            border {
-                width: 1
-                color: "black"
-            }
+
+            parentID: root.identifier
+            vName: _typehelper.getStringForValueType(vType)
+            vType: _typehelper.valueTypeForSensor(viewmode)
+
         }
+
+//        Rectangle {
+//            color: backend.dotColor
+//            width: 10
+//            height: width
+//            radius:width/2
+//            anchors {
+//                verticalCenter: titleLable.verticalCenter
+//                horizontalCenter: contentRect.right
+//            }
+//            border {
+//                width: 1
+//                color: "black"
+//            }
+//        }
 
         Item {
             id: columnWrapper
@@ -112,8 +125,10 @@ Item {
                 anchors.fill: parent
 
                 Repeater {
-                    model: backend.valueCount
-                    delegate: ValueWithSliderView {
+                    id:rep
+                    model:backend.valueCount
+                    delegate:
+                        ValueWithSliderView {
                         vName: backend.valname[model.index]
                         vMax: backend.maxvalue
                         vMin: backend.minvalue

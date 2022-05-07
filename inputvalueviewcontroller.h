@@ -40,6 +40,7 @@ class InputValueViewController : public ValueNotifierClass
 public:
     explicit InputValueViewController(QObject *parent = nullptr);
 
+    //ValueViewMode is obsolete and will be deleted soon
     enum ValueViewMode {
         Custom, Accel, Gyro, Grav, Quat, Touch
     };

@@ -136,7 +136,7 @@ void PN_Scale::setMulti(float newMulti)
 
 bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ)
 {
-        if(typ == TypeHelper::Undefined || typ == TypeHelper::Quat) return false;
+        if(typ == TypeHelper::Undefined) return false;
         else return true;
 }
 

@@ -45,7 +45,9 @@ public:
     void setEngine(QQmlApplicationEngine *engine);
 
     Q_INVOKABLE void createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition=QPoint(10,10));
-    Q_INVOKABLE bool connectionRequest(QString sourceObjectId, QString senderNodeId,int sourceIdx, QString receiverNodeId, int targetIdx, TypeHelper::ValueType valueType);
+    Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
+                                       QString receiverNodeId, int targetIdx, QQuickItem *receiverConnector,
+                                       TypeHelper::ValueType valueType);
 
     Q_INVOKABLE bool createOscOutputDevice();
 

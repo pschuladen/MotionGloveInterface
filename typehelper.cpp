@@ -46,3 +46,23 @@ QColor TypeHelper::getColorForValueType(ValueType vtype)
     return QColor();
 
 }
+
+QString TypeHelper::getStringForValueType(ValueType vtype)
+{
+    switch(vtype) {
+    case TypeHelper::Undefined:
+        return QString("undef");
+    case TypeHelper::Vector:
+        return QString("vect");
+    case TypeHelper::Quat:
+        return QString("quat");
+    case TypeHelper::List:
+        return QString("list");
+    case TypeHelper::SingleValue:
+        return QString("value");
+    case TypeHelper::BoolValue:
+        return QString("bool");
+    case TypeHelper::Trigger:
+        return QString("trig");
+    }
+}

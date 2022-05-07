@@ -55,20 +55,26 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
     //    QQuickitem *theView = processingNodes.value(name).viewBackend;
 }
 
-bool MainBackend::connectionRequest(const QString sourceObjectId, const QString senderNodeId,int sourceValueIdx,
-                                    const QString receiverNodeId, int targetValueIdx, TypeHelper::ValueType valueType)
+bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueIdx, QQuickItem *senderConnector,
+                                    const QString receiverNodeId, int targetValueIdx, QQuickItem *receiverConnector,
+                                    TypeHelper::ValueType valueType)
 {
-    qInfo() << "Connection request" << sourceObjectId << senderNodeId << sourceValueIdx << receiverNodeId << targetValueIdx << valueType;
-    qInfo() << "registered objects for" << receiverNodeId
-            << processingNodes.value(receiverNodeId).processingController
-            << processingNodes.value(receiverNodeId).viewController
-           << processingNodes.value(receiverNodeId).qmlView;
+    qInfo() << "Connection request" << senderNodeId << sourceValueIdx << senderConnector <<
+               receiverNodeId << targetValueIdx << receiverConnector <<
+               valueType;
+
+
+    //    qInfo() << "registered objects for" << receiverNodeId
+//            << processingNodes.value(receiverNodeId).processingController
+//            << processingNodes.value(receiverNodeId).viewController
+//           << processingNodes.value(receiverNodeId).qmlView;
 
     if(allConnectableObjects.contains(senderNodeId) && allConnectableObjects.contains(receiverNodeId)) {
         //TODO: create ConnectionView/Object
 
         return allConnectableObjects[receiverNodeId].notifier->newConnectionFromSender(allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx), valueType);
     }
+    qInfo() << "no objects found for connection";
     return false;
 
 
@@ -150,5 +156,4 @@ void MainBackend::createNewInputViews(MotionDevice *motionDevice)
 //    qInfo() << "begin creating views";
     createMotionInputDeviceView(motionDevice);
     createValueInputViewsForDevice(motionDevice);
-
 }
