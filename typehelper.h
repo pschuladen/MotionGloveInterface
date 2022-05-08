@@ -18,9 +18,9 @@ public:
         SingleValue, BoolValue, Trigger
     };
     Q_ENUM(ValueType);
-    Q_INVOKABLE static const ValueType valueTypeForSensor(TypeHelper::SensorType styp);
-    Q_INVOKABLE static QColor getColorForValueType(TypeHelper::ValueType vtype);
-    Q_INVOKABLE static QString getStringForValueType(TypeHelper::ValueType vtype);
+    Q_INVOKABLE static const ValueType valueTypeForSensor(const TypeHelper::SensorType styp);
+    Q_INVOKABLE static const QColor getColorForValueType(const TypeHelper::ValueType vtype);
+    Q_INVOKABLE static const QString getStringForValueType(const TypeHelper::ValueType vtype);
 
 
     enum NodeConnectionType: quint8 {
@@ -34,7 +34,7 @@ public:
     Q_ENUM(NodeConnectionType);
 
     enum NodeType: quint8 {
-        Input, Process, Output, Audio
+        Generic, Input, Process, Output, Audio
     };
     Q_ENUM(NodeType);
 };

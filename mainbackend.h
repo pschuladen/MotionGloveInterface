@@ -69,11 +69,11 @@ private:
     QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
 //    QMap<QString, DeviceDataInput*> inputDevices;
     struct ProcessingNode {
-        ProcessNode* viewController;
-        ProcessNode* processingController;
+        ProcessNode* controller;
+        QList<ProcessNode*> processor;
         QQuickItem* qmlView;
-        ProcessingNode(ProcessNode* _viewContr, ProcessNode *_processContr, QQuickItem *_qmlV)
-            : viewController{_viewContr}, processingController{_processContr}, qmlView{_qmlV} {}
+        ProcessingNode(ProcessNode* _viewContr, QQuickItem *_qmlV, QList<ProcessNode*> _processor=QList<ProcessNode*>())
+            : controller{_viewContr}, processor{_processor}, qmlView{_qmlV} {}
         ProcessingNode() {}
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
     };
@@ -82,8 +82,9 @@ private:
     struct ConnectableObject {
         ValueNotifierClass *notifier;
         QQuickItem *qmlView;
-        ConnectableObject(ValueNotifierClass *_notifier, QQuickItem *_qmlView)
-            :notifier{_notifier}, qmlView{_qmlView} {}
+        TypeHelper::NodeType nodeType;
+        ConnectableObject(ValueNotifierClass *_notifier, QQuickItem *_qmlView, TypeHelper::NodeType _nodeType)
+            :notifier{_notifier}, qmlView{_qmlView}, nodeType{_nodeType} {}
         ConnectableObject() {}
     };
     QMap<QString, ConnectableObject> allConnectableObjects;

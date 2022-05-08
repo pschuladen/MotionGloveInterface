@@ -57,6 +57,7 @@ quint8 ProcessNode::process(quint8 value)
 void ProcessNode::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
 {
     connectedValueType = newConnectedValueType;
+    createSubnotifier(newConnectedValueType);
 }
 
 bool ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
@@ -70,6 +71,11 @@ bool ProcessNode::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType 
 }
 
 ProcessNode *ProcessNode::createProcessControl(QString objectname_id)
+{
+    return nullptr;
+}
+
+ProcessNode *ProcessNode::createSubprocessor(QString objectname_id)
 {
     return nullptr;
 }
@@ -91,6 +97,7 @@ void ProcessNode::slot_vectorChanged(QVector3D vect, int frame)
         vect.setX(process(vect.x()));
         vect.setY(process(vect.y()));
         vect.setZ(process(vect.z()));
+        qInfo() << "vector print" << vect;
         callVectorChanged(vect, frame);
     }
 }
@@ -149,4 +156,13 @@ void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
 {
     m_connectedTypes.append(appendType);
     emit connectedTypesChanged(m_connectedTypes);
+}
+
+ValueNotifierClass *ProcessNode::getNotifier(int idx)
+{
+    qInfo() << this << "getNotifier in ProcessNode" << idx;
+    qInfo() << subProcessor;
+    if(idx < 0) return this;
+    else if(idx < subProcessor.size()) return subProcessor.at(idx);
+    else return nullptr;
 }

@@ -3,6 +3,11 @@
 PN_Scale::PN_Scale(QObject *parent)
 {
     setParent(parent);
+    setInHigh(1);
+    setInLow(0);
+    setOutHigh(1);
+    setOutLow(0);
+    setClipOutput(false);
 }
 
 PN_Scale::PN_Scale(TypeHelper::ValueType type, QObject *parent)
@@ -75,10 +80,12 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
     PN_Scale *newSub = new PN_Scale(type, this);
     setInitialProperties(this, newSub);
     connectPropertiesToProcessor(this, newSub);
+    qInfo() << "subprocessor before" << subProcessor;
     subProcessor.append(newSub);
+    qInfo() << "subprocessor afgter" << subProcessor;
     appendToConnectedTypes(type);
 
-    return setConnectionFromSender(sender, type, nValuesInList);
+    return newSub->setConnectionFromSender(sender, type, nValuesInList);
 }
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
@@ -95,17 +102,27 @@ ProcessNode *PN_Scale::createProcessControl(QString objectname_id)
     return qobject_cast<ProcessNode*>(scale);
 }
 
+//ValueNotifierClass *PN_Scale::getNotifier(int idx)
+//{
+//    qInfo() << this << "getNotifier in PN_Scale" << idx;
+//    qInfo() << subProcessor;
+//    if(idx < 0) return this;
+//    else if(idx < subProcessor.size()) return subProcessor.at(idx);
+//    else return nullptr;
+//}
+
 float PN_Scale::process(float value)
 {
     if(clipOutput()) {
 //        return qBound(((value - inLow()) * multi()) + outLow());
+//        qInfo() <<"clipping the result" << ((value-inLow()) * multi()) + outLow() << "clipping" << clipOutput();
         float result = ((value - inLow()) * multi()) + outLow();
         if(result < outLow()) return outLow();
         else if(result > outHigh()) return outHigh();
         else return result;
 
     }
-    qInfo() <<"process result " << ((value-inLow()) * multi()) + outLow();
+//    qInfo() <<"process result " << ((value-inLow()) * multi()) + outLow() << "clipping" << clipOutput();
     return ((value-inLow()) * multi()) + outLow();
 }
 
@@ -149,7 +166,7 @@ void PN_Scale::connectPropertiesToProcessor(PN_Scale *propertyMaster, PN_Scale *
     connect(propertyMaster, &PN_Scale::outHighChanged, propertySlave, &PN_Scale::setOutHigh);
     connect(propertyMaster, &PN_Scale::clipOutputChanged, propertySlave, &PN_Scale::setClipOutput);
     // has to be in another way...
-    connect(propertySlave, &PN_Scale::connectedTypesChanged, propertyMaster, &PN_Scale::setConnectedTypes);
+//    connect(propertySlave, &PN_Scale::connectedTypesChanged, propertyMaster, &PN_Scale::setConnectedTypes);
 }
 
 void PN_Scale::setInitialProperties(PN_Scale *propertyMaster, PN_Scale *propertySlave)
@@ -170,6 +187,7 @@ bool PN_Scale::clipOutput() const
 
 void PN_Scale::setClipOutput(bool newClipOutput)
 {
+    qInfo() << "setClipOutput" << newClipOutput;
     if (m_clipOutput == newClipOutput)
         return;
     m_clipOutput = newClipOutput;

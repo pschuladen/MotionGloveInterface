@@ -61,7 +61,7 @@ Item {
             vType: TypeHelper.SingleValue
         }
 
-        //moved to output Connector
+//moved to output Connector
 //        Rectangle {
 //            id: connector
 //            anchors.verticalCenter: row.verticalCenter
@@ -108,5 +108,4 @@ Item {
 
 //        }
     }
-
 }

@@ -6,7 +6,7 @@ Item {
 //    Layout.leftMargin: inputRect.controlMargins
 //    Layout.rightMargin: inputRect.controlMargins
 //    Layout.fillWidth: true
-    property alias value: tin.value
+    property real value: 0
     property real minValue: -20000
     property real maxValue: 20000
     height: 12
@@ -26,10 +26,9 @@ Item {
 
         TextInput {
             id: tin
-            text: "0"
+            text: root.value
             onTextChanged: console.log("text chagned", text)
-            property real value: 0
-            onValueChanged: console.log("value is", value)
+
             font.pixelSize: 10
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
@@ -38,15 +37,15 @@ Item {
 
             Keys.onReturnPressed: focus=false
             Keys.onEscapePressed: {
-                text = value
+                text = root.value
                 focus=false
             }
 
             onEditingFinished: {
-                value = text
+                root.value = text
             }
             onFocusChanged: {
-                if(!focus) { text = tin.value}
+                if(!focus) { text = root.value}
             }
             selectionColor: "lightblue"
 

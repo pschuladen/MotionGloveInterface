@@ -13,6 +13,8 @@ Item {
     property string vName: "" // just the text while dragging
 
     property color cColor: _typehelper.getColorForValueType(vType)
+
+    property bool nodeHovered: conectorMouseArea.containsMouse
 //    property TypeHelper.ValueType name: value
 
     implicitHeight: 10
@@ -42,6 +44,7 @@ Item {
 //                height: parent.height * 1.5
             hoverEnabled: true
             drag.target: draggableItem
+            onClicked: console.log(root.parentID)
         }
         Item {
 
@@ -56,7 +59,7 @@ Item {
             Drag.active: conectorMouseArea.drag.active
             Drag.onDragStarted: console.log("staaaaart")
             Drag.mimeData: {"text/plain": root.vName,
-                "nodeId": root.parentID,
+                "sourceObjectId": root.parentID,
                 "valueType": root.vType,//ProcessNodeController.Single,
                 "valueIndex": root.vIdx}
 //                "sourceObjectId": sourceObjectId}

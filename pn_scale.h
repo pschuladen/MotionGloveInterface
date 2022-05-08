@@ -42,6 +42,10 @@ public:
 
     ProcessNode* createProcessControl(QString objectname_id) override;
 
+//    virtual ValueNotifierClass *getNotifier(int idx) override;
+
+
+
 public slots:
     void setInLow(float newInLow);
     void setInHigh(float newInHigh);
@@ -56,7 +60,6 @@ private:
     void evalMultip();
     float m_multi;
 
-    QList<PN_Scale*> subProcessor;
     static void connectPropertiesToProcessor(PN_Scale *propertyMaster, PN_Scale *propertySlave);
     static void setInitialProperties(PN_Scale *propertyMaster, PN_Scale *propertySlave);
 

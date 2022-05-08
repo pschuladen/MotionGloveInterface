@@ -47,10 +47,16 @@ public:
     virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override;
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
 
-    virtual ProcessNode* createProcessControl(QString objectname_id);
+    virtual ProcessNode* createProcessControl(QString objectname_id); //can be deleted maybe
+    virtual ProcessNode* createSubprocessor(QString objectname_id);
 
     const QList<TypeHelper::ValueType> &connectedTypes() const;
     void appendToConnectedTypes(TypeHelper::ValueType appendType);
+
+    virtual ValueNotifierClass* getNotifier(int idx=-1) override;
+
+protected:
+    QList<ProcessNode*> subProcessor;
 
 private:
     virtual float process(float value); //child classes override this for the processing

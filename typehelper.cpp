@@ -5,7 +5,7 @@ TypeHelper::TypeHelper()
 
 }
 
-const TypeHelper::ValueType TypeHelper::valueTypeForSensor(SensorType styp)
+const TypeHelper::ValueType TypeHelper::valueTypeForSensor(const TypeHelper::SensorType styp)
 {
 //    return sensorToValueTypeMap.value(styp);
     switch (styp) {
@@ -24,7 +24,7 @@ const TypeHelper::ValueType TypeHelper::valueTypeForSensor(SensorType styp)
     }
 }
 
-QColor TypeHelper::getColorForValueType(ValueType vtype)
+const QColor TypeHelper::getColorForValueType(const TypeHelper::ValueType vtype)
 {
 
     switch (vtype) {
@@ -47,7 +47,7 @@ QColor TypeHelper::getColorForValueType(ValueType vtype)
 
 }
 
-QString TypeHelper::getStringForValueType(ValueType vtype)
+const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtype)
 {
     switch(vtype) {
     case TypeHelper::Undefined:

@@ -11,7 +11,7 @@ Item {
     id: root
     objectName: uniqueID+"-view"
     //required
-    property string uniqueID: "noID" //set this when creating the view
+    required property string uniqueID //set this when creating the view
 //    property alias valuecount: backend.valuecount
 
 
@@ -26,10 +26,11 @@ Item {
         objectName: root.uniqueID+"-viewcontroller"
 //        viewmode: ValueViewBackend.Custom
 //        valuecount: 2
-        inLow: inLowField.value
-        inHigh: inHighField.value
-        outLow: outLowField.value
-        outHigh: outHighField.value
+//        inLow: inLowField.value
+//        inHigh: inHighField.value
+//        outLow: outLowField.value
+//        outHigh: outHighField.value
+        clipOutput: clipValueCheckbox.checked
 
     }
 
@@ -88,6 +89,7 @@ Item {
                 right: outerShape.right
                 rightMargin: 7
             }
+            checked: backend.clipOutput
         }
 
         Rectangle {
@@ -150,6 +152,8 @@ Item {
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.fillWidth: true
+                    value: backend.inHigh
+                    onValueChanged: backend.setInHigh(value)
                 }
                 Text {
                     text: "IN"
@@ -165,6 +169,8 @@ Item {
                     Layout.rightMargin:inputRect.controlMargins
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.fillWidth: true
+                    value: backend.inLow
+                    onValueChanged: backend.setInLow(value)
                 }
             }
         }
@@ -189,6 +195,8 @@ Item {
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true
+                    value: backend.outHigh
+                    onValueChanged: backend.setOutHigh(value)
                 }
 
                 Text {
@@ -202,6 +210,8 @@ Item {
                     Layout.leftMargin: inputRect.controlMargins
                     Layout.rightMargin: inputRect.controlMargins
                     Layout.fillWidth: true
+                    value: backend.outLow
+                    onValueChanged: backend.setOutLow(value)
                 }
             }
         }

@@ -32,19 +32,18 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
     ProcessNode *viewBackend = newProcessingItem->findChild<ProcessNode*>(name+"-viewcontroller");
     newProcessingItem->setParentItem(processingGraphView);
     qInfo() << viewBackend << viewBackend->parent();
-    ProcessNode *processController = viewBackend->createProcessControl(name);
-    qInfo() << processController << processController->parent();
-
+//    ProcessNode *processController = viewBackend->createProcessControl(name);
+//    qInfo() << processController << processController->parent();
 
 //    newProcessingItem->setObjectName(name);
 //    ProcessNodeController *newProcessCalculus = new ProcessNodeController();
 //    newProcessCalculus->setObjectName(name+"-calculus");
     ProcessingNode newNode;
-    newNode.processingController = processController;
-    newNode.viewController = viewBackend;
+//    newNode.processingController = processController;
+    newNode.controller = viewBackend;
     newNode.qmlView = newProcessingItem;
     processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
-    allConnectableObjects.insert(name, ConnectableObject(processController, newProcessingItem));
+    allConnectableObjects.insert(name, ConnectableObject(viewBackend, newProcessingItem, TypeHelper::Process));
 
     qInfo() << "Node Hash size" << processingNodes.size();
     qInfo() << "node" << name << processingNodes.values().size();
@@ -71,11 +70,20 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
 
     if(allConnectableObjects.contains(senderNodeId) && allConnectableObjects.contains(receiverNodeId)) {
         //TODO: create ConnectionView/Object
-
-        return allConnectableObjects[receiverNodeId].notifier->newConnectionFromSender(allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx), valueType);
+        ValueNotifierClass *sendingNotifier = allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx);
+        ValueNotifierClass *receivingNotifier = allConnectableObjects[receiverNodeId].notifier;
+        if (sendingNotifier != nullptr && receivingNotifier != nullptr) {
+            return receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
+        }
+        else {
+            qWarning() << "no sending notifier found!";
+            return false;
+        }
     }
-    qInfo() << "no objects found for connection";
-    return false;
+    else {
+        qInfo() << "no objects found for connection";
+        return false;
+    }
 
 
 //    const MotionDevice &motionDevice = main_devicestatus::Instance()->discoveredDevices.value(sourceObjectId);
@@ -147,7 +155,7 @@ void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
         else {
             connect(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx), &ValueNotifierClass::valuesChanged, viewBackend, &InputValueViewController::viewValuesChanged);
         }
-        allConnectableObjects.insert(osc, ConnectableObject(motionDevice->getValueNotifierForPath(osc), newValDevice));
+        allConnectableObjects.insert(osc, ConnectableObject(motionDevice->getValueNotifierForPath(osc), newValDevice, TypeHelper::Input));
     }
 }
 
