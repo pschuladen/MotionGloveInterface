@@ -15,6 +15,7 @@ void MainBackend::setEngine(QQmlApplicationEngine *engine)
     deviceStatusView = mainWindow->findChild<QQuickItem*>("discoveredDevicesView");
     inputDevicesSidebarView = mainWindow->findChild<QQuickItem*>("inputDevicesView");
     processingGraphView = mainWindow->findChild<QQuickItem*>("processingGraphView");
+    outputDevcesSidebarView = mainWindow->findChild<QQuickItem*>("outputDevicesView");
 }
 
 void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition)//float posX, float posY)
@@ -106,6 +107,22 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
 bool MainBackend::createOscOutputDevice()
 {
     qInfo() << "create new osc output device";
+    OscOutputDevice *oscDevice = new OscOutputDevice();
+
+    QString uniqueID = QString("oscout-%1").arg(oscDevices.size());
+    QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/OscOutputDeviceView.qml")));
+    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", uniqueID}}));
+    OscViewController *viewController = newDeviceItem->findChild<OscViewController*>(OscViewController::standardObjectName());
+
+    if(oscDevice != nullptr && viewController != nullptr && newDeviceItem != nullptr) {
+        delete oscDevice;
+        qWarning() << "Something went wrong while creating osc device";
+        return false;
+    }
+
+    oscDevices.insert(uniqueID, OscDeviceStruct(oscDevice, viewController, newDeviceItem));
+
+
     return true;
 }
 

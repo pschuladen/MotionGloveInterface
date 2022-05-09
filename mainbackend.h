@@ -30,6 +30,8 @@
 #include "inputvalueviewcontroller.h"
 #include "processnodecontroller.h"
 #include "dataprocessingnode.h"
+#include "oscoutputdevice.h"
+#include "oscviewcontroller.h"
 
 #include "typehelper.h"
 
@@ -65,6 +67,7 @@ private:
     QQuickItem *deviceStatusView;
     QQuickItem *inputDevicesSidebarView;
     QQuickItem *processingGraphView;
+    QQuickItem *outputDevcesSidebarView;
 
     QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
 //    QMap<QString, DeviceDataInput*> inputDevices;
@@ -97,6 +100,17 @@ private:
             : connectionView{_conView}, sourceConnector{_sourCon}, receiveConnector{_recCon} {}
     };
     QMap<QString, ValueConnection> allConnections;
+
+
+    struct OscDeviceStruct {
+        QQuickItem *view;
+        OscOutputDevice *oscSender;
+        OscViewController *viewController;
+        OscDeviceStruct(OscOutputDevice*_oscSender, OscViewController* _viewController ,QQuickItem *_view)
+            :oscSender{_oscSender}, viewController{_viewController}, view{_view} {}
+        OscDeviceStruct(){};
+    };
+    QMap<QString, OscDeviceStruct> oscDevices;
 
     void createMotionInputDeviceView(MotionDevice *motionDevice);
     void createValueInputViewsForDevice(MotionDevice *motionDevice);

@@ -5,12 +5,17 @@
 #include <QUdpSocket>
 
 #include "oscpp/client.hpp"
+//#include "valuenotifierclass.h"
+#include "oscviewcontroller.h"
 
-class OscOutputDevice : public QObject
+class OscOutputDevice : public OscViewController
 {
     Q_OBJECT
+
 public:
     explicit OscOutputDevice(QObject *parent = nullptr);
+
+    bool setViewControllerObject(OscViewController* viewController);
 
 private:
     bool m_bindSocket;
@@ -19,14 +24,20 @@ private:
     uint16_t destinationPort;
     QHostAddress destinationAddress;
 
+    OscViewController *m_viewController;
+
 //    QList<QString> oscPaths;
 
 //    QList<QVariant> values;
 
-    struct OscOutputPaths {
+    struct OscOutput {
         QString ocsAddress;
         QByteArray typeTags;
     };
+    QList<OscOutput> outputPaths;
+
+public slots:
+    virtual void addOscPath() override;
 
 signals:
 

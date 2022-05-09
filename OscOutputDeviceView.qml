@@ -1,17 +1,33 @@
 import QtQuick
 import QtQuick.Controls
+import MotionGloveInterface
 
 Item {
     id: root
 
-    implicitHeight: settingcolumne.implicitHeight + 5
+//    required
+    property string uniqueID: "oscout-1"
+
+    implicitHeight: contentrect.height//settingcolumne.implicitHeight + 5
     onHeightChanged: console.log("root rect height", height)
+
+    property string ipAddress: "127.0.0.1"
+    property int port: 55211
+    //    onIpAddressChanged: console.log("ipaddress changed", ipAddress)
+    onPortChanged: console.log("port changed", port)
+
+    OscViewController {
+//        objectName: "oscviewcontroller"
+        Component.onCompleted: console.log("osc standard objectname", objectName)
+        id: oscviewcontrol
+    }
 
     Rectangle {
         id: contentrect
         color: "dodgerblue"
         width: root.width
-        height: settingcolumne.implicitHeight + 5
+        height: childrenRect.height+childrenRect.y
+        //settingcolumne.implicitHeight + 5
         onHeightChanged: console.log("content rect height", height)
 
         border {
@@ -59,13 +75,26 @@ Item {
                     id: ipinputfield
                     anchors {fill: parent; margins: 2 }
                     color: "black"
-                    text: "254.254.254.254"
+                    text: "127.0.0.1"
                     font.pixelSize: 10
                     horizontalAlignment: Text.AlignRight
-//                    anchors.leftMargin: 415
+                    //                    anchors.leftMargin: 415
                     validator: RegularExpressionValidator {
                         regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
+
                     }
+                    Keys.onReturnPressed: focus=false
+                    Keys.onEscapePressed: {
+                        text = root.ipAddress
+                        focus = false
+                    }
+                    onEditingFinished: root.ipAddress = text
+                    onFocusChanged: {
+                        if(!focus) { text = root.ipAddress}
+                    }
+                    selectByMouse: true
+
+
                     //                    }
                 }
             }
@@ -97,18 +126,27 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 2
                     color: "black"
-                    text: "65432"
+                    text: "55211"
                     font.pixelSize: 10
                     horizontalAlignment: Text.AlignRight
-//                    anchors.leftMargin: 273
-                    validator: IntValidator {bottom: 1025;top: 65536}
+                    //                    anchors.leftMargin: 273
+                    validator: IntValidator {bottom: 1025;top: 65535}
+                    Keys.onReturnPressed: focus=false
+                    Keys.onEscapePressed: {
+                        text=root.port
+                        focus=false
+                    }
+                    onEditingFinished: root.port=text
+                    onFocusChanged: {
+                        if(!focus) { text = root.port}
+                    }
+                    selectByMouse: true
+
                     //                    }
                 }
             }
-            Button {
-                text: "add path"
-                anchors.right: parent.right
-            }
+
+
 
             //                TextInput {
             //                    id: portinputfield
@@ -117,6 +155,37 @@ Item {
             //                    text: "65000"
             //                    //                    }
             //                }
+        }
+        Column {
+            id: outputPathsColumn
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: settingcolumne.bottom
+                topMargin: 10
+            }
+            Component.onCompleted: console.log("oscpathts columne height", height)
+
+            Repeater {
+                model: oscviewcontrol.nPaths
+                delegate:
+                    OscOutputView {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    controller: oscviewcontrol
+                    viewIdx: model.index
+                    uniqueID: root.uniqueID
+                    //                    oscAddress: oscviewcontrol.oscPaths[model.index]
+                }
+            }
+        }
+
+        Button {
+            text: "add path"
+            anchors.top: outputPathsColumn.bottom
+            anchors.right: parent.right
+            onClicked: oscviewcontrol.sig_addOscPath();
         }
     }
 }

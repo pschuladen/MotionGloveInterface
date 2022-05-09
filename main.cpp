@@ -7,6 +7,7 @@
 
 #include "oscoutputdevice.h"
 #include "pn_scale.h"
+#include "oscviewcontroller.h"
 
 
 //for test purposes
@@ -19,7 +20,7 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
     qmlRegisterType<PN_Scale>("MotionGloveInterface", 1, 0, "PN_Scale");
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
-
+    qmlRegisterType<OscViewController>("MotionGloveInterface", 1, 0, "OscViewController");
     //necessary for calling static functions from typehelper
     TypeHelper typhelper;
     engine->rootContext()->setContextProperty("_typehelper", QVariant::fromValue<TypeHelper>(typhelper));

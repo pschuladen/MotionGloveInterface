@@ -1,41 +1,61 @@
 import QtQuick
 import QtQuick.Layouts
+import MotionGloveInterface
 
 Item {
+    Component.onCompleted: console.log("created view at idx", viewIdx)
     id: root
-    implicitHeight: columLayout.implicitHeight
-    implicitWidth: columLayout.implicitHeight
+
+    property string uniqueID: ""
+
+    property string oscAddress: controller.oscPaths[viewIdx]//"/output"
+//    onOscAddressChanged:
+    property OscViewController controller: null
+    property int connectedType: TypeHelper.Undefined
+    property int viewIdx: 0
+    implicitHeight: 24
+    implicitWidth: 120
     Rectangle {
-        id: columLayout
-        height: childrenRect.height
-        //        width: childrenRect.width
-        Layout.preferredWidth: 120
-        Layout.fillWidth: true
+        id: addressRect
+        anchors.fill: parent
+        anchors.margins: 2
 
-
-
-
-        Text {
-            text: "ip"
-        }
         TextInput {
-            text: "127.0.0.1"
+            id: outputPathTextInput
+            anchors {
+                fill: parent
+                margins: 4
+            }
+
+            text: root.oscAddress
             validator: RegularExpressionValidator {
-                regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
+                regularExpression: /^\/.+/
+            }
+            font.pixelSize: 10
+            horizontalAlignment: Text.AlignRight
+            selectByMouse: true
+            Keys.onReturnPressed: focus=false
+            Keys.onEscapePressed: {
+                text = root.controller.oscPaths[root.viewIdx]
+                focus = false
+            }
+            onEditingFinished: root.controller.setOscPathAtIndex(text, root.viewIdx)//root.ipAddress = text
+            onFocusChanged: {
+                if(!focus) {text = root.controller.oscPaths[root.viewIdx]}
             }
         }
-        Component.onCompleted: console.log("this row width", width)
-
-
-
-        Text {
-            text: "port"
+        InputConnector {
+            anchors {
+                verticalCenter: addressRect.verticalCenter
+                horizontalCenter: addressRect.left
+            }
+            id: outConnector
+            height: 10
+            vType: controller.valueTypes[root.viewIdx]
+            parentID: root.uniqueID
+            vIdx: root.viewIdx
         }
-        TextInput {
 
-            text: "55123"
-            validator: IntValidator {bottom: 1025;top: 65536}
-        }
+//Component.onCompleted: controller.addOscPath(outputPathTextInput.text)//console.log("implicit dimension", implicitWidth, )
     }
-
 }

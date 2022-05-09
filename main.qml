@@ -168,6 +168,7 @@ anchors.verticalCenter: outputControl.verticalCenter
             }
             ColumnLayout {
                 id: outputNodesRow
+                objectName: "outputDevicesView"
                 anchors{
                     top: parent.top
                     left: parent.left

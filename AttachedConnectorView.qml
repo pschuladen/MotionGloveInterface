@@ -60,51 +60,6 @@ Item {
                     dropAreaEnabled: connectorPair.lastInModel
                 }
 
-//                Rectangle {
-//                    id: inputConnector
-//                    height: connectorPair.height
-//                    width: height
-//                    radius: height/2
-//                    color: connectorPair.nodeColor
-//                    border {
-//                        width: 1
-//                        color: inDrop.containsDrag ? "cyan" : "black"
-//                    }
-//                    //                    x: -1* radius
-//                    anchors {
-//                        verticalCenter: connectorPair.verticalCenter
-//                        horizontalCenter: connectorPair.left
-//                    }
-//                    MouseArea {
-//                        id: inConnectorMa
-//                        anchors.fill: parent
-//                        hoverEnabled: true
-//                    }
-
-
-//                    DropArea {
-//                        id: inDrop
-//                        anchors.fill: parent
-//                        anchors.margins: -4
-//                        keys: ["nodeId", "valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]
-//                        onEntered:(drag) =>  console.log(drag.keys)
-//                        onDropped: (drop) => {
-//                                       console.log(drop.source)
-//                                       if(_mbackend.connectionRequest(//drop.getDataAsString("sourceObjectId"),
-//                                                                      drop.getDataAsString("sourceObjectId"),
-//                                                                      drop.getDataAsString("valueIndex"),
-//                                                                      inputConnector,
-//                                                                      root.uniqueID,
-//                                                                      model.index,
-//                                                                      drop.source,
-//                                                                      drop.getDataAsString("valueType"))) {
-//                                           drop.acceptProposedAction()
-//                                       }
-//                                   }
-//                    }
-
-
-//                }
                 OutputConnector {
                     id: outConnector
                     height: connectorPair.height
@@ -118,23 +73,7 @@ Item {
                     }
                 }
 
-//                Rectangle {
-//                    height: connectorPair.height
-//                    width: height
-//                    radius: height/2
-//                    color: connectorPair.nodeColor
-//                    border {color: "black"; width: 1}
-//                    x: connectorPair.width-radius
-//                    anchors {
-//                        verticalCenter: connectorPair.verticalCenter
-//                        horizontalCenter: connectorPair.right
-//                    }
-//                    MouseArea {
-//                        id: outConnectorMa
-//                        anchors.fill: parent
-//                        hoverEnabled: true
-//                    }
-//                }
+
 
             }
         }

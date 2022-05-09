@@ -44,7 +44,7 @@ public:
     virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
     // there is something doppeltgemoppelt
-    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override;
+    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
 
     virtual ProcessNode* createProcessControl(QString objectname_id); //can be deleted maybe

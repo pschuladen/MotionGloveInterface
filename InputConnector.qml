@@ -24,7 +24,7 @@ Item {
         id: inputConnector
         anchors.fill: parent
         radius: height/2
-        color: connectorPair.nodeColor
+        color: cColor//connectorPair.nodeColor
         border {
             width: 1
             color: inDrop.containsDrag ? "cyan" : "black"

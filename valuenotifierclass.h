@@ -41,6 +41,8 @@ public:
 
     virtual ValueNotifierClass* getNotifier(int idx=-1);
 
+
+
 private:
     int m_numberValues;
     int m_indexInObject;
