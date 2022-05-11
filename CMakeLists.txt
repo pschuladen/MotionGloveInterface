@@ -27,6 +27,7 @@ qt_add_executable(appMotionGloveInterface
     processnode.h processnode.cpp
     saveloadinterfaceclass.h saveloadinterfaceclass.cpp
     oscviewcontroller.h oscviewcontroller.cpp
+    oscpacketbuilder.h oscpacketbuilder.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface

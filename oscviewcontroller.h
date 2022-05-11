@@ -13,7 +13,7 @@ class OscViewController : public ValueNotifierClass
     QML_ELEMENT
 
     Q_PROPERTY(QString destIp READ destIp WRITE setDestIp NOTIFY destIpChanged)
-    Q_PROPERTY(int destPort READ destPort WRITE setDestPort NOTIFY destPortChanged)
+    Q_PROPERTY(quint16 destPort READ destPort WRITE setDestPort NOTIFY destPortChanged)
     Q_PROPERTY(QList<QString> oscPaths READ oscPaths WRITE setOscPaths NOTIFY oscPathsChanged)
     Q_PROPERTY(QList<TypeHelper::ValueType> valueTypes READ valueTypes WRITE setValueTypes NOTIFY valueTypesChanged)
     Q_PROPERTY(int nPaths READ nPaths WRITE setNPaths NOTIFY nPathsChanged)
@@ -24,7 +24,7 @@ public:
 
     const QString &destIp() const;
 
-    int destPort() const;
+    quint16 destPort() const;
 
     const QList<QString> &oscPaths() const;
 
@@ -36,11 +36,11 @@ public:
 
 public slots:
 
-    void setDestIp(const QString &newDestIp);
-    void setDestPort(int newDestPort);
-    void setOscPaths(const QList<QString> &newOscPaths);
+    virtual void setDestIp(const QString &newDestIp);
+    virtual void setDestPort(quint16 newDestPort);
+    virtual void setOscPaths(const QList<QString> &newOscPaths);
     void setNPaths(int newNPaths);
-    void setValueTypes(const QList<TypeHelper::ValueType> &newValueTypes);
+    virtual void setValueTypes(const QList<TypeHelper::ValueType> &newValueTypes);
 
 
     virtual void addOscPath();
@@ -49,16 +49,15 @@ public slots:
     virtual void newConnectionAtIndex(int idx, TypeHelper::ValueType valueType);
 
 
-
 signals:
 
     void destIpChanged(QString destIp);
-    void destPortChanged(int port);
+    void destPortChanged(quint16 port);
     void oscPathsChanged(QList<QString> oscPaths);
     void oscPathAtIndexChanged(QString oscPath, quint32 idx);
     void oscPathAdded(QString oscPath);
     void nPathsChanged();
-    void valueTypesChanged();
+    void valueTypesChanged(QList<TypeHelper::ValueType> newValueTypes);
 
     void sig_addOscPath();
 
@@ -67,7 +66,7 @@ protected:
     int m_destPort;
     QList<QString> m_oscPaths;
 
-    int m_nPaths;
+    int m_nPaths = 0;
     QList<TypeHelper::ValueType> m_valueTypes;
 };
 

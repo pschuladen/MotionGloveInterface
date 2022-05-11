@@ -20,12 +20,12 @@ void OscViewController::setDestIp(const QString &newDestIp)
     emit destIpChanged(newDestIp);
 }
 
-int OscViewController::destPort() const
+quint16 OscViewController::destPort() const
 {
     return m_destPort;
 }
 
-void OscViewController::setDestPort(int newDestPort)
+void OscViewController::setDestPort(quint16 newDestPort)
 {
     if(newDestPort < 1025 || 65534 < newDestPort) return;
     if (m_destPort == newDestPort)
@@ -41,6 +41,7 @@ const QList<QString> &OscViewController::oscPaths() const
 
 void OscViewController::setOscPaths(const QList<QString> &newOscPaths)
 {
+    qInfo() << "controller receiving new path" << newOscPaths;
     if (m_oscPaths == newOscPaths)
         return;
     m_oscPaths = newOscPaths;
@@ -68,16 +69,12 @@ void OscViewController::setOscPathAtIndex(QString newPath, quint32 idx)
 
     m_oscPaths.replace(idx, newPath);
     emit oscPathAtIndexChanged(newPath, idx);
-
 }
 
 void OscViewController::newConnectionAtIndex(int idx, TypeHelper::ValueType valueType)
 {
 
 }
-
-
-
 
 int OscViewController::nPaths() const
 {
@@ -99,15 +96,16 @@ const QList<TypeHelper::ValueType> &OscViewController::valueTypes() const
 
 void OscViewController::setValueTypes(const QList<TypeHelper::ValueType> &newValueTypes)
 {
+    qInfo() << "setting value types from" << valueTypes() << "to" << newValueTypes;
     if (m_valueTypes == newValueTypes)
         return;
     m_valueTypes = newValueTypes;
-    emit valueTypesChanged();
+    emit valueTypesChanged(newValueTypes);
 }
 
 const QString OscViewController::standardObjectName()
 {
-return QString("oscviewcontroller");
+    return QString("oscviewcontroller");
 }
 
 void OscViewController::addOscPath()

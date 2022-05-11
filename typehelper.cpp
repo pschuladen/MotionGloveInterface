@@ -66,3 +66,23 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
         return QString("trig");
     }
 }
+
+size_t TypeHelper::getSizeForValueType(const ValueType vType)
+{
+    switch(vType) {
+    case TypeHelper::Undefined:
+        return 0;
+    case TypeHelper::Vector:
+        return 3;
+    case TypeHelper::Quat:
+        return 4;
+    case TypeHelper::List:
+        return 12;
+    case TypeHelper::SingleValue:
+        return 1;
+    case TypeHelper::BoolValue:
+        return 1;
+    case TypeHelper::Trigger:
+        return 1;
+    }
+}

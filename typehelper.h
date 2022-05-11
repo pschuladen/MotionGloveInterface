@@ -22,6 +22,8 @@ public:
     Q_INVOKABLE static const QColor getColorForValueType(const TypeHelper::ValueType vtype);
     Q_INVOKABLE static const QString getStringForValueType(const TypeHelper::ValueType vtype);
 
+    static size_t getSizeForValueType(const TypeHelper::ValueType vType);
+
 
     enum NodeConnectionType: quint8 {
         InputToProcess,

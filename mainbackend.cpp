@@ -72,7 +72,7 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
     if(allConnectableObjects.contains(senderNodeId) && allConnectableObjects.contains(receiverNodeId)) {
         //TODO: create ConnectionView/Object
         ValueNotifierClass *sendingNotifier = allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx);
-        ValueNotifierClass *receivingNotifier = allConnectableObjects[receiverNodeId].notifier;
+        ValueNotifierClass *receivingNotifier = allConnectableObjects[receiverNodeId].notifier->getNotifier(targetValueIdx);
         if (sendingNotifier != nullptr && receivingNotifier != nullptr) {
             return receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
         }
@@ -107,23 +107,36 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
 bool MainBackend::createOscOutputDevice()
 {
     qInfo() << "create new osc output device";
-    OscOutputDevice *oscDevice = new OscOutputDevice();
 
     QString uniqueID = QString("oscout-%1").arg(oscDevices.size());
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/OscOutputDeviceView.qml")));
     QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", uniqueID}}));
     OscViewController *viewController = newDeviceItem->findChild<OscViewController*>(OscViewController::standardObjectName());
 
+
+    OscOutputDevice *oscDevice = new OscOutputDevice(viewController, nullptr);
+
+    if(viewController == nullptr) qInfo() << "no ViewController found!!";
+    if(oscDevice == nullptr) qInfo() << "oscDevice Not Created found!!";
+    if(newDeviceItem == nullptr) qInfo() << "no VIEW found!!";
+
     if(oscDevice != nullptr && viewController != nullptr && newDeviceItem != nullptr) {
+
+        oscDevices.insert(uniqueID, OscDeviceStruct(oscDevice, viewController, newDeviceItem));
+        allConnectableObjects.insert(uniqueID, ConnectableObject(oscDevice, newDeviceItem, TypeHelper::Output));
+        newDeviceItem->setParentItem(outputDevcesSidebarView);
+        return true;
+    }
+    else {
+
         delete oscDevice;
+        delete newDeviceItem;
         qWarning() << "Something went wrong while creating osc device";
         return false;
     }
 
-    oscDevices.insert(uniqueID, OscDeviceStruct(oscDevice, viewController, newDeviceItem));
 
 
-    return true;
 }
 
 void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)

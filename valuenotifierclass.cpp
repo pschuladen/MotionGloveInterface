@@ -4,7 +4,8 @@ ValueNotifierClass::ValueNotifierClass(QObject *parent, TypeHelper::ValueType va
     : QObject{parent}
 {
     m_indexInObject = indexForObject;
-    createSubnotifier(valueType);
+    setConnectedValueType(valueType);
+
 }
 
 ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
@@ -37,9 +38,9 @@ ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject 
 
 void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 {
+    //TODO: possibly dangerous for existing (sub-)connections...
     subNotifier.resize(numberOfSubs);
     for(int i = 0; i < numberOfSubs; i++) {
-        //        qInfo() << "subnr " << i;
         ValueNotifierClass *subNotify = new ValueNotifierClass(this);
         subNotifier.insert(i, subNotify);
     }
@@ -79,6 +80,14 @@ ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
     else if(idx < subNotifier.size()) return subNotifier.at(idx);
 
     else return nullptr;
+}
+
+void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
+{
+    if(newConnectedValueType == connectedValueType()) return;
+    m_connectedValueType = newConnectedValueType;
+    createSubnotifier(newConnectedValueType);
+    emit connectedValueTypeChanged(newConnectedValueType);
 }
 
 void ValueNotifierClass::callQuatChanged(const QQuaternion quat, int frame)
@@ -152,4 +161,51 @@ void ValueNotifierClass::slot_boolValueChanged(bool value, int frame)
 void ValueNotifierClass::slot_trigger(int frame)
 {
     //TODO: implement
+}
+
+const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
+{
+    return m_connectedValueType;
+}
+
+
+bool ValueNotifierClass::connectValueTypeSignalToSlot(ValueNotifierClass *sender, ValueNotifierClass *receiver, TypeHelper::ValueType vType)
+{
+    typedef ValueNotifierClass _vc;
+    switch(vType) {
+    case TypeHelper::Undefined:
+        return false;
+    case TypeHelper::Vector:
+        connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged);
+        break;
+    case TypeHelper::Quat:
+        connect(sender, &_vc::quatChanged, receiver, &_vc::slot_quatChanged);
+        break;
+    case TypeHelper::List:
+        connect(sender, &_vc::valuesChanged, receiver, &_vc::slot_valuesChanged);
+        break;
+    case TypeHelper::SingleValue:
+        connect(sender, &_vc::singleValueChanged, receiver, &_vc::slot_singleValueChanged);
+        break;
+    case TypeHelper::BoolValue:
+        connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
+        break;
+    case TypeHelper::Trigger:
+        connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
+        break;
+    }
+    return true;
+}
+
+quint32 ValueNotifierClass::indexInObject() const
+{
+    return m_indexInObject;
+}
+
+void ValueNotifierClass::setIndexInObject(quint32 newIndexInObject)
+{
+    if (m_indexInObject == newIndexInObject)
+        return;
+    m_indexInObject = newIndexInObject;
+    emit indexInObjectChanged();
 }

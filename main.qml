@@ -175,12 +175,12 @@ anchors.verticalCenter: outputControl.verticalCenter
                     right:parent.right
                     margins: 5
                 }
-                height: childrenRect.height
+//                height: childrenRect.height
 
 
-                OscOutputDeviceView {
-                    Layout.fillWidth: true
-                }
+//                OscOutputDeviceView {
+//                    Layout.fillWidth: true
+//                }
             }
             Button {
                 text: "create Osc-Out"

@@ -39,7 +39,7 @@ public:
     };
     ProcessRole processRole = ViewController;
 
-    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
+    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
 
     virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
@@ -55,15 +55,17 @@ public:
 
     virtual ValueNotifierClass* getNotifier(int idx=-1) override;
 
+
+
 protected:
     QList<ProcessNode*> subProcessor;
+    TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
 
 private:
     virtual float process(float value); //child classes override this for the processing
     virtual quint8 process(quint8 value);
 
     //this should in theory already be used in ValueNotifierClass
-    TypeHelper::ValueType connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
 
     QList<TypeHelper::ValueType> m_connectedTypes;
 

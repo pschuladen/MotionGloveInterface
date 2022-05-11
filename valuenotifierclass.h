@@ -20,6 +20,9 @@
 class ValueNotifierClass : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(TypeHelper::ValueType connectedValueType READ connectedValueType WRITE setConnectedValueType NOTIFY connectedValueTypeChanged)
+    Q_PROPERTY(quint32 indexInObject READ indexInObject WRITE setIndexInObject NOTIFY indexInObjectChanged)
+
 public:
     typedef TypeHelper::SensorType SensType;
     explicit ValueNotifierClass(QObject *parent = nullptr, TypeHelper::ValueType valueType=TypeHelper::SingleValue, int numberOfValues = 0, int indexForObject = 0);
@@ -42,12 +45,23 @@ public:
     virtual ValueNotifierClass* getNotifier(int idx=-1);
 
 
+    virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
+    const TypeHelper::ValueType &connectedValueType() const;
+
+    static bool connectValueTypeSignalToSlot(ValueNotifierClass* sender, ValueNotifierClass *receiver, TypeHelper::ValueType vType);
+
+    quint32 indexInObject() const;
+    void setIndexInObject(quint32 newIndexInObject);
+
+protected:
+    TypeHelper::ValueType m_connectedValueType;
 
 private:
     int m_numberValues;
     int m_indexInObject;
     bool m_autoEmit = false;
     void createSubnotifier(int numberOfSubs);
+
 
 
 signals:
@@ -59,6 +73,10 @@ signals:
      void boolValueChanged(bool value, int frame=-1);
      void triggerActivated(int frame=-1);
      //     void valueChanged()
+     void connectedValueTypeChanged(TypeHelper::ValueType vType);
+
+     void indexInObjectChanged();
+
 public slots:
      virtual void slot_quatChanged(QQuaternion quat, int frame=-1);
      virtual void slot_vectorChanged(QVector3D vect, int frame=-1);

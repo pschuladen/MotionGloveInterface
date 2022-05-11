@@ -4,9 +4,10 @@ import MotionGloveInterface
 
 Item {
     id: root
-
 //    required
     property string uniqueID: "oscout-1"
+    implicitWidth:  120
+//    Component.onCompleted: Layout.fillWidth=true
 
     implicitHeight: contentrect.height//settingcolumne.implicitHeight + 5
     onHeightChanged: console.log("root rect height", height)
