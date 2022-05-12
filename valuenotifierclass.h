@@ -12,7 +12,7 @@
 #include <QObject>
 #include <QQuaternion>
 #include <QVector3D>
-//#include "inputvalueviewcontroller.h"
+
 #include "typehelper.h"
 
 
@@ -25,13 +25,11 @@ class ValueNotifierClass : public QObject
 
 public:
     typedef TypeHelper::SensorType SensType;
-    explicit ValueNotifierClass(QObject *parent = nullptr, TypeHelper::ValueType valueType=TypeHelper::SingleValue, int numberOfValues = 0, int indexForObject = 0);
+    explicit ValueNotifierClass(QObject *parent = nullptr);
+    explicit ValueNotifierClass(int objectIdx, QObject *parent = nullptr);
+//    explicit ValueNotifierClass(QObject *parent = nullptr, TypeHelper::ValueType valueType=TypeHelper::SingleValue, int numberOfValues = 0, int indexForObject = 0);
     explicit ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent = nullptr, int valueNumber=0);
-    //    typedef InputValueViewController::ValueViewMode SensType ;
-    //    explicit ValueNotifierClass(QObject *parent = nullptr, SensType sType = SensType::Custom, int indexForObject = 0, int valueNumber = 0);
-    //    explicit ValueNotifierClass(QObject *parent = nullptr, SensType sType = SensType::Custom, int indexForObject = 0, int valueNumber = 0);
-    //    void valueChanged(QQuaternion quat);
-    //    void valueChanged(QQuaternion quat);
+
     void callQuatChanged(const QQuaternion quat, int frame=-1);
     void callVectorChanged(const QVector3D vect, int frame=-1);
     void callTouchChanged(const QList<float> touch, int frame=-1);
@@ -56,12 +54,12 @@ public:
 protected:
     TypeHelper::ValueType m_connectedValueType;
 
+
 private:
     int m_numberValues;
     int m_indexInObject;
     bool m_autoEmit = false;
     void createSubnotifier(int numberOfSubs);
-
 
 
 signals:

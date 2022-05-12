@@ -24,12 +24,7 @@ Item {
     PN_Scale {
         id: backend
         objectName: root.uniqueID+"-viewcontroller"
-//        viewmode: ValueViewBackend.Custom
-//        valuecount: 2
-//        inLow: inLowField.value
-//        inHigh: inHighField.value
-//        outLow: outLowField.value
-//        outHigh: outHighField.value
+
         clipOutput: clipValueCheckbox.checked
 
     }
@@ -52,10 +47,6 @@ Item {
         MouseArea {
             anchors {
                 fill: outerShape
-//                top: outerShape.top
-//                left: outerShape.left
-//                right: outputRect.right
-//                bottom: scalingFormer.bottom
             }
             hoverEnabled: true
 //            onContainsMouseChanged: console.log("mouse")
@@ -215,47 +206,7 @@ Item {
                 }
             }
         }
-//        Rectangle {
-//            id: inputPlug
-//            property int plugIndex: 0
-//            height: 10
-//            width: height
-//            radius: height/2
-//            color: "white"
-//            anchors.horizontalCenter: parent.left
-//            anchors.verticalCenter: parent.verticalCenter
-//            border {
-//                width: 1
-//                color: inDrop.containsDrag ? "cyan" : "black"
-//            }
-//            DropArea {
-//                id: inDrop
-//                anchors.fill: parent
-//                keys: ["nodeId", "valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]
-//                onEntered:(drag) =>  console.log(drag.keys)
-//                onDropped: (drop) => {
-//                               if(_mbackend.connectionRequest(drop.getDataAsString("sourceObjectId"),
-//                                                              drop.getDataAsString("nodeId"), drop.getDataAsString("valueIndex"),
-//                                                              root.uniqueID, inputPlug.plugIndex,
-//                                                           drop.getDataAsString("valueType"))) {
-//                                   drop.acceptProposedAction()
-//                               }
-//                           }
-//            }
-//        }
-//        Rectangle {
-//            id: outputPlug
-//            height: 10
-//            width: height
-//            radius: height/2
-//            color: "white"
-//            anchors.horizontalCenter: parent.right
-//            anchors.verticalCenter: parent.verticalCenter
-//            border {
-//                width: 1
-//                color: "black"
-//            }
-//        }
+
     }
 
     AttachedConnectorView {

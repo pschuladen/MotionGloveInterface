@@ -24,7 +24,7 @@ class PN_Scale : public ProcessNode
 
 public:
     explicit PN_Scale(QObject *parent = nullptr);
-    explicit PN_Scale(TypeHelper::ValueType type, QObject *parent = nullptr);
+    explicit PN_Scale(TypeHelper::ValueType type, PN_Scale *controller, QObject *parent = nullptr);
 
     float inLow() const;
     float inHigh() const;
@@ -41,9 +41,6 @@ public:
     bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //TODO: implement
 
     ProcessNode* createProcessControl(QString objectname_id) override;
-
-//    virtual ValueNotifierClass *getNotifier(int idx) override;
-
 
 
 public slots:

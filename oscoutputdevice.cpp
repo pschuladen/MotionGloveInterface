@@ -24,8 +24,9 @@ OscOutputDevice::OscOutputDevice(QObject *parent)
 }
 
 OscOutputDevice::OscOutputDevice(OscViewController *viewController, QObject *parent)
+    : OscViewController{parent}
 {
-    setParent(parent);
+//    setParent(parent);
     setViewControllerObject(viewController);
     initialiseOscDevice();
 }

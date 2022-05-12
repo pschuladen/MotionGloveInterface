@@ -1,8 +1,8 @@
 #include "processnode.h"
 
 ProcessNode::ProcessNode(QObject *parent)
+    :ValueNotifierClass(parent)
 {
-    setParent(parent);
 }
 
 bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ)
@@ -19,31 +19,6 @@ bool ProcessNode::setConnectionFromSender(ValueNotifierClass *sender, TypeHelper
     createSubnotifier(type);
 
     return connectValueTypeSignalToSlot(sender, this, type);
-
-//    switch(type) {
-//    case TypeHelper::Undefined:
-//        return false;
-//        break;
-//    case TypeHelper::Vector:
-//        connect(sender, &ValueNotifierClass::vectorChanged, this, &ProcessNode::slot_vectorChanged);
-//        break;
-//    case TypeHelper::Quat:
-//        connect(sender, &ValueNotifierClass::quatChanged, this, &ProcessNode::slot_quatChanged);
-//        break;
-//    case TypeHelper::List:
-//        connect(sender, &ValueNotifierClass::valuesChanged, this, &ProcessNode::slot_valuesChanged);
-//        break;
-//    case TypeHelper::SingleValue:
-//        connect(sender, &ValueNotifierClass::singleValueChanged, this, &ProcessNode::slot_singleValueChanged);
-//        break;
-//    case TypeHelper::BoolValue:
-//        connect(sender, &ValueNotifierClass::boolValueChanged, this, &ProcessNode::slot_boolValueChanged);
-//        break;
-//    case TypeHelper::Trigger:
-//        connect(sender, &ValueNotifierClass::triggerActivated, this, &ProcessNode::slot_trigger);
-//        break;
-//    }
-//    return true;
 }
 
 float ProcessNode::process(float value)

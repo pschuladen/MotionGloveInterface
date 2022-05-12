@@ -1,8 +1,8 @@
 #include "inputvalueviewcontroller.h"
 
 InputValueViewController::InputValueViewController(QObject *parent)
+    : ValueNotifierClass{parent}
 {
-    setParent(parent);
 }
 
 TypeHelper::SensorType InputValueViewController::viewmode() const
@@ -103,7 +103,7 @@ void InputValueViewController::setNodeIdentifier(const QString &newNodeIdentifie
     emit nodeIdentifierChanged();
 }
 
-void InputValueViewController::vectorChanged(QVector3D vec)
+void InputValueViewController::slot_vectorChanged(QVector3D vec, int frame)
 {
 //    qInfo() << "vector changed" << vec;
     m_values[0] = vec.x();
@@ -112,7 +112,7 @@ void InputValueViewController::vectorChanged(QVector3D vec)
     checkAndEmitValuesChanged();
 }
 
-void InputValueViewController::quatChanged(QQuaternion newQuat)
+void InputValueViewController::slot_quatChanged(QQuaternion newQuat, int frame)
 {
     m_values[0] = newQuat.x();
     m_values[1] = newQuat.y();
@@ -121,12 +121,12 @@ void InputValueViewController::quatChanged(QQuaternion newQuat)
     checkAndEmitValuesChanged();
 }
 
-void InputValueViewController::touchChanged(QList<float> touch)
+void InputValueViewController::slot_touchChanged(QList<float> touch, int frame)
 {
     setValues(touch);
 }
 
-void InputValueViewController::newValues(QList<float> newValues)
+void InputValueViewController::slot_valuesChanged(QList<float> newValues, int frame)
 {
     setValues(newValues);
 }

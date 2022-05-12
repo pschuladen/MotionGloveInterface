@@ -1,19 +1,25 @@
 #include "pn_scale.h"
 
 PN_Scale::PN_Scale(QObject *parent)
+    : ProcessNode(parent)
 {
-    setParent(parent);
-    setInHigh(1);
-    setInLow(0);
-    setOutHigh(1);
-    setOutLow(0);
-    setClipOutput(false);
+//    setParent(parent);
+    m_inHigh = 1;
+    m_inLow = 0;
+    m_outHigh = 1;
+    m_outLow = 1;
+    m_clipOutput = false;
+    evalMultip();
 }
 
-PN_Scale::PN_Scale(TypeHelper::ValueType type, QObject *parent)
+PN_Scale::PN_Scale(TypeHelper::ValueType type, PN_Scale *controller, QObject *parent)
+    : ProcessNode(parent), m_clipOutput{controller->clipOutput()},
+      m_inHigh{controller->inHigh()}, m_inLow{controller->inLow()},
+      m_outHigh{controller->outHigh()}, m_outLow{controller->outLow()}
 {
-    setParent(parent);
     setConnectedValueType(type);
+    evalMultip();
+    connectPropertiesToProcessor(controller, this);
 }
 
 float PN_Scale::inLow() const
@@ -77,15 +83,15 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
 {
     if(!acceptsInputType(type)) return false;
 
-    PN_Scale *newSub = new PN_Scale(type, this);
-    setInitialProperties(this, newSub);
-    connectPropertiesToProcessor(this, newSub);
+    PN_Scale *newSubprocessor = new PN_Scale(type, this);
+//    setInitialProperties(this, newSub);  //is now done in the constructor
+//    connectPropertiesToProcessor(this, newSubprocessor); //is called from constructor
     qInfo() << "subprocessor before" << subProcessor;
-    subProcessor.append(newSub);
+    subProcessor.append(newSubprocessor);
     qInfo() << "subprocessor afgter" << subProcessor;
     appendToConnectedTypes(type);
 
-    return newSub->setConnectionFromSender(sender, type, nValuesInList);
+    return newSubprocessor->setConnectionFromSender(sender, type, nValuesInList);
 }
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)

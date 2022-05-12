@@ -15,8 +15,6 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
     else {
         qDebug() << "NO BINDING possible on Port"<< this->m_port;
     }
-    connect(this, &DeviceStatusManager::receivedNewDevice, main_backend::Instance(), &MainBackend::createNewInputViews);
-
 }
 
 
@@ -74,7 +72,7 @@ void DeviceStatusManager::handleOscMessage(const OSCPP::Server::Message &message
                     return;
                 }
                 newDevice.deviceName = pingersName;
-                newDevice.inputHandler = new DeviceDataInput(this, pingersName, 51002+discoveredDevices.size(), 2, &newDevice);
+                newDevice.inputHandler = new DeviceDataInput(pingersName, 51002+discoveredDevices.size(), 2, &newDevice, this);
 
                 newDevice.connectStatus = false;
                 discoveredDevices.insert(pingersName, newDevice);

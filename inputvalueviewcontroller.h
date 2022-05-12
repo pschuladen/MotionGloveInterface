@@ -78,10 +78,10 @@ public:
     void setDotColor(const QColor &newDotColor);
 
 public slots:
-    void vectorChanged(QVector3D vec);
-    void quatChanged(QQuaternion newQuat);
-    void touchChanged(QList<float> touch);
-    void newValues(QList<float> newValues);
+    void slot_vectorChanged(QVector3D vec, int frame=-1) override;
+    void slot_quatChanged(QQuaternion newQuat, int frame=-1) override;
+    void slot_touchChanged(QList<float> touch, int frame=-1) override;
+    void slot_valuesChanged(QList<float> newValues, int frame=-1) override;
 
 private:
 
@@ -104,13 +104,6 @@ private:
     bool m_emitvalues;
 
     int m_valuecount;
-
-//    QMap<TypeHelper::SensorType, QColor> modeColorMap = {{TypeHelper::Custom, QColor("mediumvioletred")},
-//                                               {TypeHelper::Accel, QColor("red")},
-//                                               {TypeHelper::Gyro, QColor("red")},
-//                                               {TypeHelper::Grav, QColor("red")},
-//                                               {TypeHelper::RotQuat, QColor("blue")},
-//                                               {TypeHelper::Touch, QColor("yellow")}};
 
     QColor m_dotColor;
 

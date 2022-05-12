@@ -18,7 +18,8 @@ public:
         SingleValue, BoolValue, Trigger
     };
     Q_ENUM(ValueType);
-    Q_INVOKABLE static const ValueType valueTypeForSensor(const TypeHelper::SensorType styp);
+
+    Q_INVOKABLE static const TypeHelper::ValueType valueTypeForSensor(const TypeHelper::SensorType styp);
     Q_INVOKABLE static const QColor getColorForValueType(const TypeHelper::ValueType vtype);
     Q_INVOKABLE static const QString getStringForValueType(const TypeHelper::ValueType vtype);
 

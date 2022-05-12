@@ -1,13 +1,16 @@
 #include "devicedatainput.h"
 
-DeviceDataInput::DeviceDataInput(QObject *parent, QString identifier, uint16_t port, uint8_t nSensors, MotionDevice* deviceDescription)
+DeviceDataInput::DeviceDataInput(QObject *parent)
     : QObject{parent}
 {
-    m_identifier = identifier;
-    m_port = port;
-    m_nSensors = nSensors;
-    m_deviceDescription = deviceDescription;
 
+}
+
+DeviceDataInput::DeviceDataInput(QString identifier, uint16_t port, uint8_t nSensors, MotionDevice* deviceDescription, QObject *parent)
+    : QObject{parent},
+      m_identifier{identifier}, m_port{port},
+      m_nSensors{nSensors}, m_deviceDescription{deviceDescription}
+{
     setupOscInputBindings();
     deviceDescription->inputs = &oscHandleHash;
     createNotifier();

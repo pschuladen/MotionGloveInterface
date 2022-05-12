@@ -1,9 +1,10 @@
 #include "oscviewcontroller.h"
 
 OscViewController::OscViewController(QObject *parent)
+    : ValueNotifierClass{parent}
 {
-    setParent(parent);
-    setObjectName(standardObjectName());
+//    setParent(parent);
+    setObjectName(standardObjectName()); //should maybe just be set in qml?
 }
 
 const QString &OscViewController::destIp() const

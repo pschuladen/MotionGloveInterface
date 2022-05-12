@@ -1,14 +1,17 @@
 #include "valuenotifierclass.h"
 
-ValueNotifierClass::ValueNotifierClass(QObject *parent, TypeHelper::ValueType valueType,  int valueNumber, int indexForObject)
+ValueNotifierClass::ValueNotifierClass(QObject *parent)
     : QObject{parent}
 {
-    m_indexInObject = indexForObject;
-    setConnectedValueType(valueType);
+}
 
+ValueNotifierClass::ValueNotifierClass(int objectIdx, QObject *parent)
+    : QObject{parent}, m_indexInObject{objectIdx}
+{
 }
 
 ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
+    : QObject{parent}
 {
     setParent(parent);
     int _nVals = 0;
@@ -171,6 +174,7 @@ const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
 
 bool ValueNotifierClass::connectValueTypeSignalToSlot(ValueNotifierClass *sender, ValueNotifierClass *receiver, TypeHelper::ValueType vType)
 {
+    qInfo() << "connecting sig/slo" << sender << receiver << vType;
     typedef ValueNotifierClass _vc;
     switch(vType) {
     case TypeHelper::Undefined:

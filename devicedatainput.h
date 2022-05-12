@@ -34,7 +34,8 @@ class DeviceDataInput : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeviceDataInput(QObject *parent = nullptr, QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2, MotionDevice* deviceDescription = nullptr);
+    explicit DeviceDataInput(QObject *parent = nullptr);
+    explicit DeviceDataInput(QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2, MotionDevice* deviceDescription = nullptr, QObject *parent = nullptr);
 
     QString m_identifier;
     uint8_t m_nSensors;

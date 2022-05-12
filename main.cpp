@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
 
     main_backend::Instance()->setEngine(&engine);
     main_devicestatus::Instance();
+    QObject::connect(main_devicestatus::Instance(), &DeviceStatusManager::receivedNewDevice,
+            main_backend::Instance(), &MainBackend::createNewInputViews);
 
     OscOutputDevice test;
 

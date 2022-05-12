@@ -8,7 +8,8 @@ OscPacketBuilder::OscPacketBuilder(QObject *parent)
 }
 
 OscPacketBuilder::OscPacketBuilder(QByteArray addr, quint32 idx, QObject *parent)
-    : ValueNotifierClass{parent}, m_oscAddress{addr}, m_oscMessIdx{idx}
+    : ValueNotifierClass{parent},
+      m_oscAddress{addr}, m_oscMessIdx{idx}
 {
 }
 
