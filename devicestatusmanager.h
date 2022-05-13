@@ -26,7 +26,7 @@
 #include "oscpp/client.hpp"
 
 #include "devicedatainput.h"
-#include "Singleton.h"
+//#include "Singleton.h"
 //#include "mainbackend.h"
 
 //struct MotionDevice;
@@ -65,6 +65,6 @@ private:
 };
 
 //Singleton definition always call this object through main_devicestatus::Instance();
-typedef Singleton<DeviceStatusManager> main_devicestatus ;
+//typedef Singleton<DeviceStatusManager> main_devicestatus ;
 
 #endif // DEVICESTATUSMANAGER_H

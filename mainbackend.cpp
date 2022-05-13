@@ -4,11 +4,13 @@
 MainBackend::MainBackend(QObject *parent)
     : QObject{parent}
 {
-    qInfo() << this->objectName();
+    qInfo() << "mainbackend object name" << this->objectName();
+    qInfo() << "mainbackend thread" << this->thread();
+
 }
 
 
-void MainBackend::setEngine(QQmlApplicationEngine *engine)
+void MainBackend::setQmlEngine(QQmlApplicationEngine *engine)
 {
     m_engine = engine;
 
@@ -18,6 +20,15 @@ void MainBackend::setEngine(QQmlApplicationEngine *engine)
     inputDevicesSidebarView = mainWindow->findChild<QQuickItem*>("inputDevicesView");
     processingGraphView = mainWindow->findChild<QQuickItem*>("processingGraphView");
     outputDevcesSidebarView = mainWindow->findChild<QQuickItem*>("outputDevicesView");
+}
+
+void MainBackend::initialSetup()
+{
+    DeviceStatusManager *_dma = new DeviceStatusManager();
+    deviceManager.append(_dma);
+    connect(_dma, &DeviceStatusManager::receivedNewDevice, this, &MainBackend::createNewInputViews);
+
+
 }
 
 void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition)//float posX, float posY)
@@ -42,7 +53,6 @@ void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType 
     newNode.qmlView = newProcessingItem;
     processingNodes.insert(name, newNode);//ProcessingNode(newProcessCalculus, viewBackend));
     allConnectableObjects.insert(name, ConnectableObject(viewBackend, newProcessingItem, TypeHelper::Process));
-
 
 }
 
@@ -112,7 +122,7 @@ void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
     newDeviceItem->setObjectName(QString(motionDevice->deviceName+"-view"));
     newDeviceItem->setParentItem(inputDevicesSidebarView);
     inputDeviceViews.insert(motionDevice->deviceName, newDeviceItem);
-    connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), main_devicestatus::Instance(), SLOT(setConnectStatus(bool,QString)));
+    connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), deviceManager.at(0), SLOT(setConnectStatus(bool,QString)));
 }
 
 void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)

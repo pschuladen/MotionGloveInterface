@@ -44,7 +44,8 @@ public:
     explicit MainBackend(QObject *parent = nullptr);
     typedef InputValueViewController::ValueViewMode sensType ;
 
-    void setEngine(QQmlApplicationEngine *engine);
+    void setQmlEngine(QQmlApplicationEngine *engine);
+    void initialSetup();
 
     Q_INVOKABLE void createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition=QPoint(10,10));
     Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
@@ -68,6 +69,15 @@ private:
     QQuickItem *inputDevicesSidebarView;
     QQuickItem *processingGraphView;
     QQuickItem *outputDevcesSidebarView;
+
+    QList<DeviceStatusManager*> deviceManager;
+
+    enum ThreadRole {
+        Main, NetIn, NetOut, Process, Audio
+    };
+
+    QMap<ThreadRole, QThread> threads;
+
 
     QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
 //    QMap<QString, DeviceDataInput*> inputDevices;

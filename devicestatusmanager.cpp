@@ -15,6 +15,8 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
     else {
         qDebug() << "NO BINDING possible on Port"<< this->m_port;
     }
+
+    qInfo() << "device status object" << objectName() << thread();
 }
 
 
