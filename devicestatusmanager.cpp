@@ -10,10 +10,10 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
     if(bindSuccess) {
 
         connect(socket, &QUdpSocket::readyRead, this, &DeviceStatusManager::readIncomingUdpData);
-        qDebug() << "SUCESS binding on Port"<< this->m_port;
+        qInfo() << "SUCESS binding on Port"<< this->m_port;
     }
     else {
-        qDebug() << "NO BINDING possible on Port"<< this->m_port;
+        qWarning() << "NO BINDING possible on Port"<< this->m_port;
     }
 
     qInfo() << "device status object" << objectName() << thread();
@@ -22,8 +22,8 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
 
 void DeviceStatusManager::setConnectStatus(bool connect, QString device)
 {
-    discoveredDevices[device].connectStatus = connect;
-    qInfo() << "Status for" << device << "connection is now" << discoveredDevices[device].connectStatus;
+    discoveredDevices[device.toUtf8()].connectStatus = connect;
+    qInfo() << "Status for" << device << "connection is now" << discoveredDevices[device.toUtf8()].connectStatus;
 }
 
 void DeviceStatusManager::readIncomingUdpData()
@@ -52,47 +52,64 @@ void DeviceStatusManager::handleOscMessage(const OSCPP::Server::Message &message
     if(message == "/glove/ping") {
         OSCPP::Server::ArgStream oscArgs(message.args());
         if(oscArgs.tag() == 's') {
-            QString pingersName(oscArgs.string());
-            if(!discoveredDevices.keys().contains(pingersName)) {
-                MotionDevice newDevice;
-                bool deviceData_ok = true;
+            QByteArray pingersName(oscArgs.string());
+            if(oscInputDevices.contains(pingersName)) {
 
-                if(!oscArgs.atEnd() && oscArgs.tag() == 's') {
-                    newDevice.address = oscArgs.string();
-                } else deviceData_ok = false;
+                oscInputDevices.value(pingersName)->handlePingMessage(oscArgs);
 
-                if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
-                    newDevice.port = oscArgs.int32();
-                } else deviceData_ok = false;
-
-                if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
-                    newDevice.sendIntervall = oscArgs.int32();
-                }
-
-                if(!deviceData_ok) {
-                    qInfo() << "not enough info for device" << pingersName;
-                    return;
-                }
-                newDevice.deviceName = pingersName;
-                newDevice.inputHandler = new DeviceDataInput(pingersName, 51002+discoveredDevices.size(), 2, &newDevice, this);
-
-                newDevice.connectStatus = false;
-                discoveredDevices.insert(pingersName, newDevice);
-                qInfo() << "received ping from new device" << pingersName;
-
-                emit receivedNewDevice(&newDevice);//pingersName, newDevice.inputHandler);
+//                emit receivedNewDevice(&newDevice);
             }
             else {
-                if(discoveredDevices[pingersName].connectStatus) {
-                    pingBackToDevice(pingersName);
-                }
+                createNewMotionDevice(pingersName, oscArgs);
+//                if(discoveredDevices[pingersName].connectStatus) {
+//                    pingBackToDevice(pingersName);
+//                }
                 //send ping back if true in hash
             }
         }
     }
 }
 
-void DeviceStatusManager::pingBackToDevice(QString deviceName)
+void DeviceStatusManager::createNewMotionDevice(QByteArray name, OSCPP::Server::ArgStream oscArgs)
+{
+    MotionDevice newDevice;
+    OscInputDevice *newMotionDevice = new OscInputDevice(name, this);
+    oscInputDevices.insert(name, newMotionDevice);
+
+    newMotionDevice->handlePingMessage(oscArgs);
+
+    emit newOscInputDevice(name, newMotionDevice);
+
+
+//    bool deviceData_ok = true;
+
+//    if(!oscArgs.atEnd() && oscArgs.tag() == 's') {
+//        newDevice.m_deviceAddress = oscArgs.string();
+//    } else deviceData_ok = false;
+
+//    if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
+//        newDevice.port = oscArgs.int32();
+//    } else deviceData_ok = false;
+
+//    if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
+//        newDevice.sendIntervall = oscArgs.int32();
+//    }
+
+//    if(!deviceData_ok) {
+//        qInfo() << "not enough info for device" << name;
+//        return;
+//    }
+//    newDevice.deviceName = name;
+//    newDevice.inputHandler = new OscInputDevice(name, 51002+discoveredDevices.size(), 2, &newDevice, this);
+
+//    newDevice.connectStatus = false;
+//    discoveredDevices.insert(name, newDevice);
+//    qInfo() << "received ping from new device" << name;
+
+//    emit receivedNewDevice(&newDevice);//pingersName, newDevice.inputHandler);
+}
+
+void DeviceStatusManager::pingBackToDevice(QByteArray deviceName)
 {
     MotionDevice *device = &discoveredDevices[deviceName];
     qInfo() << "pingback";
@@ -102,8 +119,8 @@ void DeviceStatusManager::pingBackToDevice(QString deviceName)
             .int32(51002)
             .closeMessage();
     size_t pongSize = pongPacket.size();
-    qInfo() << "device addr" << device->address << device->port;
-    qint64 sendedBytes = socket->writeDatagram(pongBuf.data(), pongSize, QHostAddress(device->address), device->port);
+    qInfo() << "device addr" << device->m_deviceAddress << device->port;
+    qint64 sendedBytes = socket->writeDatagram(pongBuf.data(), pongSize, QHostAddress(device->m_deviceAddress), device->port);
 }
 
 

@@ -86,3 +86,21 @@ size_t TypeHelper::getSizeForValueType(const ValueType vType)
         return 1;
     }
 }
+
+QString TypeHelper::getProtoStrForSensor(const SensorType sensType)
+{
+    switch(sensType) {
+    case TypeHelper::Custom:
+        return "sensor";
+    case TypeHelper::Accel:
+        return "acc";
+    case TypeHelper::Gyro:
+        return "gyr";
+    case TypeHelper::Grav:
+        return "gravity";
+    case TypeHelper::RotQuat:
+        return "quat";
+    case TypeHelper::Touch:
+        return "touch";
+    }
+}

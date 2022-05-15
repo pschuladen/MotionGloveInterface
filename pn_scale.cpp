@@ -7,7 +7,7 @@ PN_Scale::PN_Scale(QObject *parent)
     m_inHigh = 1;
     m_inLow = 0;
     m_outHigh = 1;
-    m_outLow = 1;
+    m_outLow = 0;
     m_clipOutput = false;
     evalMultip();
 }

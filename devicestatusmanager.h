@@ -25,7 +25,7 @@
 #include "oscpp/server.hpp"
 #include "oscpp/client.hpp"
 
-#include "devicedatainput.h"
+#include "oscinputdevice.h"
 //#include "Singleton.h"
 //#include "mainbackend.h"
 
@@ -41,11 +41,13 @@ public:
 
     void setEngine(QQmlApplicationEngine *engine);
 
-    QHash<QString, MotionDevice> discoveredDevices;
+    QMap<QByteArray, MotionDevice> discoveredDevices;
+    QMap<QByteArray, OscInputDevice*> oscInputDevices;
 
 signals:
-    void receivedPing();
+//    void receivedPing();
     void receivedNewDevice(MotionDevice *motionDevice);
+    void newOscInputDevice(QString name, OscInputDevice *newDevice);
 
 public slots:
     void setConnectStatus(bool connect, QString device);
@@ -59,9 +61,9 @@ private:
     void handleOscPacket(const OSCPP::Server::Packet &packet);
     void handleOscMessage(const OSCPP::Server::Message &message);
 
+    void createNewMotionDevice(QByteArray name, OSCPP::Server::ArgStream msgArgs);
 
-
-    void pingBackToDevice(QString deviceName);
+    void pingBackToDevice(QByteArray deviceName);
 };
 
 //Singleton definition always call this object through main_devicestatus::Instance();

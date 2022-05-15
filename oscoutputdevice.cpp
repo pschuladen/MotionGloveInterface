@@ -23,21 +23,21 @@ OscOutputDevice::OscOutputDevice(QObject *parent)
 
 }
 
-OscOutputDevice::OscOutputDevice(OscViewController *viewController, QObject *parent)
-    : OscViewController{parent}
+OscOutputDevice::OscOutputDevice(OscOutputViewController *viewController, QObject *parent)
+    : OscOutputViewController{parent}
 {
 //    setParent(parent);
     setViewControllerObject(viewController);
     initialiseOscDevice();
 }
 
-bool OscOutputDevice::setViewControllerObject(OscViewController *vc)
+bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
 {
     if (vc == nullptr) return false;
 
     m_viewController = vc;
 
-    typedef OscViewController ovc;
+    typedef OscOutputViewController ovc;
     typedef OscOutputDevice ood;
 
     connect(vc, &ovc::destIpChanged, this, &ood::setDestIp);

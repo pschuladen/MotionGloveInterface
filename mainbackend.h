@@ -23,7 +23,7 @@
 #include <QtQml/qqmlregistration.h>
 
 #include "devicestatusmanager.h" //recursive inclusion und so...
-#include "devicedatainput.h"
+#include "oscinputdevice.h"
 #include "valuenotifierclass.h" //kann weg
 #include "processnode.h"
 
@@ -31,7 +31,8 @@
 #include "processnodecontroller.h"
 #include "dataprocessingnode.h"
 #include "oscoutputdevice.h"
-#include "oscviewcontroller.h"
+#include "oscoutputviewcontroller.h"
+#include "oscinputviewcontroller.h"
 
 #include "typehelper.h"
 
@@ -112,24 +113,43 @@ private:
     QMap<QString, ValueConnection> allConnections;
 
 
-    struct OscDeviceStruct {
+    struct OscOutDeviceStruct {
         QQuickItem *view;
         OscOutputDevice *oscSender;
-        OscViewController *viewController;
-        OscDeviceStruct(OscOutputDevice*_oscSender, OscViewController* _viewController ,QQuickItem *_view)
+        OscOutputViewController *viewController;
+        OscOutDeviceStruct(OscOutputDevice*_oscSender, OscOutputViewController* _viewController ,QQuickItem *_view)
             :oscSender{_oscSender}, viewController{_viewController}, view{_view} {}
-        OscDeviceStruct(){};
+        OscOutDeviceStruct(){};
     };
-    QMap<QString, OscDeviceStruct> oscDevices;
+    QMap<QString, OscOutDeviceStruct> oscOutputDevices;
+
+    struct OscInDeviceStruct {
+        QQuickItem *view;
+        OscInputDevice *oscReceiver;
+        OscInputViewController *viewController;
+//        QQuickItem *conntainerView;
+
+        OscInDeviceStruct(OscInputDevice*_oscReceiver, OscInputViewController* _viewController ,QQuickItem *_view)
+            :oscReceiver{_oscReceiver}, viewController{_viewController}, view{_view} {}
+        OscInDeviceStruct(){};
+    };
+    QMap<QString, OscInDeviceStruct> oscInputDevices;
+
+//    QMetaObject::Connection *pendingRequestConnection;
+    QMap<QString, QMetaObject::Connection *> pendingRequestConnections;
+
 
     void createMotionInputDeviceView(MotionDevice *motionDevice);
     void createValueInputViewsForDevice(MotionDevice *motionDevice);
 
 signals:
-
+    void inputViewReady();
 
 public slots:
     void createNewInputViews(MotionDevice *motionDevice);
+
+    void createNewMotionDeviceView(QString name, OscInputDevice* newDevice);
+    void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);//QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);
 
 
 };

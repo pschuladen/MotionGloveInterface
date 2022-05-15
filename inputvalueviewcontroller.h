@@ -76,6 +76,10 @@ public:
 
     const QColor &dotColor() const;
     void setDotColor(const QColor &newDotColor);
+    ValueNotifierClass *sourceNotifier() const;
+
+    ValueNotifierClass *getNotifier(int idx) override;
+    void setSourceNotifier(ValueNotifierClass *newSourceNotifier);
 
 public slots:
     void slot_vectorChanged(QVector3D vec, int frame=-1) override;
@@ -87,6 +91,7 @@ private:
 
     void checkAndEmitValuesChanged();
 
+    ValueNotifierClass *m_sourceNotifier = nullptr;
     TypeHelper::SensorType m_viewmode;
 
     int m_valueCount;
@@ -120,6 +125,8 @@ signals:
     void emitvaluesChanged();
     void valuecountChanged();
     void dotColorChanged();
+
+    // ValueNotifierClass interface
 };
 
 #endif // INPUTVALUEVIEWCONTROLLER_H

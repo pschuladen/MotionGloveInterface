@@ -13,6 +13,12 @@ Item {
 //    onWidthChanged: console.log("width", width)
 //    onHeightChanged: console.log("height", height)
 
+    OscInputViewController {
+        objectName: "oscviewcontroller"
+        id: oscviewcontrol
+        connectDevice: connectDeviceButton.checked
+    }
+
     Rectangle {
         anchors {
             top: header.top

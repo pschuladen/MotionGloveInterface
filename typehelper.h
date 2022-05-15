@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include <QColor>
+#include <QStringList>
 
 struct TypeHelper
 {
@@ -25,6 +26,9 @@ public:
 
     static size_t getSizeForValueType(const TypeHelper::ValueType vType);
 
+//    static QStringList
+    static QString getProtoStrForSensor(const TypeHelper::SensorType sensType);
+
 
     enum NodeConnectionType: quint8 {
         InputToProcess,
@@ -46,5 +50,8 @@ struct TouchValues {
     quint8 tval[6];
     quint8 nvals = 6;
 };
+
+
+
 
 #endif // TYPEHELPER_H

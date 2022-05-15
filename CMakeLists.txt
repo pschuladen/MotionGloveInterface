@@ -12,7 +12,8 @@ qt_add_executable(appMotionGloveInterface
     main.cpp
 #    devicestatuscontroller.h devicestatuscontroller.cpp
     devicestatusmanager.h devicestatusmanager.cpp
-    devicedatainput.h devicedatainput.cpp
+#    devicedatainput.h devicedatainput.cpp
+    oscinputdevice.h oscinputdevice.cpp
     valuelistmodel.h valuelistmodel.cpp
     Singleton.h
     mainbackend.h mainbackend.cpp
@@ -26,8 +27,11 @@ qt_add_executable(appMotionGloveInterface
     pn_scale.h pn_scale.cpp
     processnode.h processnode.cpp
     saveloadinterfaceclass.h saveloadinterfaceclass.cpp
-    oscviewcontroller.h oscviewcontroller.cpp
+#    oscviewcontroller.h oscviewcontroller.cpp
+    oscoutputviewcontroller.h oscoutputviewcontroller.cpp
     oscpacketbuilder.h oscpacketbuilder.cpp
+    oscinputparser.h oscinputparser.cpp
+    oscinputviewcontroller.h oscinputviewcontroller.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface

@@ -7,7 +7,8 @@
 
 #include "oscoutputdevice.h"
 #include "pn_scale.h"
-#include "oscviewcontroller.h"
+#include "oscoutputviewcontroller.h"
+#include "oscinputviewcontroller.h"
 
 
 //for test purposes
@@ -20,7 +21,8 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
     qmlRegisterType<PN_Scale>("MotionGloveInterface", 1, 0, "PN_Scale");
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
-    qmlRegisterType<OscViewController>("MotionGloveInterface", 1, 0, "OscViewController");
+    qmlRegisterType<OscOutputViewController>("MotionGloveInterface", 1, 0, "OscOutputViewController");
+    qmlRegisterType<OscInputViewController>("MotionGloveInterface", 1, 0, "OscInputViewController");
 
     qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 

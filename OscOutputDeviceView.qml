@@ -17,7 +17,7 @@ Item {
     //    onIpAddressChanged: console.log("ipaddress changed", ipAddress)
     onPortChanged: console.log("port changed", port)
 
-    OscViewController {
+    OscOutputViewController {
 //        objectName: "oscviewcontroller"
         Component.onCompleted: console.log("osc standard objectname", objectName)
         id: oscviewcontrol

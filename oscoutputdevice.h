@@ -6,18 +6,18 @@
 
 #include "oscpp/client.hpp"
 //#include "valuenotifierclass.h"
-#include "oscviewcontroller.h"
+#include "oscoutputviewcontroller.h"
 #include "oscpacketbuilder.h"
 
-class OscOutputDevice : public OscViewController
+class OscOutputDevice : public OscOutputViewController
 {
     Q_OBJECT
 
 public:
     explicit OscOutputDevice(QObject *parent = nullptr);
-    explicit OscOutputDevice(OscViewController *viewController, QObject *parent = nullptr);
+    explicit OscOutputDevice(OscOutputViewController *viewController, QObject *parent = nullptr);
 
-    bool setViewControllerObject(OscViewController* viewController);
+    bool setViewControllerObject(OscOutputViewController* viewController);
 
 private:
     void initialiseOscDevice();
@@ -29,7 +29,7 @@ private:
     QHostAddress m_destinationAddress;
 //    quint16 m_destinationPort;
 
-    OscViewController *m_viewController;
+    OscOutputViewController *m_viewController;
 
 //    QList<QString> oscPaths;
 

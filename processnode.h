@@ -39,7 +39,7 @@ public:
     };
     ProcessRole processRole = ViewController;
 
-    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
+//    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
 
     virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!

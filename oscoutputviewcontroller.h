@@ -7,7 +7,7 @@
 
 #include "valuenotifierclass.h"
 
-class OscViewController : public ValueNotifierClass
+class OscOutputViewController : public ValueNotifierClass
 {
     Q_OBJECT
     QML_ELEMENT
@@ -20,7 +20,7 @@ class OscViewController : public ValueNotifierClass
 
 
 public:
-    explicit OscViewController(QObject *parent = nullptr);
+    explicit OscOutputViewController(QObject *parent = nullptr);
 
     const QString &destIp() const;
 

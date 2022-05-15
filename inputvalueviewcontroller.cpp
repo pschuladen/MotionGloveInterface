@@ -211,3 +211,23 @@ void InputValueViewController::setDotColor(const QColor &newDotColor)
     m_dotColor = newDotColor;
     emit dotColorChanged();
 }
+
+ValueNotifierClass *InputValueViewController::sourceNotifier() const
+{
+    return m_sourceNotifier;
+}
+
+void InputValueViewController::setSourceNotifier(ValueNotifierClass *newSourceNotifier)
+{
+    if(m_sourceNotifier != nullptr) {
+        ValueNotifierClass::disconnectValueTypeSignalToSlot(m_sourceNotifier, this, TypeHelper::valueTypeForSensor(viewmode()));
+    }
+    m_sourceNotifier = newSourceNotifier;
+    ValueNotifierClass::connectValueTypeSignalToSlot(newSourceNotifier, this, TypeHelper::valueTypeForSensor(viewmode()));
+}
+
+
+ValueNotifierClass *InputValueViewController::getNotifier(int idx)
+{
+    return m_sourceNotifier;
+}
