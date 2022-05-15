@@ -45,18 +45,15 @@ Window {
                 anchors.fill: parent
                 keys: ["text/procType"]
                 onEntered: (drag) => {console.log("drag entered", drag.keys)}
-//                onContainsDragChanged: console.log("drag entered", drag.formats)
 
                 onDropped: (drop) => {
                                drop.acceptProposedAction()
                                console.log("bla", drop.keys)
-//                               console.log("Dropped Dataaa", drop.getDataAsString("text/proceName"))
-//                               console.log("Dropped source", drop.source)
-//                               console.log("Dropped action", drop.action)
-//                               console.log("Dropped formats", drop.formats)
+
                                console.log("Position", Qt.point(drop.x, drop.y))
-//                               console.log("funktioniert dieses enum", ProcessNodeController.ViewOnly)
-                               _mbackend.createNewProcessingView(drop.getDataAsString("text/procType"), Qt.point(drop.x, drop.y))
+
+                               _mbackend.createNewProcessingView(0//drop.getDataAsString("text/procType")
+                                                                 , Qt.point(drop.x, drop.y))
                                parent.tN = drop.getDataAsString("text/procType")
                 }
             }
@@ -175,12 +172,6 @@ anchors.verticalCenter: outputControl.verticalCenter
                     right:parent.right
                     margins: 5
                 }
-//                height: childrenRect.height
-
-
-//                OscOutputDeviceView {
-//                    Layout.fillWidth: true
-//                }
             }
             Button {
                 text: "create Osc-Out"

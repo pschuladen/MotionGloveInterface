@@ -26,10 +26,6 @@
 #include "oscpp/client.hpp"
 
 #include "oscinputdevice.h"
-//#include "Singleton.h"
-//#include "mainbackend.h"
-
-//struct MotionDevice;
 
 class DeviceStatusManager : public QObject
 {
@@ -41,16 +37,14 @@ public:
 
     void setEngine(QQmlApplicationEngine *engine);
 
-    QMap<QByteArray, MotionDevice> discoveredDevices;
     QMap<QByteArray, OscInputDevice*> oscInputDevices;
 
 signals:
-//    void receivedPing();
+
     void receivedNewDevice(MotionDevice *motionDevice);
     void newOscInputDevice(QString name, OscInputDevice *newDevice);
 
 public slots:
-    void setConnectStatus(bool connect, QString device);
 
 private:
     QUdpSocket *socket;
@@ -63,10 +57,7 @@ private:
 
     void createNewMotionDevice(QByteArray name, OSCPP::Server::ArgStream msgArgs);
 
-    void pingBackToDevice(QByteArray deviceName);
 };
 
-//Singleton definition always call this object through main_devicestatus::Instance();
-//typedef Singleton<DeviceStatusManager> main_devicestatus ;
 
 #endif // DEVICESTATUSMANAGER_H

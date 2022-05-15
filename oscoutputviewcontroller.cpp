@@ -3,7 +3,6 @@
 OscOutputViewController::OscOutputViewController(QObject *parent)
     : ValueNotifierClass{parent}
 {
-//    setParent(parent);
     setObjectName(standardObjectName()); //should maybe just be set in qml?
 }
 
@@ -74,7 +73,7 @@ void OscOutputViewController::setOscPathAtIndex(QString newPath, quint32 idx)
 
 void OscOutputViewController::newConnectionAtIndex(int idx, TypeHelper::ValueType valueType)
 {
-
+qWarning() << "WARNING! newConnectionAtIndex not implemented";
 }
 
 int OscOutputViewController::nPaths() const

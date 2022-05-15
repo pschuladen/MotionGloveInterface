@@ -66,12 +66,8 @@ const QString &OscInputDevice::deviceName() const
 
 ValueNotifierClass *OscInputDevice::getNotifier(SensType sensType, int sensIndex, int subIndex)
 {
-    if(subIndex == -1) {
-        return valueNotifier.value(sensType).at(sensIndex);
-    }
-    else {
-        return valueNotifier.value(sensType).at(sensIndex)->subNotifier.at(subIndex);
-    }
+    qWarning() << "WARNING! get notifier for sensType and sensIndex not implemented!!";
+return nullptr;
 }
 
 void OscInputDevice::readIncomingUdpData()

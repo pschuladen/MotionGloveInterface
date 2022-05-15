@@ -20,8 +20,8 @@ qt_add_executable(appMotionGloveInterface
     valuenotifierclass.h valuenotifierclass.cpp
 #    valueviewbackend.h valueviewbackend.cpp
     inputvalueviewcontroller.h inputvalueviewcontroller.cpp
-    dataprocessingnode.h dataprocessingnode.cpp
-    processnodecontroller.h processnodecontroller.cpp
+#    dataprocessingnode.h dataprocessingnode.cpp
+#    processnodecontroller.h processnodecontroller.cpp
     oscoutputdevice.h oscoutputdevice.cpp
     typehelper.h typehelper.cpp
     pn_scale.h pn_scale.cpp

@@ -4,29 +4,11 @@ OscOutputDevice::OscOutputDevice(QObject *parent)
 {
     setParent(parent);
     initialiseOscDevice();
-
-
-//        QString sstr("/123456789012345");
-////    qInfo() << "string size" << sstr.size();
-//    pongPacket.openMessage(sstr.toUtf8(), 9)
-//            .int32(123)
-//            .float32(1.23)
-//            .float32(2.34)
-//            .float32(3.45)
-//            .float32(4.45).float32(4.45).float32(4.45).float32(4.45).float32(4.45)
-//            .closeMessage();
-//pongPacket.reset();
-//    size_t pongSize = pongPacket.size();
-//    qInfo() << "message size" << pongSize;
-//    qInfo() << "buffer:" << pongBuf;
-//    qint64 sendedBytes = socket->writeDatagram(pongBuf.data(), pongSize, QHostAddress(QHostAddress::LocalHost), 55110);
-
 }
 
 OscOutputDevice::OscOutputDevice(OscOutputViewController *viewController, QObject *parent)
     : OscOutputViewController{parent}
 {
-//    setParent(parent);
     setViewControllerObject(viewController);
     initialiseOscDevice();
 }
@@ -66,8 +48,6 @@ void OscOutputDevice::initialiseOscDevice()
 
     OSCPP::Client::Packet pongPacket(pongBuf.data(), 100);
 
-//    m_destPort = 55211;
-//    m_destinationAddress.setAddress(QHostAddress::LocalHost);
     OscOutputDevice::setDestPort(55211);
     OscOutputDevice::setDestIp("127.0.0.1");
 }
@@ -87,21 +67,6 @@ void OscOutputDevice::addOscPath()
 
 void OscOutputDevice::setDestIp(const QString &newDestIp)
 {
-//    QHostAddress address(newDestIp);
-//    if (QAbstractSocket::IPv4Protocol == address.protocol())
-//    {
-//       qDebug("Valid IPv4 address.");
-//    }
-//    else if (QAbstractSocket::IPv6Protocol == address.protocol())
-//    {
-//       qDebug("Valid IPv6 address.");
-//    }
-//    else
-//    {
-//        emit destIpChanged(destIp());
-//        return;
-//        qDebug("Unknown or invalid address.");
-//    }
     if(newDestIp == destIp()) {
     if(m_destinationAddress.toString() == newDestIp) {
             return;
@@ -109,7 +74,6 @@ void OscOutputDevice::setDestIp(const QString &newDestIp)
 
     }
     if(m_destinationAddress.setAddress(newDestIp)) {
-//        setOscDestIp(newDestIp);
         m_destIp = newDestIp;
     }
     emit destIpChanged(destIp());
@@ -154,13 +118,11 @@ void OscOutputDevice::addOscPath(QString newPath)
     m_valueTypes.append(TypeHelper::Undefined);
     emit valueTypesChanged(valueTypes());
     emit oscPathsChanged(oscPaths());
-//    outputPaths.append(OscOutput(newPath.toUtf8(), newOsc));
 }
 
 void OscOutputDevice::slot_addOscPath()
 {
     qInfo() << "adding osc path";
-//    QString newPathAddress = QString("/out/%1").arg(outputPaths.size()+1);
     addOscPath(QString("/out/%1").arg(packetBuilder.size()+1));
 }
 

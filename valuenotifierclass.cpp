@@ -49,10 +49,9 @@ ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject 
 void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 {
     //TODO: possibly dangerous for existing (sub-)connections...
-    subNotifier.resize(numberOfSubs);
+    subNotifier.reserve(numberOfSubs);
     for(int i = 0; i < numberOfSubs; i++) {
-        ValueNotifierClass *subNotify = new ValueNotifierClass(this);
-        subNotifier.insert(i, subNotify);
+        subNotifier.append(new ValueNotifierClass(this));
     }
 }
 
@@ -63,32 +62,6 @@ void ValueNotifierClass::createSubnotifierForValueType(TypeHelper::ValueType val
     else createSubnotifier(TypeHelper::getSizeForValueType(valType));
 }
 
-//void ValueNotifierClass::createSubnotifier(TypeHelper::ValueType valueType)
-//{
-//    int _nVals = 0;
-//    switch(valueType) {
-//    case TypeHelper::Undefined:
-//        qWarning() << "undefined value notifier";
-//        break;
-//    case TypeHelper::Vector:
-//        _nVals = 3;
-//        break;
-//    case TypeHelper::Quat:
-//        _nVals = 4;
-//        break;
-//    case TypeHelper::List:
-//        _nVals = 6;
-//        break;
-//    case TypeHelper::SingleValue:
-//        break;
-//    case TypeHelper::BoolValue:
-//        break;
-//    case TypeHelper::Trigger:
-//        break;
-//    }
-//    createSubnotifier(_nVals);
-
-//}
 
 ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
 {

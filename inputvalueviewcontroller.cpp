@@ -186,19 +186,6 @@ void InputValueViewController::setEmitvalues(bool newEmitvalues)
     emit emitvaluesChanged();
 }
 
-//int InputValueViewController::valuecount() const
-//{
-//    return m_valuecount;
-//}
-
-//void InputValueViewController::setValuecount(int newValuecount)
-//{
-//    if (m_valuecount == newValuecount)
-//        return;
-//    m_valuecount = newValuecount;
-//    emit valuecountChanged();
-//}
-
 const QColor &InputValueViewController::dotColor() const
 {
     return m_dotColor;

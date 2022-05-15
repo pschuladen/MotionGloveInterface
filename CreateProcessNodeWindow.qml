@@ -84,11 +84,11 @@ Item {
         id: createProcessModel
         ListElement {
             name: "sum"
-            type: ProcessNodeController.Scale
+            type: 0//ProcessNodeController.Scale
         }
         ListElement {
             name: "scale"
-            type: ProcessNodeController.ViewOnly
+            type: 1//ProcessNodeController.ViewOnly
         }
     }
 }

@@ -33,18 +33,11 @@ class InputValueViewController : public ValueNotifierClass
     Q_PROPERTY(TypeHelper::SensorType viewmode READ viewmode WRITE setViewmode NOTIFY viewmodeChanged)
     Q_PROPERTY(QColor dotColor READ dotColor WRITE setDotColor NOTIFY dotColorChanged)
 
-//    Q_PROPERTY(int valuecount READ valuecount WRITE setValuecount NOTIFY valuecountChanged)
 
     Q_PROPERTY(bool emitvalues READ emitvalues WRITE setEmitvalues NOTIFY emitvaluesChanged)
 
 public:
     explicit InputValueViewController(QObject *parent = nullptr);
-
-    //ValueViewMode is obsolete and will be deleted soon
-    enum ValueViewMode {
-        Custom, Accel, Gyro, Grav, Quat, Touch
-    };
-    Q_ENUM(ValueViewMode);
 
     TypeHelper::SensorType viewmode() const;
     void setViewmode(TypeHelper::SensorType newViewmode);
@@ -71,8 +64,7 @@ public:
     bool emitvalues() const;
     void setEmitvalues(bool newEmitvalues);
 
-//    int valuecount() const;
-//    void setValuecount(int newValuecount);
+
 
     const QColor &dotColor() const;
     void setDotColor(const QColor &newDotColor);

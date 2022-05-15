@@ -25,26 +25,11 @@ private:
     bool m_bindSocket;
 
     QUdpSocket *socket;
-//    uint16_t destinationPort;
+
     QHostAddress m_destinationAddress;
-//    quint16 m_destinationPort;
 
     OscOutputViewController *m_viewController;
 
-//    QList<QString> oscPaths;
-
-//    QList<QVariant> values;
-
-//    struct OscOutput {
-//        QByteArray oscAddress;
-////        QByteArray typeTags;
-//        OscPacketBuilder *oscBuilder;
-//        OscOutput(QByteArray _addr): oscAddress{_addr} {}
-//        OscOutput(QByteArray _addr, OscPacketBuilder *_oscBuilder)
-//            : oscAddress{_addr}, oscBuilder{_oscBuilder} {}
-//        OscOutput() {}
-//    };
-//    QList<OscOutput> outputPaths;
     QList<OscPacketBuilder*> packetBuilder;
 
 public slots:

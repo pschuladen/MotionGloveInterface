@@ -28,8 +28,6 @@
 #include "processnode.h"
 
 #include "inputvalueviewcontroller.h"
-#include "processnodecontroller.h"
-#include "dataprocessingnode.h"
 #include "oscoutputdevice.h"
 #include "oscoutputviewcontroller.h"
 #include "oscinputviewcontroller.h"
@@ -43,12 +41,11 @@ class MainBackend : public QObject
 public:
 
     explicit MainBackend(QObject *parent = nullptr);
-    typedef InputValueViewController::ValueViewMode sensType ;
 
     void setQmlEngine(QQmlApplicationEngine *engine);
     void initialSetup();
 
-    Q_INVOKABLE void createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition=QPoint(10,10));
+    Q_INVOKABLE void createNewProcessingView(int type, QPoint atPosition=QPoint(10,10));
     Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
                                        QString receiverNodeId, int targetIdx, QQuickItem *receiverConnector,
                                        TypeHelper::ValueType valueType);
@@ -80,8 +77,6 @@ private:
     QMap<ThreadRole, QThread> threads;
 
 
-    QHash<QString, QQuickItem*> inputDeviceViews; //store devices here
-//    QMap<QString, DeviceDataInput*> inputDevices;
     struct ProcessingNode {
         ProcessNode* controller;
         QList<ProcessNode*> processor;
@@ -139,14 +134,10 @@ private:
     QMap<QString, QMetaObject::Connection *> pendingRequestConnections;
 
 
-    void createMotionInputDeviceView(MotionDevice *motionDevice);
-    void createValueInputViewsForDevice(MotionDevice *motionDevice);
-
 signals:
     void inputViewReady();
 
 public slots:
-    void createNewInputViews(MotionDevice *motionDevice);
 
     void createNewMotionDeviceView(QString name, OscInputDevice* newDevice);
     void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);//QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);

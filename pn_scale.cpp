@@ -3,7 +3,6 @@
 PN_Scale::PN_Scale(QObject *parent)
     : ProcessNode(parent)
 {
-//    setParent(parent);
     m_inHigh = 1;
     m_inLow = 0;
     m_outHigh = 1;
@@ -84,8 +83,7 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
     if(!acceptsInputType(type)) return false;
 
     PN_Scale *newSubprocessor = new PN_Scale(type, this);
-//    setInitialProperties(this, newSub);  //is now done in the constructor
-//    connectPropertiesToProcessor(this, newSubprocessor); //is called from constructor
+
     qInfo() << "subprocessor before" << subProcessor;
     subProcessor.append(newSubprocessor);
     qInfo() << "subprocessor afgter" << subProcessor;

@@ -56,13 +56,7 @@ private:
 
     void oscR_singleValue(OSCPP::Server::ArgStream *args);
 
-//    void oscR_acceleration(OSCPP::Server::ArgStream *args);
-//    void oscR_gyroscope(OSCPP::Server::ArgStream *args);
-//    void oscR_quaternion(OSCPP::Server::ArgStream *args);
-//    void oscR_touch(OSCPP::Server::ArgStream *args);
-
     void oscR_unMapped(OSCPP::Server::ArgStream *args);
-
 
     void set3dVectorFromArgs(OSCPP::Server::ArgStream *args);
     void setQuaternionFromArgs(OSCPP::Server::ArgStream *args);

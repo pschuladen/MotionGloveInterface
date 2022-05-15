@@ -6,7 +6,6 @@ MainBackend::MainBackend(QObject *parent)
 {
     qInfo() << "mainbackend object name" << this->objectName();
     qInfo() << "mainbackend thread" << this->thread();
-
 }
 
 
@@ -26,18 +25,16 @@ void MainBackend::initialSetup()
 {
     DeviceStatusManager *_dma = new DeviceStatusManager();
     deviceManager.append(_dma);
-//    connect(_dma, &DeviceStatusManager::receivedNewDevice, this, &MainBackend::createNewInputViews);
     connect(_dma, &DeviceStatusManager::newOscInputDevice, this, &MainBackend::createNewMotionDeviceView);
 }
 
-void MainBackend::createNewProcessingView(ProcessNodeController::ProcessingType type, QPoint atPosition)//float posX, float posY)
+void MainBackend::createNewProcessingView(int type, QPoint atPosition)//float posX, float posY)
 {
     qInfo() << "now i should creat a view" << type << "at" << atPosition.x() << atPosition.y();
 
     QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml")));
     qInfo() << "errorstring" << newProcessingComponent.errorString();
     QString name = QString("proc-%1").arg(processingNodes.size());
-//    ProcessNodeController newC; //= new ProcessNodeController();
     QQuickItem *newProcessingItem = qobject_cast<QQuickItem*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", name},
                                                                                                                   {"x", atPosition.x()-40},
                                                                                                                   {"y", atPosition.y()-20}}));
@@ -112,60 +109,10 @@ bool MainBackend::createOscOutputDevice()
     }
 }
 
-void MainBackend::createMotionInputDeviceView(MotionDevice *motionDevice)
-{
-    QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
-//    qInfo() << newDeviceComponent.errors();
-    QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDeviceComponent.create());
-    newDeviceItem->setProperty("identifier", motionDevice->deviceName);
-    newDeviceItem->setObjectName(QString(motionDevice->deviceName+"-view"));
-    newDeviceItem->setParentItem(inputDevicesSidebarView);
-    inputDeviceViews.insert(motionDevice->deviceName, newDeviceItem);
-    connect(newDeviceItem, SIGNAL(connectButtonChanged(bool,QString)), deviceManager.at(0), SLOT(setConnectStatus(bool,QString)));
-}
-
-void MainBackend::createValueInputViewsForDevice(MotionDevice *motionDevice)
-{
-//    QQuickItem *parentForValueView = inputDeviceViews.value(motionDevice->deviceName, new QQuickItem())->findChild<QQuickItem*>("sensorViewContainer");
-//    if(!parentForValueView) {
-//        qWarning() << "no suitable view for inputs found";
-//        return;
-//    }
-//    QQmlComponent newInput(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorValuesView.qml")));
-//    foreach(const QByteArray &osc, motionDevice->getSortedInputKeys(true)) {//inputs->keys()) { //
-//        QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", motionDevice->inputs->value(osc).sensorType},
-//                                                                                                   {"identifier", osc},
-//                                                                                                   {"sourceObjectId", motionDevice->deviceName}}));
-//        newValDevice->setParentItem(parentForValueView);
-//        InputValueViewController *viewBackend = newValDevice->findChild<InputValueViewController*>("valuebackend");
-//        if (!viewBackend) {
-//            qWarning() << "no backend found";
-//            return;
-//        }
-//        TypeHelper::SensorType sTyp = motionDevice->inputs->value(osc).sensorType;
-//        TypeHelper::ValueType vTyp = TypeHelper::valueTypeForSensor(sTyp);
-//        int senIdx = motionDevice->inputs->value(osc).sensorIndex;
-
-//        ValueNotifierClass::connectValueTypeSignalToSlot(motionDevice->inputHandler->valueNotifier.value(sTyp).at(senIdx),
-//                                                         viewBackend, vTyp);
-
-//        allConnectableObjects.insert(osc, ConnectableObject(motionDevice->getValueNotifierForPath(osc), newValDevice, TypeHelper::Input));
-//    }
-}
-
-void MainBackend::createNewInputViews(MotionDevice *motionDevice)
-{
-
-
-//    qInfo() << "begin creating views";
-    createMotionInputDeviceView(motionDevice);
-    createValueInputViewsForDevice(motionDevice);
-}
 
 void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDevice)
 {
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
-//    qInfo() << newDeviceComponent.errors();
     QQuickItem *newDeviceItem = qobject_cast<QQuickItem*>(newDeviceComponent.createWithInitialProperties({{"identifier", name}}));
     OscInputViewController *viewCon = newDeviceItem->findChild<OscInputViewController*>("oscviewcontroller");
 
@@ -187,7 +134,7 @@ void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDev
 
 void MainBackend::createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors)
 {
-    qInfo() << "creating views" << sensors.size();
+//    qInfo() << "creating views" << sensors.size();
     if(!oscInputDevices.contains(sendername)) {
         qWarning() << "no parentview found for sender";
     }
@@ -198,10 +145,9 @@ void MainBackend::createSensorViewsForMotionDevice(const QString sendername, con
         qWarning() << "no container view for osc device" << sendername << "found!";
     }
 
-//    for(const OscInputDevice::OscSensorInputStruct sensor: sensors) {
     for(QList<OscInputDevice::OscSensorInputStruct>::const_iterator sensor = sensors.cbegin(), end = sensors.cend(); sensor != end; ++sensor) {
 
-        qInfo() << "Sensor" << sensor->identifier << sensor->sensType;
+//        qInfo() << "Sensor" << sensor->identifier << sensor->sensType;
 
         QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", sensor->sensType},
                                                                                                    {"identifier", sensor->identifier},
@@ -211,12 +157,4 @@ void MainBackend::createSensorViewsForMotionDevice(const QString sendername, con
         newValDevice->setParentItem(parentForSensorView);
 
     }
-
-//    for(QList<OscInputDevice::OscSensorInputStruct>::const_iterator sensor = sensors.cbegin(), end = sensors.cend(); sensor != end; ++sensor)
-//    }
-
-//    for(OscInputDevice::OscSensorInputStruct _sensor: sensors) {
-
-//    }
-
 }

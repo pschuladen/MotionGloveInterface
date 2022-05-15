@@ -17,8 +17,6 @@ bool ProcessNode::setConnectionFromSender(ValueNotifierClass *sender, TypeHelper
 
     setValueNumber(nValuesInList);
     setConnectedValueType(type);
-//    m_connectedValueType = type;
-//    createSubnotifier(type, nValuesInList);
 
     return connectValueTypeSignalToSlot(sender, this, type);
 }
@@ -33,11 +31,6 @@ quint8 ProcessNode::process(quint8 value)
     return value;
 }
 
-//void ProcessNode::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
-//{
-//    m_connectedValueType = newConnectedValueType;
-//    createSubnotifierForType(newConnectedValueType);
-//}
 
 bool ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {

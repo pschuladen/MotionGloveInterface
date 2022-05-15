@@ -15,7 +15,7 @@ class PN_Scale : public ProcessNode
     Q_PROPERTY(float outLow READ outLow WRITE setOutLow NOTIFY outLowChanged)
     Q_PROPERTY(float outHigh READ outHigh WRITE setOutHigh NOTIFY outHighChanged)
     Q_PROPERTY(bool clipOutput READ clipOutput WRITE setClipOutput NOTIFY clipOutputChanged)
-//    Q_PROPERTY(float mulitip READ mulitip WRITE setMulitip NOTIFY mulitipChanged STORED false)
+
 
     float m_inLow;
     float m_inHigh;

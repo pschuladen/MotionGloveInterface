@@ -65,8 +65,7 @@ private:
     virtual float process(float value); //child classes override this for the processing
     virtual quint8 process(quint8 value);
 
-    //this should in theory already be used in ValueNotifierClass
-
+    //this should in theory already be used in ValueNotifierClass?
     QList<TypeHelper::ValueType> m_connectedTypes;
 
 public slots:

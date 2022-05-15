@@ -24,7 +24,7 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterType<OscOutputViewController>("MotionGloveInterface", 1, 0, "OscOutputViewController");
     qmlRegisterType<OscInputViewController>("MotionGloveInterface", 1, 0, "OscInputViewController");
 
-    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
+//    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 
     engine->rootContext()->setContextProperty("_mbackend", main_backend::Instance());
 
