@@ -137,29 +137,27 @@ void OscInputParser::oscR_singleValue(OSCPP::Server::ArgStream *args)
 void OscInputParser::oscR_unMapped(OSCPP::Server::ArgStream *args)
 {
     emit gotUnmappedMessage();
-
 }
 
 
 void OscInputParser::set3dVectorFromArgs(OSCPP::Server::ArgStream *args)
 {
-    QVector3D vector;
+
     uint8_t fc = 0;
     while(!args->atEnd() && fc < 3) {
         if(args->tag() == 'f') {
             //check for NaN?
             switch (fc) {
             case 0:
-                vector.setX(args->float32()); break;
+                m_vector.setX(args->float32()); break;
             case 1:
-                vector.setY(args->float32()); break;
+                m_vector.setY(args->float32()); break;
             case 2:
-                vector.setZ(args->float32()); break;
+                m_vector.setZ(args->float32()); break;
             }
             fc++;
         }
     }
-//    return vector;
 }
 
 void OscInputParser::setQuaternionFromArgs(OSCPP::Server::ArgStream *args)
@@ -171,18 +169,17 @@ void OscInputParser::setQuaternionFromArgs(OSCPP::Server::ArgStream *args)
             //check for NaN?
             switch(fc) {
             case 0:
-                quat.setX(args->float32()); break;
+                m_quat.setX(args->float32()); break;
             case 1:
-                quat.setY(args->float32()); break;
+                m_quat.setY(args->float32()); break;
             case 2:
-                quat.setZ(args->float32()); break;
+                m_quat.setZ(args->float32()); break;
             case 3:
-                quat.setScalar(args->float32()); break;
+                m_quat.setScalar(args->float32()); break;
             }
             fc++;
         }
     }
-//    return quat;
 }
 
 void OscInputParser::setFloatListFromFloatArgs(OSCPP::Server::ArgStream *args)

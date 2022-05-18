@@ -25,7 +25,22 @@ void MainBackend::initialSetup()
 {
     DeviceStatusManager *_dma = new DeviceStatusManager();
     deviceManager.append(_dma);
+    QList<ThreadRole> _threadList = {Main, NetIn, NetOut, Process, Audio};
+    QList<QString> _threadNames = {"Main-Thread", "Net-In", "Net-Out", "Process-Thread", "Audio-Thread"};
+//    foreach(const ThreadRole &_thread, _threadList) {
+    for(int i=0; i<_threadList.size(); i++)
+    {
+        QThread *_newThread = new QThread();
+        _newThread->setObjectName(_threadNames.at(i));
+        threads.insert(_threadList.at(i), _newThread);
+    }
+
+    _dma->moveToThread(threads.value(NetIn));
     connect(_dma, &DeviceStatusManager::newOscInputDevice, this, &MainBackend::createNewMotionDeviceView);
+//    connect(_dma, &DeviceStatusManager::receivedNewDevice, this, &MainBackend::createNewInputViews, Qt::QueuedConnection);
+
+//    connect(threads.value(NetIn), &QThread::finished, this, &MainBackend::test_threadAlive);
+    threads.value(NetIn)->start();
 }
 
 void MainBackend::createNewProcessingView(int type, QPoint atPosition)//float posX, float posY)

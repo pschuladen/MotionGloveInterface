@@ -26,7 +26,6 @@ public:
 
     static size_t getSizeForValueType(const TypeHelper::ValueType vType);
 
-//    static QStringList
     static QString getProtoStrForSensor(const TypeHelper::SensorType sensType);
 
 

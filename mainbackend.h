@@ -22,6 +22,8 @@
 #include <QQmlApplicationEngine>
 #include <QtQml/qqmlregistration.h>
 
+
+
 #include "devicestatusmanager.h" //recursive inclusion und so...
 #include "oscinputdevice.h"
 #include "valuenotifierclass.h" //kann weg
@@ -74,7 +76,7 @@ private:
         Main, NetIn, NetOut, Process, Audio
     };
 
-    QMap<ThreadRole, QThread> threads;
+    QMap<ThreadRole, QThread*> threads;
 
 
     struct ProcessingNode {

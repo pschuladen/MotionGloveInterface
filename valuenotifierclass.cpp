@@ -161,7 +161,7 @@ const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
 
 bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType)
 {
-    qInfo() << "connecting sig/slo" << sender << receiver << vType;
+
     typedef ValueNotifierClass _vc;
     switch(vType) {
     case TypeHelper::Undefined:
@@ -190,7 +190,7 @@ bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *
 
 bool ValueNotifierClass::disconnectValueTypeSignalToSlot(const ValueNotifierClass *sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType)
 {
-//    qInfo() << "connecting sig/slo" << sender << receiver << vType;
+
     typedef ValueNotifierClass _vc;
     switch(vType) {
     case TypeHelper::Undefined:

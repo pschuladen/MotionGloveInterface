@@ -60,52 +60,5 @@ Item {
             vName: root.vName
             vType: TypeHelper.SingleValue
         }
-
-//moved to output Connector
-//        Rectangle {
-//            id: connector
-//            anchors.verticalCenter: row.verticalCenter
-//            //anchors.topMargin: 10
-//            height: 10
-//            width: 10
-//            radius: 5
-//            border {
-//                width: 1
-//                color: "black"
-//            }
-//            color: conectorMouseArea.containsMouse ? cColor.lighter(1.3) : cColor
-
-
-//            //Drag function
-//            MouseArea {
-//                id: conectorMouseArea
-//                anchors.fill: parent
-//                anchors.margins: -2
-////                width: parent.width * 1.5
-////                height: parent.height * 1.5
-//                hoverEnabled: true
-//                drag.target: draggableItem
-//            }
-//            Item {
-
-//                id: draggableItem
-//                anchors.centerIn: connector
-
-//                Drag.dragType: Drag.Automatic
-//                objectName: "this is a dragitem"
-
-//                property bool starting: conectorMouseArea.drag.active
-
-//                Drag.active: conectorMouseArea.drag.active
-//                Drag.onDragStarted: console.log("staaaaart")
-//                Drag.mimeData: {"text/plain": root.vName,
-//                    "nodeId": root.parentIdentifier,
-//                    "valueType": TypeHelper.SingleValue,//ProcessNodeController.Single,
-//                    "valueIndex": root.vIdx,
-//                    "sourceObjectId": sourceObjectId}
-////                Drag.onDragFinished: console.log("drag finished")
-//            }
-
-//        }
     }
 }

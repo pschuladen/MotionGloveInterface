@@ -12,23 +12,23 @@ Item {
     property alias viewmode: backend.viewmode
     property alias identifier: backend.nodeIdentifier
     property alias backendObject: backend
-    //    required property ValueViewBackend backend
+
     property bool globalBool_valuesHidden: parent ? parent.valuesHiddenBool : false
     property bool viewCollapsed: true
     property string sourceObjectId: "unknown"
-//    onGlobalShowSensorChanged: console.log("global sensor show changed", globalShowSensor)
+
 
     InputValueViewController {
         id: backend
         objectName: "valuebackend"
         emitvalues: !root.viewCollapsed && !root.globalBool_valuesHidden
     }
-    Component.onCompleted: console.log(backend.valname, backend.nodeIdentifier)
+
 
     Rectangle {
         id: contentRect
         width:  valueColumn.implicitWidth
-        height: childrenRect.height + childrenRect.y + 5//collapseButton.checked ? heightForm : 2* collapseButton.y + collapseButton.height
+        height: childrenRect.height + childrenRect.y + 5
         property real heightForm: columnWrapper.height + columnWrapper.y + 10
         radius: 2
         border {
@@ -49,10 +49,7 @@ Item {
                 leftMargin: 10
                 top: contentRect.top
                 topMargin: 10
-//                verticalCenter: collapseButton.verticalCenter
             }
-
-            //            Component.onCompleted: console.log(titleLable.font.pointSize, titleLable.font.pixelSize)
         }
         Rectangle {
             id:muteButton
@@ -86,21 +83,6 @@ Item {
 
         }
 
-//        Rectangle {
-//            color: backend.dotColor
-//            width: 10
-//            height: width
-//            radius:width/2
-//            anchors {
-//                verticalCenter: titleLable.verticalCenter
-//                horizontalCenter: contentRect.right
-//            }
-//            border {
-//                width: 1
-//                color: "black"
-//            }
-//        }
-
         Item {
             id: columnWrapper
             clip: true
@@ -109,7 +91,7 @@ Item {
                 leftMargin: 5
                 top: titleLable.bottom
                 topMargin: 10
-//                bottom: contentRect.bottom
+
             }
             width: valueColumn.implicitWidth
             height: root.viewCollapsed ? 0 : valueColumn.implicitHeight
@@ -119,7 +101,6 @@ Item {
                 id: valueColumn
                 property bool showValues: !root.viewCollapsed
 
-    //            onShowValuesChanged: console.log(collapseButton.checked, showValues)
                 visible: false //controled by height animation
 
                 anchors.fill: parent

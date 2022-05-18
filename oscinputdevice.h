@@ -45,7 +45,6 @@ class OscInputDevice : public QObject
 public:
     explicit OscInputDevice(QObject *parent = nullptr);
     explicit OscInputDevice(QString deviceName, QObject *parent = nullptr);
-//    explicit OscInputDevice(QString identifier = "", uint16_t port = 51002, uint8_t nSensors = 2, MotionDevice* deviceDescription = nullptr, QObject *parent = nullptr);
 
     QString m_deviceName;
     uint8_t m_nSensors;
@@ -105,13 +104,11 @@ signals:
     void deviceReadyChanged();
     void devicePortChanged();
 
-//    void sendInputPathsForValueType(QString oscPaths, TypeHelper::ValueType valType, ValueNotifierClass* oscHandler);
-//    void sendInputPathsForSensorType(QString oscPaths, TypeHelper::SensorType sensType, ValueNotifierClass* oscHandler);
     void sendSensorStructList(const QString myname, const QList<OscInputDevice::OscSensorInputStruct>);
     void requestViewCreation(QString deviceName);
 
 public slots:
-//    void nameRequested();
+
     void viewWasCreated();
 
 

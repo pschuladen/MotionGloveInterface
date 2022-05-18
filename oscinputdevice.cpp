@@ -11,7 +11,6 @@ OscInputDevice::OscInputDevice(QString deviceName, QObject *parent)
 {
     m_nSensors = 2;
 
-//    createNotifier();
     setupOscInputBindings();
 
     quint16 _baseport = 51001;
@@ -24,7 +23,6 @@ OscInputDevice::OscInputDevice(QString deviceName, QObject *parent)
             bindSuccess = m_socket->bind(QHostAddress::Any, _baseport+_trials);
             _trials++;
     }
-
     if(bindSuccess) {
         connect(m_socket, &QUdpSocket::readyRead, this, &OscInputDevice::readIncomingUdpData);
         qDebug() << "SUCESS binding on Port"<< m_rcvPort;
@@ -34,30 +32,6 @@ OscInputDevice::OscInputDevice(QString deviceName, QObject *parent)
     }
 }
 
-//OscInputDevice::OscInputDevice(QString identifier, uint16_t port, uint8_t nSensors, MotionDevice* deviceDescription, QObject *parent)
-//    : QObject{parent},
-//      m_deviceName{identifier}, m_rcvPort{port},
-//      m_nSensors{nSensors}, m_deviceDescription{deviceDescription}
-//{
-////    setupOscInputBindings();
-////    deviceDescription->inputs = &oscHandleHash;
-//////    createNotifier();
-
-////    m_socket = new QUdpSocket(this);
-
-////    //TODO: bind on other port if no success
-////    //TODO: tell devicestatuscontroller the port
-////    bool bindSuccess = m_socket->bind(QHostAddress::Any, m_rcvPort);
-
-////    if(bindSuccess) {
-////        connect(m_socket, &QUdpSocket::readyRead, this, &OscInputDevice::readIncomingUdpData);
-////        qDebug() << "SUCESS binding on Port"<< m_rcvPort;
-////    }
-////    else {
-////        qDebug() << "NO BINDING possible on Port"<< m_rcvPort;
-////    }
-
-//}
 
 const QString &OscInputDevice::deviceName() const
 {
@@ -100,11 +74,8 @@ void OscInputDevice::handleOscPacket(const OSCPP::Server::Packet &packet)
 
 void OscInputDevice::handleOscMessage(const OSCPP::Server::Message &message)
 {
-//    qInfo() << "handling osc message" << message.address();
 
-//    const OscInputStruct &oscInput = oscHandleHash.value(message.address(), unmappedOsc);
     oscInputParser.value(message.address())->handleOscArgs(OSCPP::Server::ArgStream(message.args()), 0);
-//    oscInput.handleFunction(this, oscInput.sensorIndex, OSCPP::Server::ArgStream(message.args()));
 }
 
 void OscInputDevice::setupOscInputBindings()
@@ -126,136 +97,28 @@ void OscInputDevice::setupOscInputBindings()
 
     qInfo() << "created oscInputParser size" << oscInputParser.size();
 
-//    acceleration.resize(m_nSensors);
-//    gyroscope.resize(m_nSensors);
-//    gravityVector.resize(m_nSensors);
-//    quaternion.resize(m_nSensors);
-
     QString oscAddress;
-//    InputValueViewController::ValueViewMode type;
+
     for(int i = 0; i < m_nSensors; i++) {
 
         oscAddress = QString("/%1/acc/%2").arg(deviceName()).arg(i);
         oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Accel, this));
-//        oscHandleHash.insert(oscAddress.toUtf8(), OscInputStruct(&OscInputDevice::oscR_setAcceleration, i, TypeHelper::Accel));
 
         oscAddress = QString("/%1/gravity/%2").arg(deviceName()).arg(i);
         oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Grav, this));
-//        oscHandleHash.insert(oscAddress.toUtf8(), OscInputStruct(&OscInputDevice::oscR_setGravityVector, i, TypeHelper::Grav));
 
         oscAddress = QString("/%1/gyr/%2").arg(deviceName()).arg(i);
         oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Gyro, this));
-//        oscHandleHash.insert(oscAddress.toUtf8(), OscInputStruct(&OscInputDevice::oscR_setGyroscope, i, TypeHelper::Gyro));
 
         oscAddress = QString("/%1/quat/%2").arg(deviceName()).arg(i);
         oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::RotQuat, this));
-//        oscHandleHash.insert(oscAddress.toUtf8(), OscInputStruct(&OscInputDevice::oscR_setQuaternion, i, TypeHelper::RotQuat));
     }
 
     oscAddress = QString("/%1/touch").arg(deviceName());
     oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Touch, this));
-//    oscHandleHash.insert(oscAddress.toUtf8(),  OscInputStruct(&OscInputDevice::oscR_setQuaternion, 0, TypeHelper::Touch));
 
 }
 
-//void OscInputDevice::createNotifier()
-//{
-////    for(SensType t: qAsConst(allSensTypes)) {
-////        QList<ValueNotifierClass*> notifyList;
-////        notifyList.resize(m_nSensors);
-////        valueNotifier.insert(t, notifyList);
-////    }
-////    for(QHash<QByteArray, OscInputStruct>::const_iterator oscInpIterator = oscHandleHash.cbegin(), end = oscHandleHash.cend(); oscInpIterator != end; ++oscInpIterator) {
-////        valueNotifier[oscInpIterator.value().sensorType][oscInpIterator.value().sensorIndex] = new ValueNotifierClass(oscInpIterator.value().sensorType);
-////    }
-////    for(QByteArray osc : oscHandleHash.keys()) {
-////        OscInputStruct oscStruct = oscHandleHash.value(osc);
-////        valueNotifier[oscStruct.sensorType][oscStruct.sensorIndex] = new ValueNotifierClass(oscStruct.sensorType, this);
-//    //    }
-//}
-
-//void OscInputDevice::sendPongToDevice()
-//{
-
-//}
-
-//void OscInputDevice::oscR_setAcceleration(OscInputDevice* who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-//    who->set3dVector(&who->acceleration[sens_index], &args);
-//    who->valueNotifier.value(SensType::Accel).at(sens_index)->callVectorChanged(who->acceleration[sens_index]);
-//}
-
-//void OscInputDevice::oscR_setGyroscope(OscInputDevice* who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-//    who->set3dVector(&who->gyroscope[sens_index], &args);
-//    who->valueNotifier.value(SensType::Gyro).at(sens_index)->callVectorChanged(who->gyroscope[sens_index]);
-//}
-
-//void OscInputDevice::oscR_setGravityVector(OscInputDevice* who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-//    who->set3dVector(&who->gravityVector[sens_index], &args);
-//    who->gravityVector[sens_index].normalize();
-//    who->valueNotifier.value(SensType::Grav).at(sens_index)->callVectorChanged(who->gravityVector[sens_index]);
-//}
-
-//void OscInputDevice::oscR_setQuaternion(OscInputDevice* who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-//    who->setQuat(&who->quaternion[sens_index], &args);
-//    who->valueNotifier.value(SensType::RotQuat).at(sens_index)->callQuatChanged(who->quaternion[sens_index]);
-//}
-
-//void OscInputDevice::oscR_setTouch(OscInputDevice* who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-//    //TODO: implement touch
-
-//}
-
-//void OscInputDevice::oscR_unMapped(OscInputDevice *who, int sens_index, OSCPP::Server::ArgStream args)
-//{
-////    qInfo() << "osc unmapped";
-//    //dummy function as default value for oscFunctionHashMap... does nothing, but prevents crash for unknow osc
-//    //could be used for automatically create inputs
-//}
-
-//void OscInputDevice::set3dVector(QVector3D *vector, OSCPP::Server::ArgStream *args)
-//{
-//    uint8_t fc = 0;
-//    while(!args->atEnd() && fc < 3) {
-//        if(args->tag() == 'f') {
-//            //check for NaN?
-//            switch (fc) {
-//            case 0:
-//                vector->setX(args->float32()); break;
-//            case 1:
-//                vector->setY(args->float32()); break;
-//            case 2:
-//                vector->setZ(args->float32()); break;
-//            }
-//            fc++;
-//        }
-//    }
-//}
-
-//void OscInputDevice::setQuat(QQuaternion *quat, OSCPP::Server::ArgStream *args)
-//{
-//    uint8_t fc = 0;
-//    while(!args->atEnd() && fc < 4) {
-//        if(args->tag() == 'f') {
-//            //check for NaN?
-//            switch(fc) {
-//            case 0:
-//                quat->setX(args->float32()); break;
-//            case 1:
-//                quat->setY(args->float32()); break;
-//            case 2:
-//                quat->setZ(args->float32()); break;
-//            case 3:
-//                quat->setScalar(args->float32()); break;
-//            }
-//            fc++;
-//        }
-//    }
-//}
 
 bool OscInputDevice::readyToPong()
 {
@@ -274,27 +137,6 @@ void OscInputDevice::sendPongMessage()
     qInfo() << "pong datasize" << sendedBytes;
     qInfo() << "sended to device addr" << deviceAddressStr() << devicePort();
 }
-
-//QString OscInputDevice::getProtoStrForSensor(TypeHelper::SensorType sensType)
-//{
-//    qWarning() << "touch is wrong.";
-//    switch(sensType) {
-//    case TypeHelper::Custom:
-//        return QString("/%1/sensor/%2");
-//    case TypeHelper::Accel:
-//        return QString("/%1/acc/%2");
-//    case TypeHelper::Gyro:
-//        return QString("/%1/gyr/%2");
-//    case TypeHelper::Grav:
-//        return QString("/%1/gravity/%2");
-//    case TypeHelper::RotQuat:
-//        return QString("/%1/qiat/%2");
-//    case TypeHelper::Touch:
-//        return QString("/%1/touch/%2");
-
-//    }
-//}
-
 
 
 void OscInputDevice::setDeviceName(const QString &newDeviceName)
@@ -388,20 +230,15 @@ void OscInputDevice::handlePingMessage(OSCPP::Server::ArgStream oscArgs)
 {
     bool deviceData_ok = true;
     if(!oscArgs.atEnd() && oscArgs.tag() == 's') {
-//        setDeviceName(oscArgs.string());
         setDeviceAddressStr(oscArgs.string());
-//        newDevice.address = oscArgs.string();
     } else deviceData_ok = false;
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
-//        setRcvPort()
         setDevicePort(oscArgs.int32());
-//        newDevice.port = oscArgs.int32();
     } else deviceData_ok = false;
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
         setSendIntervall(oscArgs.int32());
-//        newDevice.sendIntervall = oscArgs.int32();
     }
 
     if(sendPong() && readyToPong() && deviceData_ok) {
@@ -432,16 +269,9 @@ void OscInputDevice::viewWasCreated()
     int ci = 0;
     QMap<QByteArray,OscInputParser*>::const_iterator oscPa;
     for(oscPa = oscInputParser.cbegin(); oscPa != oscInputParser.cend(); ++oscPa) {
-        qInfo() << oscPa.key();
         oscStructs.append(OscSensorInputStruct(QString(oscPa.key()), oscPa.value()->sensorType(), oscPa.value()));
-        qInfo() << oscPa.key() << "added" << oscPa.value()->sensorType() << oscPa.value();
-        qInfo() << ci << oscStructs.at(ci).identifier << oscStructs.at(ci).sensType << oscStructs.at(ci).oscHandler;
         ci++;
     }
-    qInfo() << "sended oscsctruct size" << oscStructs.size()<< "counter" << ci;
-    for(int i = 0; i < oscStructs.size(); i++)
-    {
-        qInfo() << i << oscStructs.at(i).identifier << oscStructs.at(i).sensType << oscStructs.at(i).oscHandler;
-    }
+
     emit sendSensorStructList(deviceName(), oscStructs);
 }
