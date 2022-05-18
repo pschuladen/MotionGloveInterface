@@ -1,7 +1,7 @@
 #include "pn_scale.h"
 
 PN_Scale::PN_Scale(QObject *parent)
-    : ProcessNode(parent)
+    : ProcessNode{parent}
 {
     m_inHigh = 1;
     m_inLow = 0;
@@ -11,12 +11,12 @@ PN_Scale::PN_Scale(QObject *parent)
     evalMultip();
 }
 
-PN_Scale::PN_Scale(TypeHelper::ValueType type, PN_Scale *controller, QObject *parent)
-    : ProcessNode(parent), m_clipOutput{controller->clipOutput()},
+PN_Scale::PN_Scale(int idxInControlller, PN_Scale *controller, TypeHelper::ValueType type, quint16 valueNumber, QObject *parent)
+    : ProcessNode{idxInControlller, type, valueNumber, parent},
+      m_clipOutput{controller->clipOutput()},
       m_inHigh{controller->inHigh()}, m_inLow{controller->inLow()},
       m_outHigh{controller->outHigh()}, m_outLow{controller->outLow()}
 {
-    setConnectedValueType(type);
     evalMultip();
     connectPropertiesToProcessor(controller, this);
 }
@@ -28,7 +28,6 @@ float PN_Scale::inLow() const
 
 void PN_Scale::setInLow(float newInLow)
 {
-    qInfo() << "setInLow was called" << newInLow;
     if (qFuzzyCompare(m_inLow, newInLow))
         return;
     m_inLow = newInLow;
@@ -82,14 +81,19 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
 {
     if(!acceptsInputType(type)) return false;
 
-    PN_Scale *newSubprocessor = new PN_Scale(type, this);
+    PN_Scale *newSubprocessor = new PN_Scale(subProcessor.size(), this, type, nValuesInList);
 
-    qInfo() << "subprocessor before" << subProcessor;
-    subProcessor.append(newSubprocessor);
-    qInfo() << "subprocessor afgter" << subProcessor;
     appendToConnectedTypes(type);
+    if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
+        subProcessor.append(newSubprocessor);
 
-    return newSubprocessor->setConnectionFromSender(sender, type, nValuesInList);
+        emit newSubprocessorWasCreated(newSubprocessor);
+        return true;
+    }
+    else {
+        newSubprocessor->deleteLater();
+        return false;
+    }
 }
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
@@ -106,28 +110,18 @@ ProcessNode *PN_Scale::createProcessControl(QString objectname_id)
     return qobject_cast<ProcessNode*>(scale);
 }
 
-//ValueNotifierClass *PN_Scale::getNotifier(int idx)
-//{
-//    qInfo() << this << "getNotifier in PN_Scale" << idx;
-//    qInfo() << subProcessor;
-//    if(idx < 0) return this;
-//    else if(idx < subProcessor.size()) return subProcessor.at(idx);
-//    else return nullptr;
-//}
-
 float PN_Scale::process(float value)
 {
-    if(clipOutput()) {
-//        return qBound(((value - inLow()) * multi()) + outLow());
-//        qInfo() <<"clipping the result" << ((value-inLow()) * multi()) + outLow() << "clipping" << clipOutput();
-        float result = ((value - inLow()) * multi()) + outLow();
-        if(result < outLow()) return outLow();
-        else if(result > outHigh()) return outHigh();
-        else return result;
+    if(clipOutput())
+        return qBound(outLow(), ((value - inLow()) * multi()) + outLow(), outHigh());
 
-    }
-//    qInfo() <<"process result " << ((value-inLow()) * multi()) + outLow() << "clipping" << clipOutput();
-    return ((value-inLow()) * multi()) + outLow();
+    else
+        return ((value-inLow()) * multi()) + outLow();
+
+//        float result = ((value - inLow()) * multi()) + outLow();
+//        if(result < outLow()) return outLow();
+//        else if(result > outHigh()) return outHigh();
+//        else return result;
 }
 
 quint8 PN_Scale::process(quint8 value)
@@ -140,7 +134,6 @@ void PN_Scale::evalMultip()
     float inputDiff = inHigh()-inLow();
     if(inputDiff==0) inputDiff = 1;
     setMulti((outHigh()-outLow()) / (inputDiff));
-    qInfo() << "multipli" << multi();
 }
 
 float PN_Scale::multi() const
@@ -191,7 +184,6 @@ bool PN_Scale::clipOutput() const
 
 void PN_Scale::setClipOutput(bool newClipOutput)
 {
-    qInfo() << "setClipOutput" << newClipOutput;
     if (m_clipOutput == newClipOutput)
         return;
     m_clipOutput = newClipOutput;

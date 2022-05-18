@@ -3,14 +3,13 @@ import QtQuick.Layouts
 import MotionGloveInterface
 
 Item {
-    Component.onCompleted: console.log("created view at idx", viewIdx)
+
     id: root
 
     property string uniqueID: ""
 
-    property string oscAddress: controller.oscPaths[viewIdx]//"/output"
-//    onOscAddressChanged:
-    property OscViewController controller: null
+    property string oscAddress: controller.oscPaths[viewIdx]
+    property OscOutputViewController controller: null
     property int connectedType: TypeHelper.Undefined
     property int viewIdx: 0
     implicitHeight: 24
@@ -55,7 +54,5 @@ Item {
             parentID: root.uniqueID
             vIdx: root.viewIdx
         }
-
-//Component.onCompleted: controller.addOscPath(outputPathTextInput.text)//console.log("implicit dimension", implicitWidth, )
     }
 }

@@ -30,6 +30,7 @@ class ProcessNode : public ValueNotifierClass
     Q_OBJECT
 public:
     explicit ProcessNode(QObject *parent = nullptr);
+    explicit ProcessNode(int idxInController,  TypeHelper::ValueType valType, quint16 valueNumber=0, QObject *parent = nullptr);
 
 //    Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged)
     Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged);
@@ -59,7 +60,7 @@ public:
 
 protected:
     QList<ProcessNode*> subProcessor;
-    TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
+//    TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
 
 private:
     virtual float process(float value); //child classes override this for the processing
@@ -79,6 +80,8 @@ public slots:
     virtual void slot_trigger(int frame=-1) override;
 signals:
     void connectedTypesChanged(QList<TypeHelper::ValueType> connectedTypes);
+
+    void newSubprocessorWasCreated(ProcessNode *newSubproc);
 };
 
 #endif // PROCESSNODE_H

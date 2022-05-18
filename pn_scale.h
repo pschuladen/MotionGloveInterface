@@ -24,7 +24,7 @@ class PN_Scale : public ProcessNode
 
 public:
     explicit PN_Scale(QObject *parent = nullptr);
-    explicit PN_Scale(TypeHelper::ValueType type, PN_Scale *controller, QObject *parent = nullptr);
+    explicit PN_Scale(int idxInControlller, PN_Scale *controller, TypeHelper::ValueType type, quint16 valueNumber=0, QObject *parent = nullptr);
 
     float inLow() const;
     float inHigh() const;

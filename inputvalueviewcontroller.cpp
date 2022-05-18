@@ -53,7 +53,6 @@ void InputValueViewController::setViewmode(TypeHelper::SensorType newViewmode)
     setDotColor(TypeHelper::getColorForValueType(TypeHelper::valueTypeForSensor(newViewmode)));//modeColorMap.value(newViewmode, QColor("white")));
     setValueCount(m_values.size());
 
-//    qInfo() << "new viewmode" << newViewmode;
     emit viewmodeChanged();
 }
 
@@ -105,7 +104,6 @@ void InputValueViewController::setNodeIdentifier(const QString &newNodeIdentifie
 
 void InputValueViewController::slot_vectorChanged(QVector3D vec, int frame)
 {
-//    qInfo() << "vector changed" << vec;
     m_values[0] = vec.x();
     m_values[1] = vec.y();
     m_values[2] = vec.z();
@@ -179,11 +177,11 @@ bool InputValueViewController::emitvalues() const
 
 void InputValueViewController::setEmitvalues(bool newEmitvalues)
 {
-//    qInfo() << "backend emitvalues set" << newEmitvalues;
     if (m_emitvalues == newEmitvalues)
         return;
     m_emitvalues = newEmitvalues;
     emit emitvaluesChanged();
+    if(m_emitvalues) emit viewValuesChanged();
 }
 
 const QColor &InputValueViewController::dotColor() const

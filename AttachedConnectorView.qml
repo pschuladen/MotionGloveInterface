@@ -8,14 +8,11 @@ Item {
     required property string uniqueID
     id: root
 
-    //    Component.onCompleted: console.log("attached view rect", width, height)
-
     ColumnLayout {
         anchors.fill: parent
         anchors.bottomMargin: 5
         anchors.topMargin: 5
         spacing: 0
-        //        Component.onCompleted: console.log("layoutrect", width, height, spacing)
 
         Repeater {
 
@@ -34,7 +31,6 @@ Item {
                 property int idx: lastInModel ? -1 : model.index
 
 
-                //                Component.onCompleted: console.log("conPosition", y)
                 Rectangle {
                     anchors {
                         verticalCenter: parent.verticalCenter
@@ -43,7 +39,6 @@ Item {
                     height: 4
                     opacity: (outConnector.nodeHovered || inConnector.nodeHovered) ? 0.25 : 0
                     color: connectorPair.nodeColor
-                    //(outConnectorMa.containsMouse || inConnectorMa.containsMouse) ? "lightgrey" : "transparent"
                 }
 
                 InputConnector {
@@ -72,9 +67,6 @@ Item {
                         horizontalCenter: connectorPair.right
                     }
                 }
-
-
-
             }
         }
     }

@@ -40,11 +40,8 @@ Item {
             id: conectorMouseArea
             anchors.fill: parent
             anchors.margins: -2
-//                width: parent.width * 1.5
-//                height: parent.height * 1.5
             hoverEnabled: true
             drag.target: draggableItem
-            onClicked: console.log(root.parentID)
         }
         Item {
 
@@ -57,13 +54,12 @@ Item {
             property bool starting: conectorMouseArea.drag.active
 
             Drag.active: conectorMouseArea.drag.active
-            Drag.onDragStarted: console.log("staaaaart")
             Drag.mimeData: {"text/plain": root.vName,
                 "sourceObjectId": root.parentID,
                 "valueType": root.vType,//ProcessNodeController.Single,
                 "valueIndex": root.vIdx}
 //                "sourceObjectId": sourceObjectId}
-//                Drag.onDragFinished: console.log("drag finished")
+
         }
     }
 }

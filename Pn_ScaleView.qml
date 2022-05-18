@@ -10,16 +10,14 @@ Item {
 
     id: root
     objectName: uniqueID+"-view"
-    //required
+
     required property string uniqueID //set this when creating the view
-//    property alias valuecount: backend.valuecount
+
 
 
 
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
-
-    Component.onCompleted: console.log("processnode rect", width, height)
 
     PN_Scale {
         id: backend
@@ -49,7 +47,6 @@ Item {
                 fill: outerShape
             }
             hoverEnabled: true
-//            onContainsMouseChanged: console.log("mouse")
             onClicked: focus=true
             drag.target: root
         }
@@ -110,7 +107,6 @@ Item {
                         x: scalingFormer.width
                         y: 0
                     }
-                    Component.onCompleted: console.log("stroke")
                 }
             }
             Rectangle {
@@ -211,9 +207,8 @@ Item {
 
     AttachedConnectorView {
         anchors.fill: parent
-//        Component.onCompleted: console.log("parentsize", parent.width, parent.height)
         uniqueID: root.uniqueID
-        connectedTypes: backend.connectedTypes//[TypeHelper.Quat, TypeHelper.Vector, TypeHelper.List]
-//        numConnections:
+        connectedTypes: backend.connectedTypes
+
     }
 }

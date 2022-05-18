@@ -16,8 +16,6 @@ Window {
     title: qsTr("Motion Glove Interface")
     color: "black"
 
-    Component.onCompleted: console.log(TypeHelper.Accel)
-
     Item {
         id: mainItem
         objectName: "mainRootItem"
@@ -38,23 +36,18 @@ Window {
                 right: outputNodes.left
                 bottom: mainItem.bottom
             }
-            property int tN: 4
-            onTNChanged: console.log("tn changed", tN)
             DropArea {
                 id: dropa
                 anchors.fill: parent
                 keys: ["text/procType"]
-                onEntered: (drag) => {console.log("drag entered", drag.keys)}
+//                onEntered: (drag) => {console.log("drag entered", drag.keys)}
 
                 onDropped: (drop) => {
-                               drop.acceptProposedAction()
-                               console.log("bla", drop.keys)
-
-                               console.log("Position", Qt.point(drop.x, drop.y))
-
-                               _mbackend.createNewProcessingView(0//drop.getDataAsString("text/procType")
-                                                                 , Qt.point(drop.x, drop.y))
-                               parent.tN = drop.getDataAsString("text/procType")
+//                               console.log("dropkeys:", drop.keys)
+                               if(_mbackend.createNewProcessingView(0//drop.getDataAsString("text/procType")
+                                                                 , Qt.point(drop.x, drop.y))) {
+                                   drop.acceptProposedAction()
+                               }
                 }
             }
         }

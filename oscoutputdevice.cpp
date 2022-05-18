@@ -122,7 +122,6 @@ void OscOutputDevice::addOscPath(QString newPath)
 
 void OscOutputDevice::slot_addOscPath()
 {
-    qInfo() << "adding osc path";
     addOscPath(QString("/out/%1").arg(packetBuilder.size()+1));
 }
 
@@ -136,7 +135,6 @@ void OscOutputDevice::setOscPathAtIndex(QString newPath, quint32 idx)
 
 void OscOutputDevice::newConnectionAtIndex(int idx, TypeHelper::ValueType valueType)
 {
-    qInfo() << "got new Conenction at index" << idx << valueType;
     if(idx < packetBuilder.size() && idx < valueTypes().size()) {
         m_valueTypes.replace(idx, valueType);
         emit valueTypesChanged(valueTypes());
@@ -145,7 +143,6 @@ void OscOutputDevice::newConnectionAtIndex(int idx, TypeHelper::ValueType valueT
 
 void OscOutputDevice::sendOscMsgBuffer(const QByteArray &oscBuffer, size_t msgSize, int frame)
 {
-//    qInfo() << "attempt to send data to" << destinationAddress() << destPort() << oscBuffer;
     qint64 _seby = socket->writeDatagram(oscBuffer.data(), msgSize, destinationAddress(), destPort());
     if (_seby < msgSize) qWarning() << "Osc message send incomplete in output socket";
 }
@@ -153,7 +150,6 @@ void OscOutputDevice::sendOscMsgBuffer(const QByteArray &oscBuffer, size_t msgSi
 
 ValueNotifierClass *OscOutputDevice::getNotifier(int idx)
 {
-//    qInfo() <<"oscdevice asked for notifier. " << packetBuilder;
     if (idx < packetBuilder.size()) return packetBuilder.at(idx);
     else return nullptr;
 }

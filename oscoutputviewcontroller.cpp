@@ -41,7 +41,6 @@ const QList<QString> &OscOutputViewController::oscPaths() const
 
 void OscOutputViewController::setOscPaths(const QList<QString> &newOscPaths)
 {
-    qInfo() << "controller receiving new path" << newOscPaths;
     if (m_oscPaths == newOscPaths)
         return;
     m_oscPaths = newOscPaths;
@@ -52,7 +51,6 @@ void OscOutputViewController::setOscPaths(const QList<QString> &newOscPaths)
 
 void OscOutputViewController::addOscPath(QString newPath)
 {
-    qInfo() << "new osc path" << newPath;
     if(!newPath.startsWith('/')) return ;
 
     m_oscPaths.append(newPath);
@@ -64,7 +62,6 @@ void OscOutputViewController::addOscPath(QString newPath)
 
 void OscOutputViewController::setOscPathAtIndex(QString newPath, quint32 idx)
 {
-    qInfo() << "path changed at idx" << idx << "to" << newPath;
     if(!newPath.startsWith('/') && idx < m_oscPaths.size()) return;
 
     m_oscPaths.replace(idx, newPath);
@@ -96,7 +93,6 @@ const QList<TypeHelper::ValueType> &OscOutputViewController::valueTypes() const
 
 void OscOutputViewController::setValueTypes(const QList<TypeHelper::ValueType> &newValueTypes)
 {
-    qInfo() << "setting value types from" << valueTypes() << "to" << newValueTypes;
     if (m_valueTypes == newValueTypes)
         return;
     m_valueTypes = newValueTypes;

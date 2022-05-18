@@ -10,8 +10,6 @@ Item {
 
     width:  childrenRect.width+childrenRect.x
     height: childrenRect.height+childrenRect.y + 10
-//    onWidthChanged: console.log("width", width)
-//    onHeightChanged: console.log("height", height)
 
     OscInputViewController {
         objectName: "oscviewcontroller"
@@ -132,8 +130,7 @@ Item {
             left: root.left
             leftMargin: 5
         }
-        height: sensorView.implicitHeight//sensorsShow.checked ? sensorView.implicitHeight : 0
-//        onHeightChanged: console.log("onHeight", sensorView.showSensorsBool)
+        height: sensorView.implicitHeight
 
         Column {
             // all SensorValuesView go in here, create by mainbackend

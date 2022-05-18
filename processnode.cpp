@@ -5,6 +5,12 @@ ProcessNode::ProcessNode(QObject *parent)
 {
 }
 
+ProcessNode::ProcessNode(int idxInController, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
+    : ValueNotifierClass{idxInController, valType, valueNumber, parent}
+{
+
+}
+
 bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ)
 {
     if(typ == TypeHelper::Undefined) return false;
@@ -13,7 +19,7 @@ bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ)
 
 bool ProcessNode::setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    if(!acceptsInputType(type) && m_connectedValueType != TypeHelper::Undefined) return false;
+    if(!acceptsInputType(type)) return false;
 
     setValueNumber(nValuesInList);
     setConnectedValueType(type);
@@ -69,7 +75,6 @@ void ProcessNode::slot_vectorChanged(QVector3D vect, int frame)
         vect.setX(process(vect.x()));
         vect.setY(process(vect.y()));
         vect.setZ(process(vect.z()));
-        qInfo() << "vector print" << vect;
         callVectorChanged(vect, frame);
     }
 }
@@ -132,8 +137,6 @@ void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
 
 ValueNotifierClass *ProcessNode::getNotifier(int idx)
 {
-    qInfo() << this << "getNotifier in ProcessNode" << idx;
-    qInfo() << subProcessor;
     if(idx < 0) return this;
     else if(idx < subProcessor.size()) return subProcessor.at(idx);
     else return nullptr;

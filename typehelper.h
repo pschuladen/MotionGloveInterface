@@ -40,9 +40,11 @@ public:
     Q_ENUM(NodeConnectionType);
 
     enum NodeType: quint8 {
-        Generic, Input, Process, Output, Audio
+        Generic, Gui, Input, Process, Output, Audio, Audiocontroller
     };
     Q_ENUM(NodeType);
+
+
 };
 
 struct TouchValues {

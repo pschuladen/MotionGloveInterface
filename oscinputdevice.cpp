@@ -20,15 +20,16 @@ OscInputDevice::OscInputDevice(QString deviceName, QObject *parent)
     quint16 _trials = 0;
     bool bindSuccess = false;
     while(!bindSuccess && _trials < _maxtry) {
-            bindSuccess = m_socket->bind(QHostAddress::Any, _baseport+_trials);
-            _trials++;
+        bindSuccess = m_socket->bind(QHostAddress::Any, 51002);
+        _trials++;
     }
+    m_rcvPort = m_socket->localPort();//_trials+_baseport;
     if(bindSuccess) {
         connect(m_socket, &QUdpSocket::readyRead, this, &OscInputDevice::readIncomingUdpData);
-        qDebug() << "SUCESS binding on Port"<< m_rcvPort;
+        qInfo() << "OscInput: SUCESS binding on Port"<< m_rcvPort;
     }
     else {
-        qDebug() << "NO BINDING possible on Port"<< m_rcvPort;
+        qWarning() << "OscInput: NO BINDING possible on Port"<< _baseport << "to" << _baseport+_trials;
     }
 }
 
@@ -41,7 +42,7 @@ const QString &OscInputDevice::deviceName() const
 ValueNotifierClass *OscInputDevice::getNotifier(SensType sensType, int sensIndex, int subIndex)
 {
     qWarning() << "WARNING! get notifier for sensType and sensIndex not implemented!!";
-return nullptr;
+    return nullptr;
 }
 
 void OscInputDevice::readIncomingUdpData()
@@ -52,7 +53,6 @@ void OscInputDevice::readIncomingUdpData()
 
     m_socket->readDatagram(buffer.data(),buffer.size(), &sender, &senderPort);
 
-//    qInfo() <<"udp read" <<buffer;
     handleOscPacket(OSCPP::Server::Packet(buffer.data(), buffer.size()));
 }
 
@@ -82,11 +82,9 @@ void OscInputDevice::setupOscInputBindings()
 {
 
     static const QList<SensType> sortOrder={SensType::RotQuat, SensType::Accel, SensType::Grav, SensType::Gyro};
-
     for(const TypeHelper::SensorType &_type: sortOrder) {
         for (int i = 0; i< nSensors(); i++) {
             oscInputParser.insert(
-
                         QString("/%1/%2/%3").arg(deviceName(), TypeHelper::getProtoStrForSensor(_type)).arg(i).toUtf8(),
                         new OscInputParser(_type, this));
         }
@@ -94,8 +92,6 @@ void OscInputDevice::setupOscInputBindings()
     oscInputParser.insert(
                 QString("/%1/%2").arg(deviceName(), TypeHelper::getProtoStrForSensor(SensType::Touch)).toUtf8(),
                 new OscInputParser(SensType::Touch, this));
-
-    qInfo() << "created oscInputParser size" << oscInputParser.size();
 
     QString oscAddress;
 
@@ -132,10 +128,11 @@ void OscInputDevice::sendPongMessage()
     pongPacket.openMessage("/pong", 1)
             .int32(rcvPort())
             .closeMessage();
-    size_t pongSize = pongPacket.size();
+    qsizetype pongSize = pongPacket.size();
     qint64 sendedBytes = m_socket->writeDatagram(pongBuf.data(), pongSize, m_deviceIpAddress, devicePort());
-    qInfo() << "pong datasize" << sendedBytes;
-    qInfo() << "sended to device addr" << deviceAddressStr() << devicePort();
+    if(sendedBytes < pongSize) {
+        qWarning() << "Something might be gone wrong while ponging";
+    }
 }
 
 
@@ -264,7 +261,6 @@ void OscInputDevice::viewWasCreated()
     // gather all keys sorted...
     // TODO: qmap is already sorted but some kind of sortingfunction would be nice
     QList<OscSensorInputStruct> oscStructs;
-    qInfo() << "oscStruct size" << oscInputParser.size();
     oscStructs.reserve(oscInputParser.size());
     int ci = 0;
     QMap<QByteArray,OscInputParser*>::const_iterator oscPa;

@@ -10,11 +10,10 @@ ValueNotifierClass::ValueNotifierClass(int objectIdx, QObject *parent)
 {
 }
 
-ValueNotifierClass::ValueNotifierClass(TypeHelper::ValueType valType, quint16 valueNumber, int objectIdx, QObject *parent)
+ValueNotifierClass::ValueNotifierClass(int objectIdx, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
     : QObject{parent}, m_connectedValueType{valType}, m_valueNumber{valueNumber}, m_indexInObject{objectIdx}
 {
     createSubnotifierForValueType(valType, valueNumber);
-
 }
 
 ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
@@ -57,7 +56,6 @@ void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 
 void ValueNotifierClass::createSubnotifierForValueType(TypeHelper::ValueType valType, int nVals)
 {
-//    int _nvals = TypeHelper::getSizeForValueType(valType);
     if(valType == TypeHelper::List && nVals > 0) createSubnotifier(nVals);
     else createSubnotifier(TypeHelper::getSizeForValueType(valType));
 }
@@ -72,44 +70,56 @@ ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
     else return nullptr;
 }
 
-void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
+void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier)
 {
-    if(newConnectedValueType == connectedValueType()) return;
+    if(newConnectedValueType == m_connectedValueType) return;
+
     m_connectedValueType = newConnectedValueType;
-    createSubnotifierForValueType(newConnectedValueType, valueNumber());
+    setSupportsSubValues(createSubnotifier);
+    if(createSubnotifier)
+        createSubnotifierForValueType(newConnectedValueType, valueNumber());
+
     emit connectedValueTypeChanged(newConnectedValueType);
 }
 
 void ValueNotifierClass::callQuatChanged(const QQuaternion quat, int frame)
 {
     emit quatChanged(quat, frame);
-    emit subNotifier.at(0)->singleValueChanged(quat.x(), frame);
-    emit subNotifier.at(1)->singleValueChanged(quat.y(), frame);
-    emit subNotifier.at(2)->singleValueChanged(quat.z(), frame);
-    emit subNotifier.at(3)->singleValueChanged(quat.scalar(), frame);
+    if(supportsSubValues()) {
+        emit subNotifier.at(0)->singleValueChanged(quat.x(), frame);
+        emit subNotifier.at(1)->singleValueChanged(quat.y(), frame);
+        emit subNotifier.at(2)->singleValueChanged(quat.z(), frame);
+        emit subNotifier.at(3)->singleValueChanged(quat.scalar(), frame);
+    }
 }
 
 void ValueNotifierClass::callVectorChanged(const QVector3D vect, int frame)
 {
     emit vectorChanged(vect);
-    emit subNotifier.at(0)->singleValueChanged(vect.x(), frame);
-    emit subNotifier.at(1)->singleValueChanged(vect.y(), frame);
-    emit subNotifier.at(2)->singleValueChanged(vect.z(), frame);
+    if(supportsSubValues()) {
+        emit subNotifier.at(0)->singleValueChanged(vect.x(), frame);
+        emit subNotifier.at(1)->singleValueChanged(vect.y(), frame);
+        emit subNotifier.at(2)->singleValueChanged(vect.z(), frame);
+    }
 }
 
 void ValueNotifierClass::callTouchChanged(const QList<float> touch, int frame)
 {
     emit touchChanged(touch);
-    for(int i = 0; i < m_valueNumber; i++) {
-        emit subNotifier.at(i)->singleValueChanged(touch.at(i), frame);
+    if(supportsSubValues()) {
+        for(int i = 0; i < m_valueNumber; i++) {
+            emit subNotifier.at(i)->singleValueChanged(touch.at(i), frame);
+        }
     }
 }
 
 void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
 {
     emit valuesChanged(values);
-    for(int i= 0; i < values.size(); i++) {
-        emit subNotifier.at(i)->singleValueChanged(values[i], frame);
+    if(supportsSubValues()) {
+        for(int i= 0; i < values.size(); i++) {
+            emit subNotifier.at(i)->singleValueChanged(values[i], frame);
+        }
     }
 }
 
@@ -162,27 +172,28 @@ const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
 bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType)
 {
 
+    QMetaObject::Connection _co;
     typedef ValueNotifierClass _vc;
     switch(vType) {
     case TypeHelper::Undefined:
         return false;
     case TypeHelper::Vector:
-        connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged);
+        _co = connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged, Qt::QueuedConnection);
         break;
     case TypeHelper::Quat:
-        connect(sender, &_vc::quatChanged, receiver, &_vc::slot_quatChanged);
+        _co = connect(sender, &_vc::quatChanged, receiver, &_vc::slot_quatChanged);
         break;
     case TypeHelper::List:
-        connect(sender, &_vc::valuesChanged, receiver, &_vc::slot_valuesChanged);
+        _co = connect(sender, &_vc::valuesChanged, receiver, &_vc::slot_valuesChanged);
         break;
     case TypeHelper::SingleValue:
-        connect(sender, &_vc::singleValueChanged, receiver, &_vc::slot_singleValueChanged);
+        _co = connect(sender, &_vc::singleValueChanged, receiver, &_vc::slot_singleValueChanged);
         break;
     case TypeHelper::BoolValue:
-        connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
+        _co = connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
         break;
     case TypeHelper::Trigger:
-        connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
+        _co = connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
         break;
     }
     return true;
@@ -241,4 +252,22 @@ void ValueNotifierClass::setValueNumber(quint16 newValueNumber)
         return;
     m_valueNumber = newValueNumber;
     emit valueNumberChanged();
+}
+
+void ValueNotifierClass::unimplementedValueTypeWarning(TypeHelper::ValueType valType, QString extraMsg)
+{
+    qInfo() << this << ": valueType" << valType << "not implemented yet" << extraMsg;
+}
+
+bool ValueNotifierClass::supportsSubValues() const
+{
+    return m_supportsSubValues;
+}
+
+void ValueNotifierClass::setSupportsSubValues(bool newSupportsSubValues)
+{
+    if (m_supportsSubValues == newSupportsSubValues)
+        return;
+    m_supportsSubValues = newSupportsSubValues;
+    emit supportsSubValuesChanged();
 }

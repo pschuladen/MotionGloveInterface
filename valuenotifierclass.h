@@ -23,12 +23,13 @@ class ValueNotifierClass : public QObject
     Q_PROPERTY(TypeHelper::ValueType connectedValueType READ connectedValueType WRITE setConnectedValueType NOTIFY connectedValueTypeChanged)
     Q_PROPERTY(quint32 indexInObject READ indexInObject WRITE setIndexInObject NOTIFY indexInObjectChanged)
     Q_PROPERTY(quint16 valueNumber READ valueNumber WRITE setValueNumber NOTIFY valueNumberChanged)
+    Q_PROPERTY(bool supportsSubValues READ supportsSubValues WRITE setSupportsSubValues NOTIFY supportsSubValuesChanged)
 
 public:
     typedef TypeHelper::SensorType SensType;
     explicit ValueNotifierClass(QObject *parent = nullptr);
     explicit ValueNotifierClass(int objectIdx, QObject *parent = nullptr);
-    explicit ValueNotifierClass(TypeHelper::ValueType valType, quint16 valueNumber=0, int objectIdx=0, QObject *parent = nullptr);
+    explicit ValueNotifierClass(int objectIdx, TypeHelper::ValueType valType, quint16 valueNumber=0, QObject *parent = nullptr);
 //    explicit ValueNotifierClass(QObject *parent = nullptr, TypeHelper::ValueType valueType=TypeHelper::SingleValue, int numberOfValues = 0, int indexForObject = 0);
     explicit ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent = nullptr, int valueNumber=0); // deprecated... moved to oscInputParser practically
 
@@ -44,8 +45,6 @@ public:
 
     virtual ValueNotifierClass* getNotifier(int idx=-1);
 
-
-    virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
     const TypeHelper::ValueType &connectedValueType() const;
 
     static bool connectValueTypeSignalToSlot(const ValueNotifierClass* sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType);
@@ -57,8 +56,12 @@ public:
     quint16 valueNumber() const;
     void setValueNumber(quint16 newValueNumber);
 
+    bool supportsSubValues() const;
+    void setSupportsSubValues(bool newSupportsSubValues);
+
 protected:
-    TypeHelper::ValueType m_connectedValueType;
+    TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined;
+    void unimplementedValueTypeWarning(TypeHelper::ValueType valType, QString extraMsg="");
 
 
 private:
@@ -70,6 +73,8 @@ private:
 //    void createSubnotifier();
 
     quint16 m_valueNumber;
+
+    bool m_supportsSubValues;
 
 signals:
      void quatChanged(QQuaternion quat, int frame=-1);
@@ -86,6 +91,8 @@ signals:
 
      void valueNumberChanged();
 
+     void supportsSubValuesChanged();
+
 public slots:
      virtual void slot_quatChanged(QQuaternion quat, int frame=-1);
      virtual void slot_vectorChanged(QVector3D vect, int frame=-1);
@@ -94,6 +101,8 @@ public slots:
      virtual void slot_singleValueChanged(float value, int frame=-1);
      virtual void slot_boolValueChanged(bool value, int frame=-1);
      virtual void slot_trigger(int frame=-1);
+
+     virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier=true);
 };
 
 #endif // VALUENOTIFIERCLASS_H

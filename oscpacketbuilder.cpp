@@ -53,7 +53,6 @@ size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
 {
     //TODO: implement different list sizes
     qsizetype _addrSize = m_oscAddress.size();
-    qInfo() << "addr size"  << _addrSize;
     qsizetype _size = _addrSize + TypeHelper::getSizeForValueType(connectedValueType())*4 + 60 + valueListSize; //+10 as safety.. TODO: das macht noch nicht so viel Sinn
     if(connectedValueType() == TypeHelper::List) m_nValuesInMsg = valueListSize;
     else m_nValuesInMsg = TypeHelper::getSizeForValueType(connectedValueType());
@@ -67,13 +66,17 @@ size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
 
 bool OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    qInfo() << "packet build got connection request" << sender << type;
     if (valueInputConnected) return false;
 
     typedef TypeHelper::ValueType _vt;
-    if(type == _vt::BoolValue || type==_vt::Undefined || type==_vt::Trigger ) return false; //some things are not implemented yet
+    if(type == _vt::BoolValue || type==_vt::Undefined || type==_vt::Trigger ) {
+        unimplementedValueTypeWarning(type);
+        return false;
+    }
+//    qDebug() << "connection request in thread" << QThread::currentThread();
+//    qDebug() << "this object thread" << this->thread();
 
-    setConnectedValueType(type);
+    setConnectedValueType(type, false);
     valueInputConnected = true;
     valueListSize = nValuesInList;
     setMsgBufferSize();
@@ -99,10 +102,7 @@ void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)
 void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
 {
     m_oscPacket.reset();
-//    qInfo() << "address at index" << oscMessIdx();
 
-//    qInfo() << "reserved size" << reservedSize() << "ByteBuffersize" << m_msgBuffer.size() << "Address" << oscAddress() << oscAddress().size();
-//    OSCPP::Client::Packet pak(m_msgBuffer.data(), reservedSize()-10);
     m_oscPacket.openMessage(oscAddress(), nValuesInMsg())
             .float32(vect.x())
             .float32(vect.y())
@@ -144,9 +144,11 @@ void OscPacketBuilder::slot_singleValueChanged(float value, int frame)
 void OscPacketBuilder::slot_boolValueChanged(bool value, int frame)
 {
     //TODO: implement
+    unimplementedValueTypeWarning(TypeHelper::BoolValue);
 }
 
 void OscPacketBuilder::slot_trigger(int frame)
 {
     //TODO: implement
+    unimplementedValueTypeWarning(TypeHelper::Trigger);
 }

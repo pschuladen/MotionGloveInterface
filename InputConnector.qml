@@ -1,4 +1,5 @@
 import QtQuick
+import MotionGloveInterface
 
 Item {
     id:root
@@ -42,9 +43,9 @@ Item {
             anchors.fill: parent
             anchors.margins: -4
             keys: ["valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]"nodeId",
-            onEntered:(drag) =>  console.log(drag.keys)
+//            onEntered:(drag) =>  console.log(drag.keys)
             onDropped: (drop) => {
-                           console.log(drop.source)
+//                           console.log(drop.source)
                            if(_mbackend.connectionRequest(//drop.getDataAsString("sourceObjectId"),
                                                           drop.getDataAsString("sourceObjectId"),
                                                           drop.getDataAsString("valueIndex"),

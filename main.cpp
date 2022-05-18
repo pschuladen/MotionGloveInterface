@@ -16,6 +16,33 @@
 //#include <QQuickItem>
 //#include "valueviewbackend.h"
 //#include <QQuickWindow>
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+ {
+     QByteArray localMsg = msg.toLocal8Bit();
+     const char *file = context.file ? context.file : "";
+     const char *function = context.function ? context.function : "";
+     switch (type) {
+     case QtDebugMsg:
+         fprintf(stderr, "Debug: %s \n(%s:%u, %s)\n\n", localMsg.constData(), file, context.line, function);
+         break;
+     case QtInfoMsg:
+         fprintf(stderr, "Info: %s\n\n", localMsg.constData());
+//         fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+         break;
+     case QtWarningMsg:
+         fprintf(stderr, "Warning: %s \n(%s:%u, %s)\n\n", localMsg.constData(), file, context.line, function);
+         break;
+     case QtCriticalMsg:
+         fprintf(stderr, "Critical: %s \n(%s:%u, %s)\n\n", localMsg.constData(), file, context.line, function);
+         break;
+     case QtFatalMsg:
+         fprintf(stderr, "Fatal: %s \n(%s:%u, %s)\n\n", localMsg.constData(), file, context.line, function);
+         break;
+     }
+ }
+
+
 void registerQmlTypes(QQmlApplicationEngine *engine) {
 
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
@@ -27,6 +54,7 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
 //    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 
     engine->rootContext()->setContextProperty("_mbackend", main_backend::Instance());
+    qWarning();
 
     //necessary for calling static functions from typehelper
     TypeHelper typhelper;
@@ -37,6 +65,8 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
 int main(int argc, char *argv[])
 {
     //    qputenv("QT_FATAL_WARNINGS","1");
+    qInstallMessageHandler(myMessageOutput);
+
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
@@ -54,7 +84,6 @@ int main(int argc, char *argv[])
 
     engine.load(url);
     engine.setObjectName("MAIN_QML_ENGINE");
-    qInfo() << "engine thread name" << engine.thread()->objectName();//->setObjectName("qml engine thread");
 
     main_backend::Instance()->setQmlEngine(&engine);
     main_backend::Instance()->initialSetup();

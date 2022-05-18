@@ -16,7 +16,7 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
         qWarning() << "NO BINDING possible on Port"<< this->m_port;
     }
 
-    qInfo() << "device status object" << objectName() << thread();
+
 }
 
 void DeviceStatusManager::readIncomingUdpData()
@@ -27,7 +27,7 @@ void DeviceStatusManager::readIncomingUdpData()
 
     socket->readDatagram(buffer.data(),buffer.size(), &sender, &senderPort);
 
-//    qInfo() <<"udp read" <<buffer;
+
     handleOscPacket(OSCPP::Server::Packet(buffer.data(), buffer.size()));
 
 }
@@ -39,7 +39,7 @@ void DeviceStatusManager::handleOscPacket(const OSCPP::Server::Packet &packet)
 
 void DeviceStatusManager::handleOscMessage(const OSCPP::Server::Message &message)
 {
-//    qInfo() << "handling osc message";
+
     if(message == "/glove/ping") {
         OSCPP::Server::ArgStream oscArgs(message.args());
         if(oscArgs.tag() == 's') {

@@ -7,19 +7,15 @@ Item {
 //    required
     property string uniqueID: "oscout-1"
     implicitWidth:  120
-//    Component.onCompleted: Layout.fillWidth=true
 
-    implicitHeight: contentrect.height//settingcolumne.implicitHeight + 5
-    onHeightChanged: console.log("root rect height", height)
+
+    implicitHeight: contentrect.height
 
     property string ipAddress: "127.0.0.1"
     property int port: 55211
-    //    onIpAddressChanged: console.log("ipaddress changed", ipAddress)
-    onPortChanged: console.log("port changed", port)
 
     OscOutputViewController {
-//        objectName: "oscviewcontroller"
-        Component.onCompleted: console.log("osc standard objectname", objectName)
+
         id: oscviewcontrol
     }
 
@@ -28,8 +24,6 @@ Item {
         color: "dodgerblue"
         width: root.width
         height: childrenRect.height+childrenRect.y
-        //settingcolumne.implicitHeight + 5
-        onHeightChanged: console.log("content rect height", height)
 
         border {
             color: "burlywood"
@@ -61,9 +55,7 @@ Item {
                 color: "white"
                 font.italic: true
             }
-            //                Rectangle {
-            //                    width: ipinputfield.implicitWidth
-            //                    color: "white"
+
             Rectangle {
                 color: "white"
                 height: ipinputfield.implicitHeight + 4
@@ -79,7 +71,7 @@ Item {
                     text: "127.0.0.1"
                     font.pixelSize: 10
                     horizontalAlignment: Text.AlignRight
-                    //                    anchors.leftMargin: 415
+
                     validator: RegularExpressionValidator {
                         regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
 
@@ -96,14 +88,9 @@ Item {
                     selectByMouse: true
 
 
-                    //                    }
                 }
             }
 
-
-            //                width: parent.width
-            //                height: portinputfield.implicitHeight
-            //                id: portrow
             Text {
                 anchors.right: settingcolumne.right
                 anchors.rightMargin: 4
@@ -111,9 +98,7 @@ Item {
                 color: "white"
                 font.italic: true
             }
-            //                Rectangle {
-            //                    width: ipinputfield.implicitWidth
-            //                    color: "white"
+
             Rectangle {
                 color: "white"
                 border {color: "black"; width: 1}
@@ -143,19 +128,10 @@ Item {
                     }
                     selectByMouse: true
 
-                    //                    }
                 }
             }
 
 
-
-            //                TextInput {
-            //                    id: portinputfield
-            //                    anchors.right: portrow.right
-            //                    color: "white"
-            //                    text: "65000"
-            //                    //                    }
-            //                }
         }
         Column {
             id: outputPathsColumn
@@ -165,7 +141,6 @@ Item {
                 top: settingcolumne.bottom
                 topMargin: 10
             }
-            Component.onCompleted: console.log("oscpathts columne height", height)
 
             Repeater {
                 model: oscviewcontrol.nPaths
@@ -177,7 +152,6 @@ Item {
                     controller: oscviewcontrol
                     viewIdx: model.index
                     uniqueID: root.uniqueID
-                    //                    oscAddress: oscviewcontrol.oscPaths[model.index]
                 }
             }
         }

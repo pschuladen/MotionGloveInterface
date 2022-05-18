@@ -47,7 +47,7 @@ public:
     void setQmlEngine(QQmlApplicationEngine *engine);
     void initialSetup();
 
-    Q_INVOKABLE void createNewProcessingView(int type, QPoint atPosition=QPoint(10,10));
+    Q_INVOKABLE bool createNewProcessingView(int type, QPoint atPosition=QPoint(10,10));
     Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
                                        QString receiverNodeId, int targetIdx, QQuickItem *receiverConnector,
                                        TypeHelper::ValueType valueType);
@@ -73,10 +73,11 @@ private:
     QList<DeviceStatusManager*> deviceManager;
 
     enum ThreadRole {
-        Main, NetIn, NetOut, Process, Audio
+        Main, NetIn, NetOut, Process, Audio, Subthread
     };
-
     QMap<ThreadRole, QThread*> threads;
+
+    ThreadRole threadRoleForNodeType(TypeHelper::NodeType nodeType);
 
 
     struct ProcessingNode {
@@ -143,6 +144,9 @@ public slots:
 
     void createNewMotionDeviceView(QString name, OscInputDevice* newDevice);
     void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);//QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);
+
+    void moveObjectToThread(QObject *objToMove, TypeHelper::NodeType nodeType);
+    void moveSubprocessorToProcessThread(ProcessNode* processor);
 
 
 };

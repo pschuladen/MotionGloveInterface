@@ -7,7 +7,7 @@ OscInputParser::OscInputParser(QObject *parent)
 }
 
 OscInputParser::OscInputParser(TypeHelper::SensorType sensorType, QObject *parent)
-    : ValueNotifierClass{TypeHelper::valueTypeForSensor(sensorType), 0, 0, parent}, m_sensorType{sensorType}
+    : ValueNotifierClass{0, TypeHelper::valueTypeForSensor(sensorType), 0, parent}, m_sensorType{sensorType}
 {
     switch(sensorType) {
     case TypeHelper::Custom:
@@ -30,10 +30,11 @@ OscInputParser::OscInputParser(TypeHelper::SensorType sensorType, QObject *paren
         m_oscHandle = &OscInputParser::oscR_touchType;
         break;
     }
+    setSupportsSubValues(true);
 }
 
 OscInputParser::OscInputParser(TypeHelper::ValueType valType, quint16 nValues, QObject *parent)
-    : ValueNotifierClass{valType, nValues, 0, parent}
+    : ValueNotifierClass{0, valType, nValues, parent}
 {
     switch(valType) {
     case TypeHelper::Undefined:

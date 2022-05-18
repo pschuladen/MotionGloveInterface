@@ -24,6 +24,8 @@ public:
     const TypeHelper::SensorType &sensorType() const;
     void setSensorType(const TypeHelper::SensorType &newSensorType);
 
+
+
 signals:
     void gotUnmappedMessage();
 

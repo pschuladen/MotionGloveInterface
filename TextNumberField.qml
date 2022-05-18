@@ -17,17 +17,10 @@ Item {
         anchors.fill: parent
 
         border {color: "black"; width:1}
-        //childrenRect.height
-//                    MouseArea {
-//                        anchors.fill: parent
-//                        onClicked: console.log("click")
-//                        Component.createObject: TextField
-//                    }
 
         TextInput {
             id: tin
             text: root.value
-            onTextChanged: console.log("text chagned", text)
 
             font.pixelSize: 10
             anchors.fill: parent
