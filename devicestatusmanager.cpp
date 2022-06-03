@@ -19,6 +19,17 @@ DeviceStatusManager::DeviceStatusManager(QObject *parent)
 
 }
 
+void DeviceStatusManager::setIdForNamedDevice(QString deviceName, QString deviceId)
+{
+    if (!oscInputDevices.contains(deviceName.toUtf8())) {
+        qWarning() << "Please implement oscInput-device creation triggered by backend!";
+    }
+    else {
+        deviceForId.insert(deviceId, deviceName.toUtf8());
+        oscInputDevices.value(deviceName.toUtf8())->setUniqueId(deviceId);
+    }
+}
+
 void DeviceStatusManager::readIncomingUdpData()
 {
     QByteArray buffer(socket->pendingDatagramSize(), char());

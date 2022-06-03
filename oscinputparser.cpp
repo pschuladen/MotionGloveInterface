@@ -3,11 +3,11 @@
 OscInputParser::OscInputParser(QObject *parent)
     : ValueNotifierClass{parent}
 {
-
+    setSupportsSubValues(false);
 }
 
-OscInputParser::OscInputParser(TypeHelper::SensorType sensorType, QObject *parent)
-    : ValueNotifierClass{0, TypeHelper::valueTypeForSensor(sensorType), 0, parent}, m_sensorType{sensorType}
+OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::SensorType sensorType, QObject *parent)
+    : ValueNotifierClass{identifier, 0, TypeHelper::valueTypeForSensor(sensorType), 0, parent}, m_sensorType{sensorType}
 {
     switch(sensorType) {
     case TypeHelper::Custom:
@@ -33,8 +33,8 @@ OscInputParser::OscInputParser(TypeHelper::SensorType sensorType, QObject *paren
     setSupportsSubValues(true);
 }
 
-OscInputParser::OscInputParser(TypeHelper::ValueType valType, quint16 nValues, QObject *parent)
-    : ValueNotifierClass{0, valType, nValues, parent}
+OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::ValueType valType, quint16 nValues, QObject *parent)
+    : ValueNotifierClass{identifier, 0, valType, nValues, parent}
 {
     switch(valType) {
     case TypeHelper::Undefined:

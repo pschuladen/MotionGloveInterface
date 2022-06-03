@@ -33,8 +33,11 @@
 #include "oscoutputdevice.h"
 #include "oscoutputviewcontroller.h"
 #include "oscinputviewcontroller.h"
+#include "outputnodecontroller.h"
+#include "inputnodecontroller.h"
 
 #include "typehelper.h"
+
 
 class MainBackend : public QObject
 {
@@ -47,13 +50,21 @@ public:
     void setQmlEngine(QQmlApplicationEngine *engine);
     void initialSetup();
 
-    Q_INVOKABLE bool createNewProcessingView(int type, QPoint atPosition=QPoint(10,10));
     Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
                                        QString receiverNodeId, int targetIdx, QQuickItem *receiverConnector,
                                        TypeHelper::ValueType valueType);
 
     Q_INVOKABLE bool createOscOutputDevice();
 
+//    Q_INVOKABLE bool newNodeDropped(QString mimeData);
+    Q_INVOKABLE bool createInputNodeDrop(QPoint atPoint, QString sourceDevice, QString inputPath,
+                                         TypeHelper::ValueType valType=TypeHelper::Undefined, int subIdx=-1);
+    Q_INVOKABLE bool createProcessingNodeDrop(QPoint atPosition, int processorType);
+    Q_INVOKABLE bool createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex,
+                                         TypeHelper::ValueType valType=TypeHelper::Undefined, int subIdx=-1);
+
+
+    Q_INVOKABLE QString createUniqueId(TypeHelper::NodeType forNodeType);
 
 private:
     struct NodesData {
@@ -61,7 +72,7 @@ private:
         QString container;
         QString oscPath; //TODO: implement
     };
-    QHash<QString, NodesData> inputNodes; //TODO: implement?
+//    QHash<QString, NodesData> inputNodes; //TODO: implement?
 
     QQmlApplicationEngine *m_engine;
     QQuickWindow *mainWindow;
@@ -91,22 +102,56 @@ private:
     };
     QHash<QString, ProcessingNode> processingNodes;
 
+    struct InputNode {
+        QQuickItem *qmlView;
+        QString inputDevice;
+        QString inputAddress;
+        InputNode(QQuickItem *_qmlView, QString _inputDevice, QString _inputAddress)
+            : qmlView{_qmlView}, inputDevice{_inputDevice}, inputAddress{_inputAddress} {}
+        InputNode() {}
+    };
+    QMap<QString, InputNode> inputNodes;
+
+    struct OutputNode {
+        QQuickItem *qmlView;
+        //QList<QString> outputDevice;
+        QString outputDevice;
+        //QList<QString> outputAddress;
+        quint16 outputIndex;
+        OutputNode(QQuickItem *_qmlView, QString _outputDevice, quint16 _outputIndex)
+            : qmlView{_qmlView}, outputDevice{_outputDevice}, outputIndex{_outputIndex} {}
+        OutputNode() {}
+    };
+    QMap<QString, OutputNode> outputNodes;
+
+
     struct ConnectableObject {
         ValueNotifierClass *notifier;
         QQuickItem *qmlView;
         TypeHelper::NodeType nodeType;
+        QList<QString> receivingConnections;
+        QList<QSet<QString>> sendConnections;
         ConnectableObject(ValueNotifierClass *_notifier, QQuickItem *_qmlView, TypeHelper::NodeType _nodeType)
             :notifier{_notifier}, qmlView{_qmlView}, nodeType{_nodeType} {}
         ConnectableObject() {}
     };
     QMap<QString, ConnectableObject> allConnectableObjects;
 
+
     struct ValueConnection {
+        QString sourceId;
+        int sourceIdx;
+        QString receiverId;
+        int receiverIdx;
+        TypeHelper::ValueType valType;
         QQuickItem *connectionView;
-        QQuickItem *sourceConnector;
-        QQuickItem *receiveConnector;
-        ValueConnection(QQuickItem *_conView, QQuickItem *_sourCon, QQuickItem *_recCon)
-            : connectionView{_conView}, sourceConnector{_sourCon}, receiveConnector{_recCon} {}
+        ValueConnection(QString _sourceId, int _sourceIdx,
+                        QString _receiverId, int _receiverIdx,
+                        TypeHelper::ValueType _valType, QQuickItem *_connectionView=nullptr)
+            : sourceId{_sourceId}, sourceIdx{_sourceIdx},
+              receiverId{_receiverId}, receiverIdx{_receiverIdx},
+              valType{_valType}, connectionView{_connectionView} {}
+        ValueConnection() {}
     };
     QMap<QString, ValueConnection> allConnections;
 
@@ -115,6 +160,7 @@ private:
         QQuickItem *view;
         OscOutputDevice *oscSender;
         OscOutputViewController *viewController;
+
         OscOutDeviceStruct(OscOutputDevice*_oscSender, OscOutputViewController* _viewController ,QQuickItem *_view)
             :oscSender{_oscSender}, viewController{_viewController}, view{_view} {}
         OscOutDeviceStruct(){};
@@ -122,13 +168,14 @@ private:
     QMap<QString, OscOutDeviceStruct> oscOutputDevices;
 
     struct OscInDeviceStruct {
+        QString deviceName;
         QQuickItem *view;
         OscInputDevice *oscReceiver;
         OscInputViewController *viewController;
 //        QQuickItem *conntainerView;
-
-        OscInDeviceStruct(OscInputDevice*_oscReceiver, OscInputViewController* _viewController ,QQuickItem *_view)
-            :oscReceiver{_oscReceiver}, viewController{_viewController}, view{_view} {}
+        QMap<QString, InputValueViewController*> inputViewController;// = QMap<QString, InputValueViewController*>();
+        OscInDeviceStruct(QString _deviceName, OscInputDevice*_oscReceiver, OscInputViewController* _viewController ,QQuickItem *_view)
+            :deviceName{_deviceName}, oscReceiver{_oscReceiver}, viewController{_viewController}, view{_view} {}
         OscInDeviceStruct(){};
     };
     QMap<QString, OscInDeviceStruct> oscInputDevices;
@@ -137,16 +184,26 @@ private:
     QMap<QString, QMetaObject::Connection *> pendingRequestConnections;
 
 
+
+
+
+
 signals:
     void inputViewReady();
+    void sig_connectRequestFromSender(ValueNotifierClass *sender, TypeHelper::ValueType valType, quint16 nValues=0);
+    void deviceWithNameCreated(QString deviceName, QString deviceId);
 
 public slots:
 
     void createNewMotionDeviceView(QString name, OscInputDevice* newDevice);
-    void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);//QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);
+    void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);
+    //QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);
 
     void moveObjectToThread(QObject *objToMove, TypeHelper::NodeType nodeType);
     void moveSubprocessorToProcessThread(ProcessNode* processor);
+
+    void newConnectionEstablished();
+
 
 
 };

@@ -26,7 +26,6 @@
 
 #include "oscinputparser.h"
 
-struct MotionDevice;
 
 class OscInputDevice : public QObject
 {
@@ -40,6 +39,8 @@ class OscInputDevice : public QObject
     Q_PROPERTY(quint16 sendIntervall READ sendIntervall WRITE setSendIntervall NOTIFY sendIntervallChanged)
     Q_PROPERTY(bool sendPong READ sendPong WRITE setSendPong NOTIFY sendPongChanged)
     Q_PROPERTY(bool deviceReady READ deviceReady WRITE setDeviceReady NOTIFY deviceReadyChanged)
+
+    Q_PROPERTY(QString uniqueId READ uniqueId WRITE setUniqueId NOTIFY uniqueIdChanged)
 
 
 public:
@@ -56,6 +57,7 @@ public:
     //
 
     QMap<QByteArray, OscInputParser*> oscInputParser;
+    ValueNotifierClass* getNotifierForOsc(QByteArray oscAddress) const;
 
     const QString &deviceName() const;
 
@@ -93,6 +95,9 @@ public:
     quint16 devicePort() const;
     void setDevicePort(quint16 newDevicePort);
 
+    const QString &uniqueId() const;
+    void setUniqueId(const QString &newUniqueId);
+
 signals:
 
     void deviceNameChanged();
@@ -104,8 +109,10 @@ signals:
     void deviceReadyChanged();
     void devicePortChanged();
 
-    void sendSensorStructList(const QString myname, const QList<OscInputDevice::OscSensorInputStruct>);
+    void sendSensorStructList(const QString myId, const QList<OscInputDevice::OscSensorInputStruct>);
     void requestViewCreation(QString deviceName);
+
+    void uniqueIdChanged();
 
 public slots:
 
@@ -113,8 +120,6 @@ public slots:
 
 
 private:
-
-    MotionDevice* m_deviceDescription;
 
     QUdpSocket *m_socket;
     uint16_t m_rcvPort;
@@ -137,6 +142,7 @@ private:
     bool readyToPong();
     void sendPongMessage();
 
+    QString m_uniqueId;
 };
 
 /*

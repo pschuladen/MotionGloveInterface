@@ -11,6 +11,7 @@
 #include "oscinputviewcontroller.h"
 
 
+
 //for test purposes
 //#include <QQmlComponent>
 //#include <QQuickItem>
@@ -50,6 +51,8 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
     qmlRegisterType<OscOutputViewController>("MotionGloveInterface", 1, 0, "OscOutputViewController");
     qmlRegisterType<OscInputViewController>("MotionGloveInterface", 1, 0, "OscInputViewController");
+    qmlRegisterType<OutputNodeController>("MotionGloveInterface", 1, 0, "OutputNodeController");
+    qmlRegisterType<InputNodeController>("MotionGloveInterface", 1, 0, "InputNodeController");
 
 //    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 

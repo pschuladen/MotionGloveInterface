@@ -70,7 +70,15 @@ void OscOutputViewController::setOscPathAtIndex(QString newPath, quint32 idx)
 
 void OscOutputViewController::newConnectionAtIndex(int idx, TypeHelper::ValueType valueType)
 {
-qWarning() << "WARNING! newConnectionAtIndex not implemented";
+    qWarning() << "WARNING! newConnectionAtIndex not implemented";
+}
+
+void OscOutputViewController::viewAtIndexHovered(bool hovered, int idx)
+{
+    if(hovered) setIndexHovered(idx);
+    else setIndexHovered(-1);
+
+    emit sig_viewAtIndexHovered(hovered, idx);
 }
 
 int OscOutputViewController::nPaths() const
@@ -104,7 +112,79 @@ const QString OscOutputViewController::standardObjectName()
     return QString("oscviewcontroller");
 }
 
+bool OscOutputViewController::nodeAtIndexWasCreated(int idx)
+{
+    return m_createdOutputNodes.contains(idx);
+}
+
+void OscOutputViewController::nodeWithIdxWasCreated(int idx)
+{
+    m_createdOutputNodes.insert(idx);
+}
+
+void OscOutputViewController::removeNodeWithIdx(int idx)
+{
+    m_createdOutputNodes.remove(idx);
+}
+
 void OscOutputViewController::addOscPath()
 {
     emit sig_addOscPath();
+}
+
+
+//ValueNotifierClass *OscOutputViewController::getNotifier(int idx)
+//{
+//}
+
+const QString &OscOutputViewController::uniqueID() const
+{
+    return m_uniqueID;
+}
+
+void OscOutputViewController::setUniqueID(const QString &newUniqueID)
+{
+    if (m_uniqueID == newUniqueID)
+        return;
+    m_uniqueID = newUniqueID;
+    emit uniqueIDChanged();
+}
+
+const QList<bool> &OscOutputViewController::outputNodeCreated() const
+{
+    return m_outputNodeCreated;
+}
+
+void OscOutputViewController::setOutputNodeCreated(const QList<bool> &newOutputNodeCreated)
+{
+    if (m_outputNodeCreated == newOutputNodeCreated)
+        return;
+    m_outputNodeCreated = newOutputNodeCreated;
+    emit outputNodeCreatedChanged();
+}
+
+const QSet<int> &OscOutputViewController::createdOutputNodes() const
+{
+    return m_createdOutputNodes;
+}
+
+void OscOutputViewController::setCreatedOutputNodes(const QSet<int> &newCreatedOutputNodes)
+{
+    if (m_createdOutputNodes == newCreatedOutputNodes)
+        return;
+    m_createdOutputNodes = newCreatedOutputNodes;
+    emit createdOutputNodesChanged();
+}
+
+int OscOutputViewController::indexHovered() const
+{
+    return m_indexHovered;
+}
+
+void OscOutputViewController::setIndexHovered(int newIndexHovered)
+{
+    if (m_indexHovered == newIndexHovered)
+        return;
+    m_indexHovered = newIndexHovered;
+    emit indexHoveredChanged();
 }

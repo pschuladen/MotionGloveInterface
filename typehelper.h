@@ -24,11 +24,6 @@ public:
     Q_INVOKABLE static const QColor getColorForValueType(const TypeHelper::ValueType vtype);
     Q_INVOKABLE static const QString getStringForValueType(const TypeHelper::ValueType vtype);
 
-    static size_t getSizeForValueType(const TypeHelper::ValueType vType);
-
-    static QString getProtoStrForSensor(const TypeHelper::SensorType sensType);
-
-
     enum NodeConnectionType: quint8 {
         InputToProcess,
         ProcessToProcess,
@@ -40,9 +35,17 @@ public:
     Q_ENUM(NodeConnectionType);
 
     enum NodeType: quint8 {
-        Generic, Gui, Input, Process, Output, Audio, Audiocontroller
+        Generic, Gui, Input, Process, Output, Audio, Audiocontroller, OscInput, OscOutput
     };
     Q_ENUM(NodeType);
+
+    static QString getPrefixForNodetype(NodeType nodeType);
+
+    static size_t getSizeForValueType(const TypeHelper::ValueType vType);
+
+    static QString getProtoStrForSensor(const TypeHelper::SensorType sensType);
+
+//    static QString generateIdForType(TypeHelper::NodeType nodeType);
 
 
 };

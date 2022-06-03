@@ -23,7 +23,7 @@ void OscPacketBuilder::setOscAddress(const QByteArray &newOscAddress)
     if (m_oscAddress == newOscAddress)
         return;
     m_oscAddress = newOscAddress;
-    emit oscAddressChanged();
+    emit oscAddressChanged(newOscAddress);
 }
 
 quint32 OscPacketBuilder::oscMessIdx() const
@@ -36,7 +36,7 @@ void OscPacketBuilder::setOscMessIdx(quint32 newOscMessIdx)
     if (m_oscMessIdx == newOscMessIdx)
         return;
     m_oscMessIdx = newOscMessIdx;
-    emit oscMessIdxChanged();
+    emit oscMessIdxChanged(newOscMessIdx);
 }
 
 qsizetype OscPacketBuilder::nValuesInMsg() const
@@ -151,4 +151,10 @@ void OscPacketBuilder::slot_trigger(int frame)
 {
     //TODO: implement
     unimplementedValueTypeWarning(TypeHelper::Trigger);
+}
+
+
+bool OscPacketBuilder::acceptsInputType(TypeHelper::ValueType typ) const
+{
+    return !valueInputConnected;
 }

@@ -112,7 +112,7 @@ void OscOutputDevice::addOscPath(QString newPath)
 {
     OscPacketBuilder *newOsc = new OscPacketBuilder(newPath.toUtf8(), packetBuilder.size(), this);
     connect(newOsc, &OscPacketBuilder::gotNewConnectionWithType, this, &OscOutputDevice::newConnectionAtIndex);
-    connect(newOsc, &OscPacketBuilder::oscMessageBufferReady,this, &OscOutputDevice::sendOscMsgBuffer);
+    connect(newOsc, &OscPacketBuilder::oscMessageBufferReady, this, &OscOutputDevice::sendOscMsgBuffer);
     packetBuilder.append(newOsc);
     m_oscPaths.append(newPath);
     m_valueTypes.append(TypeHelper::Undefined);

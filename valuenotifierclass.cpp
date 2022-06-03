@@ -5,45 +5,46 @@ ValueNotifierClass::ValueNotifierClass(QObject *parent)
 {
 }
 
-ValueNotifierClass::ValueNotifierClass(int objectIdx, QObject *parent)
-    : QObject{parent}, m_indexInObject{objectIdx}
+ValueNotifierClass::ValueNotifierClass(QByteArray identifier, int objectIdx, QObject *parent)
+    : QObject{parent}, m_indexInObject{objectIdx}, m_identifier{identifier}
 {
 }
 
-ValueNotifierClass::ValueNotifierClass(int objectIdx, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
-    : QObject{parent}, m_connectedValueType{valType}, m_valueNumber{valueNumber}, m_indexInObject{objectIdx}
+ValueNotifierClass::ValueNotifierClass(QByteArray identifier, int objectIdx, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
+    : QObject{parent}, m_connectedValueType{valType}, m_valueNumber{valueNumber},
+      m_indexInObject{objectIdx}, m_identifier{identifier}
 {
     createSubnotifierForValueType(valType, valueNumber);
 }
 
-ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
-    : QObject{parent}
-{
-    setParent(parent);
-    int _nVals = 0;
-    switch (sensType) {
+//ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
+//    : QObject{parent}
+//{
+//    setParent(parent);
+//    int _nVals = 0;
+//    switch (sensType) {
 
-    case SensType::Accel:
-        _nVals = 3;
-        break;
-    case SensType::Gyro:
-        _nVals = 3;
-        break;
-    case SensType::Grav:
-        _nVals = 3;
-        break;
-    case SensType::RotQuat:
-        _nVals = 4;
-        break;
-    case SensType::Touch:
-        _nVals = 6;
-        break;
-    case SensType::Custom:
-        int _nVals = valueNumber;
-        break;
-    }
-    createSubnotifier(_nVals);
-}
+//    case SensType::Accel:
+//        _nVals = 3;
+//        break;
+//    case SensType::Gyro:
+//        _nVals = 3;
+//        break;
+//    case SensType::Grav:
+//        _nVals = 3;
+//        break;
+//    case SensType::RotQuat:
+//        _nVals = 4;
+//        break;
+//    case SensType::Touch:
+//        _nVals = 6;
+//        break;
+//    case SensType::Custom:
+//        int _nVals = valueNumber;
+//        break;
+//    }
+//    createSubnotifier(_nVals);
+//}
 
 void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 {
@@ -171,7 +172,7 @@ const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
 
 bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType)
 {
-
+    if(sender == nullptr || receiver == nullptr) return false;
     QMetaObject::Connection _co;
     typedef ValueNotifierClass _vc;
     switch(vType) {
@@ -259,6 +260,11 @@ void ValueNotifierClass::unimplementedValueTypeWarning(TypeHelper::ValueType val
     qInfo() << this << ": valueType" << valType << "not implemented yet" << extraMsg;
 }
 
+bool ValueNotifierClass::acceptsInputType(TypeHelper::ValueType typ) const
+{
+    return false;
+}
+
 bool ValueNotifierClass::supportsSubValues() const
 {
     return m_supportsSubValues;
@@ -270,4 +276,30 @@ void ValueNotifierClass::setSupportsSubValues(bool newSupportsSubValues)
         return;
     m_supportsSubValues = newSupportsSubValues;
     emit supportsSubValuesChanged();
+}
+
+const QByteArray &ValueNotifierClass::identifier() const
+{
+    return m_identifier;
+}
+
+void ValueNotifierClass::setIdentifier(const QByteArray &newIdentifier)
+{
+    if (m_identifier == newIdentifier)
+        return;
+    m_identifier = newIdentifier;
+    emit identifierChanged();
+}
+
+bool ValueNotifierClass::autoEmit() const
+{
+    return m_autoEmit;
+}
+
+void ValueNotifierClass::setAutoEmit(bool newAutoEmit)
+{
+    if (m_autoEmit == newAutoEmit)
+        return;
+    m_autoEmit = newAutoEmit;
+    emit autoEmitChanged();
 }

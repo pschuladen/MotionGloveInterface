@@ -26,8 +26,8 @@ public:
 signals:
     void oscMessageBufferReady(const QByteArray &oscBuffer, size_t msgSize, int frame=-1);
 
-    void oscAddressChanged();
-    void oscMessIdxChanged();
+    void oscAddressChanged(QByteArray oscAddress);
+    void oscMessIdxChanged(quint32 msgIdx);
 
 private:
     QByteArray m_oscAddress;
@@ -45,11 +45,13 @@ private:
 
     // ValueNotifierClass interface
 public:
-    bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
+
 
     size_t reservedSize() const;
 
     qsizetype nValuesInMsg() const;
+
+    bool acceptsInputType(TypeHelper::ValueType typ) const override;
 
 public slots:
     void slot_quatChanged(QQuaternion quat, int frame) override;
@@ -60,8 +62,14 @@ public slots:
     void slot_boolValueChanged(bool value, int frame) override;
     void slot_trigger(int frame) override;
 
+    bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
+
 signals:
     void gotNewConnectionWithType(int idx, TypeHelper::ValueType vtype);
+
+    // ValueNotifierClass interface
+protected:
+
 };
 
 #endif // OSCPACKETBUILDER_H

@@ -10,8 +10,8 @@ Window {
     id: mainWindow
     width: 1024
     height: 768
-    x:300
-    y:200
+//    x:2700//300
+//    y:85//200
     visible: true
     title: qsTr("Motion Glove Interface")
     color: "black"
@@ -39,15 +39,39 @@ Window {
             DropArea {
                 id: dropa
                 anchors.fill: parent
-                keys: ["text/procType"]
+                keys: ["nodeType"]
 //                onEntered: (drag) => {console.log("drag entered", drag.keys)}
 
                 onDropped: (drop) => {
 //                               console.log("dropkeys:", drop.keys)
-                               if(_mbackend.createNewProcessingView(0//drop.getDataAsString("text/procType")
-                                                                 , Qt.point(drop.x, drop.y))) {
+//                               _mbackend.newNodeDropped(drop.getDataAsArrayBuffer())
+
+
+                               var nodetype = drop.getDataAsString("nodeType");
+                               var shouldAccept = false
+
+
+                               if( nodetype === TypeHelper.Process.toString()) {
+                                   shouldAccept = _mbackend.createProcessingNodeDrop(Qt.point(drop.x, drop.y),
+                                                                                     drop.getDataAsString("processorType"))
+                               }
+                               else if(nodetype === TypeHelper.Output.toString()) {
+                                   shouldAccept =_mbackend.createOutputNodeDrop(Qt.point(drop.x, drop.y),
+                                                                 drop.getDataAsString("targetDevice"),
+                                                                 drop.getDataAsString("outputIndex"),
+                                                                               drop.getDataAsString("valueType"))
+                               }
+                               else if(nodetype === TypeHelper.Input.toString()) {
+                                   shouldAccept = _mbackend.createInputNodeDrop(Qt.point(drop.x, drop.y),
+                                                                 drop.getDataAsString("sourceDevice"),
+                                                                 drop.getDataAsString("identifier"),
+                                                                 drop.getDataAsString("valueType"))
+                               }
+
+                               if(shouldAccept) {
                                    drop.acceptProposedAction()
                                }
+
                 }
             }
         }
@@ -66,6 +90,11 @@ Window {
             border {
                 width: 1
                 color: "black"
+            }
+            Text {
+                id: windowCoordinats
+                text: "%1  -  %2".arg(mainWindow.x).arg(mainWindow.y)
+                x: 20; y: 20
             }
         }
         Rectangle {
@@ -139,6 +168,7 @@ Window {
            Button {
                text: "click"
 anchors.verticalCenter: outputControl.verticalCenter
+onClicked: console.log(_mbackend.createUniqueId(TypeHelper.Input))
            }
 
         }

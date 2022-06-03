@@ -30,7 +30,7 @@ class ProcessNode : public ValueNotifierClass
     Q_OBJECT
 public:
     explicit ProcessNode(QObject *parent = nullptr);
-    explicit ProcessNode(int idxInController,  TypeHelper::ValueType valType, quint16 valueNumber=0, QObject *parent = nullptr);
+    explicit ProcessNode(QByteArray identifier, int idxInController,  TypeHelper::ValueType valType, quint16 valueNumber=0, QObject *parent = nullptr);
 
 //    Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged)
     Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged);
@@ -42,10 +42,10 @@ public:
 
 //    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
 
-    virtual bool acceptsInputType(TypeHelper::ValueType typ); //override for asking if connection allowed
+    virtual bool acceptsInputType(TypeHelper::ValueType typ) const override; //override for asking if connection allowed
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
     // there is something doppeltgemoppelt
-    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
+
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
 
     virtual ProcessNode* createProcessControl(QString objectname_id); //can be deleted maybe
@@ -78,10 +78,13 @@ public slots:
     virtual void slot_singleValueChanged(float value, int frame=-1) override;
     virtual void slot_boolValueChanged(bool value, int frame=-1) override;
     virtual void slot_trigger(int frame=-1) override;
+    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
+
 signals:
     void connectedTypesChanged(QList<TypeHelper::ValueType> connectedTypes);
 
     void newSubprocessorWasCreated(ProcessNode *newSubproc);
+
 };
 
 #endif // PROCESSNODE_H

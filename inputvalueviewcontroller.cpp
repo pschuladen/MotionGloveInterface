@@ -89,18 +89,18 @@ void InputValueViewController::setValname(const QList<QString> &newValname)
     emit valnameChanged();
 }
 
-const QString &InputValueViewController::nodeIdentifier() const
-{
-    return m_nodeIdentifier;
-}
+//const QString &InputValueViewController::nodeIdentifier() const
+//{
+//    return m_nodeIdentifier;
+//}
 
-void InputValueViewController::setNodeIdentifier(const QString &newNodeIdentifier)
-{
-    if (m_nodeIdentifier == newNodeIdentifier)
-        return;
-    m_nodeIdentifier = newNodeIdentifier;
-    emit nodeIdentifierChanged();
-}
+//void InputValueViewController::setNodeIdentifier(const QString &newNodeIdentifier)
+//{
+//    if (m_nodeIdentifier == newNodeIdentifier)
+//        return;
+//    m_nodeIdentifier = newNodeIdentifier;
+//    emit nodeIdentifierChanged();
+//}
 
 void InputValueViewController::slot_vectorChanged(QVector3D vec, int frame)
 {
@@ -215,4 +215,31 @@ void InputValueViewController::setSourceNotifier(ValueNotifierClass *newSourceNo
 ValueNotifierClass *InputValueViewController::getNotifier(int idx)
 {
     return m_sourceNotifier;
+}
+
+bool InputValueViewController::mouseHover() const
+{
+    return m_mouseHover;
+}
+
+void InputValueViewController::setMouseHover(bool newMouseHover)
+{
+
+    if (m_mouseHover == newMouseHover)
+        return;
+    m_mouseHover = newMouseHover;
+    emit mouseHoverChanged(m_mouseHover);
+}
+
+bool InputValueViewController::canDragInput() const
+{
+    return m_canDragInput;
+}
+
+void InputValueViewController::setCanDragInput(bool newCanDragInput)
+{
+    if (m_canDragInput == newCanDragInput)
+        return;
+    m_canDragInput = newCanDragInput;
+    emit canDragInputChanged();
 }

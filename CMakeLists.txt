@@ -32,6 +32,8 @@ qt_add_executable(appMotionGloveInterface
     oscpacketbuilder.h oscpacketbuilder.cpp
     oscinputparser.h oscinputparser.cpp
     oscinputviewcontroller.h oscinputviewcontroller.cpp
+    outputnodecontroller.h outputnodecontroller.cpp
+    inputnodecontroller.h inputnodecontroller.cpp
 )
 
 qt_add_qml_module(appMotionGloveInterface
@@ -51,6 +53,8 @@ qt_add_qml_module(appMotionGloveInterface
                 AttachedConnectorView.qml
                 OutputConnector.qml
                 InputConnector.qml
+                InputNodeView.qml
+                OutputNodeView.qml
 )
 
 

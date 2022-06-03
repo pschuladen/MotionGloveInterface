@@ -11,6 +11,7 @@
 */
 
 #include <QObject>
+#include <QQuickItem>
 #include <QQuaternion>
 #include <QVector3D>
 #include <QtQml/qqmlregistration.h>
@@ -24,7 +25,7 @@ class InputValueViewController : public ValueNotifierClass
     Q_OBJECT
     QML_ELEMENT
 
-    Q_PROPERTY(QString nodeIdentifier READ nodeIdentifier WRITE setNodeIdentifier NOTIFY nodeIdentifierChanged)
+//    Q_PROPERTY(QString nodeIdentifier READ nodeIdentifier WRITE setNodeIdentifier NOTIFY nodeIdentifierChanged)
     Q_PROPERTY(QList<QString> valname READ valname WRITE setValname NOTIFY valnameChanged)
     Q_PROPERTY(QList<float> values READ values WRITE setValues NOTIFY viewValuesChanged)
     Q_PROPERTY(float minvalue READ minvalues WRITE setMinvalue NOTIFY minvalueChanged)
@@ -35,6 +36,8 @@ class InputValueViewController : public ValueNotifierClass
 
 
     Q_PROPERTY(bool emitvalues READ emitvalues WRITE setEmitvalues NOTIFY emitvaluesChanged)
+    Q_PROPERTY(bool mouseHover READ mouseHover WRITE setMouseHover NOTIFY mouseHoverChanged)
+    Q_PROPERTY(bool canDragInput READ canDragInput WRITE setCanDragInput NOTIFY canDragInputChanged)
 
 public:
     explicit InputValueViewController(QObject *parent = nullptr);
@@ -51,8 +54,8 @@ public:
     const QList<QString> &valname() const;
     void setValname(const QList<QString> &newValname);
 
-    const QString &nodeIdentifier() const;
-    void setNodeIdentifier(const QString &newNodeIdentifier);
+//    const QString &nodeIdentifier() const;
+//    void setNodeIdentifier(const QString &newNodeIdentifier);
 
 
     float minvalues() const;
@@ -73,7 +76,14 @@ public:
     ValueNotifierClass *getNotifier(int idx) override;
     void setSourceNotifier(ValueNotifierClass *newSourceNotifier);
 
+    bool mouseHover() const;
+
+    bool canDragInput() const;
+    void setCanDragInput(bool newCanDragInput);
+
 public slots:
+
+    void setMouseHover(bool newMouseHover);
     void slot_vectorChanged(QVector3D vec, int frame=-1) override;
     void slot_quatChanged(QQuaternion newQuat, int frame=-1) override;
     void slot_touchChanged(QList<float> touch, int frame=-1) override;
@@ -92,7 +102,7 @@ private:
 
     QList<QString> m_valname;
 
-    QString m_nodeIdentifier;
+//    QString m_nodeIdentifier;
 
     float m_minvalue;
 
@@ -104,6 +114,10 @@ private:
 
     QColor m_dotColor;
 
+    bool m_mouseHover;
+
+    bool m_canDragInput = true;
+
 signals:
 
     void viewmodeChanged();
@@ -111,7 +125,7 @@ signals:
 
     void viewValuesChanged();
     void valnameChanged();
-    void nodeIdentifierChanged();
+//    void nodeIdentifierChanged();
     void minvalueChanged();
     void maxvalueChanged();
     void emitvaluesChanged();
@@ -119,6 +133,8 @@ signals:
     void dotColorChanged();
 
     // ValueNotifierClass interface
+    void mouseHoverChanged(bool mouseHover);
+    void canDragInputChanged();
 };
 
 #endif // INPUTVALUEVIEWCONTROLLER_H

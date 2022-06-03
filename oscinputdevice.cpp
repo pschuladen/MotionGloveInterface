@@ -45,6 +45,11 @@ ValueNotifierClass *OscInputDevice::getNotifier(SensType sensType, int sensIndex
     return nullptr;
 }
 
+ValueNotifierClass *OscInputDevice::getNotifierForOsc(QByteArray oscAddress) const
+{
+    return oscInputParser.value(oscAddress);
+}
+
 void OscInputDevice::readIncomingUdpData()
 {
     QByteArray buffer(m_socket->pendingDatagramSize(), char());
@@ -80,38 +85,20 @@ void OscInputDevice::handleOscMessage(const OSCPP::Server::Message &message)
 
 void OscInputDevice::setupOscInputBindings()
 {
+    QString oscIdentifer("/%1/%2/%3");
 
     static const QList<SensType> sortOrder={SensType::RotQuat, SensType::Accel, SensType::Grav, SensType::Gyro};
     for(const TypeHelper::SensorType &_type: sortOrder) {
         for (int i = 0; i< nSensors(); i++) {
-            oscInputParser.insert(
-                        QString("/%1/%2/%3").arg(deviceName(), TypeHelper::getProtoStrForSensor(_type)).arg(i).toUtf8(),
-                        new OscInputParser(_type, this));
+
+            QByteArray _osc = oscIdentifer.arg(deviceName(),
+                                            TypeHelper::getProtoStrForSensor(_type))
+                                            .arg(i).toUtf8();
+            oscInputParser.insert(_osc, new OscInputParser(_osc, _type, this));
         }
     }
-    oscInputParser.insert(
-                QString("/%1/%2").arg(deviceName(), TypeHelper::getProtoStrForSensor(SensType::Touch)).toUtf8(),
-                new OscInputParser(SensType::Touch, this));
-
-    QString oscAddress;
-
-    for(int i = 0; i < m_nSensors; i++) {
-
-        oscAddress = QString("/%1/acc/%2").arg(deviceName()).arg(i);
-        oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Accel, this));
-
-        oscAddress = QString("/%1/gravity/%2").arg(deviceName()).arg(i);
-        oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Grav, this));
-
-        oscAddress = QString("/%1/gyr/%2").arg(deviceName()).arg(i);
-        oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Gyro, this));
-
-        oscAddress = QString("/%1/quat/%2").arg(deviceName()).arg(i);
-        oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::RotQuat, this));
-    }
-
-    oscAddress = QString("/%1/touch").arg(deviceName());
-    oscInputParser.insert(oscAddress.toUtf8(), new OscInputParser(TypeHelper::Touch, this));
+    QByteArray _osc = QString("/%1/%2").arg(deviceName(), TypeHelper::getProtoStrForSensor(SensType::Touch)).toUtf8();
+    oscInputParser.insert(_osc, new OscInputParser(_osc, SensType::Touch, this));
 
 }
 
@@ -131,7 +118,7 @@ void OscInputDevice::sendPongMessage()
     qsizetype pongSize = pongPacket.size();
     qint64 sendedBytes = m_socket->writeDatagram(pongBuf.data(), pongSize, m_deviceIpAddress, devicePort());
     if(sendedBytes < pongSize) {
-        qWarning() << "Something might be gone wrong while ponging";
+        qWarning() << "Something might have been gone wrong while ponging";
     }
 }
 
@@ -259,7 +246,7 @@ void OscInputDevice::setDevicePort(quint16 newDevicePort)
 void OscInputDevice::viewWasCreated()
 {
     // gather all keys sorted...
-    // TODO: qmap is already sorted but some kind of sortingfunction would be nice
+    // TODO: qmap is already somehow sorted but some kind of sortingfunction would be nice
     QList<OscSensorInputStruct> oscStructs;
     oscStructs.reserve(oscInputParser.size());
     int ci = 0;
@@ -269,5 +256,18 @@ void OscInputDevice::viewWasCreated()
         ci++;
     }
 
-    emit sendSensorStructList(deviceName(), oscStructs);
+    emit sendSensorStructList(uniqueId(), oscStructs);
+}
+
+const QString &OscInputDevice::uniqueId() const
+{
+    return m_uniqueId;
+}
+
+void OscInputDevice::setUniqueId(const QString &newUniqueId)
+{
+    if (m_uniqueId == newUniqueId)
+        return;
+    m_uniqueId = newUniqueId;
+    emit uniqueIdChanged();
 }

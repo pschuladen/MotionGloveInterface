@@ -37,14 +37,16 @@ public:
 
     void setEngine(QQmlApplicationEngine *engine);
 
+
+    QMap<QString, QByteArray> deviceForId;
     QMap<QByteArray, OscInputDevice*> oscInputDevices;
 
 signals:
 
-    void receivedNewDevice(MotionDevice *motionDevice);
     void newOscInputDevice(QString name, OscInputDevice *newDevice);
 
 public slots:
+    void setIdForNamedDevice(QString deviceName, QString deviceId);
 
 private:
     QUdpSocket *socket;

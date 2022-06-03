@@ -48,7 +48,7 @@ Item {
                     }
                 }
                 Drag.active: dragHandle.active
-                Drag.mimeData: {"text/plain": model.name, "text/procType": model.type}
+                Drag.mimeData: {"text/plain": model.name, "processorType": model.type, "nodeType": TypeHelper.Process}
             }
 
 

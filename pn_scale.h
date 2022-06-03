@@ -24,7 +24,10 @@ class PN_Scale : public ProcessNode
 
 public:
     explicit PN_Scale(QObject *parent = nullptr);
-    explicit PN_Scale(int idxInControlller, PN_Scale *controller, TypeHelper::ValueType type, quint16 valueNumber=0, QObject *parent = nullptr);
+    explicit PN_Scale(QByteArray identifier, int idxInControlller,
+                      PN_Scale *controller,
+                      TypeHelper::ValueType type, quint16 valueNumber=0,
+                      QObject *parent = nullptr);
 
     float inLow() const;
     float inHigh() const;
@@ -36,7 +39,7 @@ public:
     float multi() const;
     void setMulti(float newMulti);
 
-    bool acceptsInputType(TypeHelper::ValueType typ) override;
+    bool acceptsInputType(TypeHelper::ValueType typ) const override;
     bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override;
     bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //TODO: implement
 

@@ -5,8 +5,9 @@ import MotionGloveInterface
 
 Item {
     id: root
-    property string identifier: "setthisvalue"
-    signal connectButtonChanged(connect: bool, deviceN: string);
+    property string deviceName: "setthisvalue"
+
+//    signal connectButtonChanged(connect: bool, deviceN: string);
 
     width:  childrenRect.width+childrenRect.x
     height: childrenRect.height+childrenRect.y + 10
@@ -42,7 +43,7 @@ Item {
         }
         Text {
             id: deviceName
-            text: root.identifier
+            text: root.deviceName
             anchors {
                 top: header.top
                 topMargin: 10
@@ -59,7 +60,7 @@ Item {
                 verticalCenter: deviceName.verticalCenter
             }
             text: "C"
-            onCheckedChanged: root.connectButtonChanged(checked, identifier);
+//            onCheckedChanged: root.connectButtonChanged(checked, identifier);
 
         }
 

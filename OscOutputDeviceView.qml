@@ -6,17 +6,18 @@ Item {
     id: root
 //    required
     property string uniqueID: "oscout-1"
-    implicitWidth:  120
+    implicitWidth:  140
 
 
     implicitHeight: contentrect.height
 
-    property string ipAddress: "127.0.0.1"
-    property int port: 55211
+//    property string ipAddress: "127.0.0.1"
+//    property int port: 55211
 
     OscOutputViewController {
 
         id: oscviewcontrol
+        uniqueID: root.uniqueID
     }
 
     Rectangle {
@@ -78,12 +79,12 @@ Item {
                     }
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text = root.ipAddress
+                        text = oscviewcontrol.ipAddress
                         focus = false
                     }
-                    onEditingFinished: root.ipAddress = text
+                    onEditingFinished: oscviewcontrol.ipAddress = text
                     onFocusChanged: {
-                        if(!focus) { text = root.ipAddress}
+                        if(!focus) { text = oscviewcontrol.ipAddress}
                     }
                     selectByMouse: true
 
@@ -119,12 +120,12 @@ Item {
                     validator: IntValidator {bottom: 1025;top: 65535}
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text=root.port
+                        text=oscviewcontrol.port
                         focus=false
                     }
-                    onEditingFinished: root.port=text
+                    onEditingFinished: oscviewcontrol.port=text
                     onFocusChanged: {
-                        if(!focus) { text = root.port}
+                        if(!focus) { text = oscviewcontrol.port}
                     }
                     selectByMouse: true
 

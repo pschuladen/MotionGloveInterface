@@ -10,6 +10,14 @@ Item {
 
     property string oscAddress: controller.oscPaths[viewIdx]
     property OscOutputViewController controller: null
+//    controller.onIndexHoveredChanged: {
+//        remoteHovered = controller.indexHovered == viewIdx
+//    }
+    property bool viewHovered: magrabber.containsMouse
+    onViewHoveredChanged: controller.viewAtIndexHovered(viewHovered, viewIdx)
+    property bool remoteHovered: controller.indexHovered == viewIdx
+    property bool lightenView: viewHovered || remoteHovered
+
     property int connectedType: TypeHelper.Undefined
     property int viewIdx: 0
     implicitHeight: 24
@@ -22,7 +30,10 @@ Item {
         TextInput {
             id: outputPathTextInput
             anchors {
-                fill: parent
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+                left: grabRect.right
                 margins: 4
             }
 
@@ -43,16 +54,55 @@ Item {
                 if(!focus) {text = root.controller.oscPaths[root.viewIdx]}
             }
         }
-        InputConnector {
+        Rectangle {
+            id: grabRect
+            property color rColor: "darkgrey"
+            color: root.lightenView ? rColor.lighter(1.2 ) : rColor
+
+            width: 20
+
             anchors {
-                verticalCenter: addressRect.verticalCenter
-                horizontalCenter: addressRect.left
+                left:parent.left
+                top:parent.top
+                bottom:parent.bottom
             }
-            id: outConnector
-            height: 10
-            vType: controller.valueTypes[root.viewIdx]
-            parentID: root.uniqueID
-            vIdx: root.viewIdx
+
+
+            MouseArea {
+                id: magrabber
+                anchors.fill: parent
+                hoverEnabled: true
+
+                drag.target: draggableItem
+            }
+
+            Item {
+                id: draggableItem
+
+                Drag.active: magrabber.drag.active && !root.controller.nodeAtIndexWasCreated(root.viewIdx)
+
+                Drag.dragType: Drag.Automatic
+                Drag.mimeData: {"text/plain": root.oscAddress,
+//                    "sourceDevice": root.sourceObjectId,
+//                    "identifier": root.identifier,
+                    "nodeType": TypeHelper.Output,
+                    "valueType": root.connectedType,
+                    "outputIndex": root.viewIdx,
+                    "targetDevice": root.uniqueID
+                }
+            }
         }
+
+//        InputConnector {
+//            anchors {
+//                verticalCenter: addressRect.verticalCenter
+//                horizontalCenter: addressRect.left
+//            }
+//            id: outConnector
+//            height: 10
+//            vType: controller.valueTypes[root.viewIdx]
+//            parentID: root.uniqueID
+//            vIdx: root.viewIdx
+//        }
     }
 }

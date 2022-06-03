@@ -11,8 +11,9 @@ PN_Scale::PN_Scale(QObject *parent)
     evalMultip();
 }
 
-PN_Scale::PN_Scale(int idxInControlller, PN_Scale *controller, TypeHelper::ValueType type, quint16 valueNumber, QObject *parent)
-    : ProcessNode{idxInControlller, type, valueNumber, parent},
+PN_Scale::PN_Scale(QByteArray identifier, int idxInControlller, PN_Scale *controller,
+                   TypeHelper::ValueType type, quint16 valueNumber, QObject *parent)
+    : ProcessNode{identifier, idxInControlller, type, valueNumber, parent},
       m_clipOutput{controller->clipOutput()},
       m_inHigh{controller->inHigh()}, m_inLow{controller->inLow()},
       m_outHigh{controller->outHigh()}, m_outLow{controller->outLow()}
@@ -81,7 +82,7 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
 {
     if(!acceptsInputType(type)) return false;
 
-    PN_Scale *newSubprocessor = new PN_Scale(subProcessor.size(), this, type, nValuesInList);
+    PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
 
     appendToConnectedTypes(type);
     if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
@@ -148,7 +149,7 @@ void PN_Scale::setMulti(float newMulti)
     m_multi = newMulti;
 }
 
-bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ)
+bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ) const
 {
         if(typ == TypeHelper::Undefined) return false;
         else return true;

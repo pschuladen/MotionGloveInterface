@@ -16,7 +16,7 @@ Item {
     property string sourceObjectId: "unknown"
 
     height: row.implicitHeight
-    width: row.implicitWidth
+    width: row.implicitWidth + 10
 
 
 
@@ -50,15 +50,15 @@ Item {
             width: 70
         }
 
-        OutputConnector {
-            anchors.verticalCenter: row.verticalCenter
-            height: 10
-            width: 10
-            parentID: root.parentIdentifier
-//            cColor: root.cColor
-            vIdx: root.vIdx
-            vName: root.vName
-            vType: TypeHelper.SingleValue
-        }
+//        OutputConnector {
+//            anchors.verticalCenter: row.verticalCenter
+//            height: 10
+//            width: 10
+//            parentID: root.parentIdentifier
+////            cColor: root.cColor
+//            vIdx: root.vIdx
+//            vName: root.vName
+//            vType: TypeHelper.SingleValue
+//        }
     }
 }

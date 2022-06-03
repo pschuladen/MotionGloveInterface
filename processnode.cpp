@@ -5,13 +5,13 @@ ProcessNode::ProcessNode(QObject *parent)
 {
 }
 
-ProcessNode::ProcessNode(int idxInController, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
-    : ValueNotifierClass{idxInController, valType, valueNumber, parent}
+ProcessNode::ProcessNode(QByteArray identifier, int idxInController, TypeHelper::ValueType valType, quint16 valueNumber, QObject *parent)
+    : ValueNotifierClass{identifier, idxInController, valType, valueNumber, parent}
 {
 
 }
 
-bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ)
+bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ) const
 {
     if(typ == TypeHelper::Undefined) return false;
     else return true;

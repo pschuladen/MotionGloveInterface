@@ -13,8 +13,8 @@ class OscInputParser : public ValueNotifierClass
 
 public:
     explicit OscInputParser(QObject *parent = nullptr);
-    explicit OscInputParser(TypeHelper::SensorType sensorType, QObject *parent = nullptr);
-    explicit OscInputParser(TypeHelper::ValueType valType, quint16 nValues, QObject *parent = nullptr);
+    explicit OscInputParser(QByteArray identifier, TypeHelper::SensorType sensorType, QObject *parent = nullptr);
+    explicit OscInputParser(QByteArray identifier, TypeHelper::ValueType valType, quint16 nValues, QObject *parent = nullptr);
 
     bool handleUnmappedOsc() const;
     void setHandleUnmappedOsc(bool newHandleUnmappedOsc);

@@ -7,7 +7,7 @@ TypeHelper::TypeHelper()
 
 const TypeHelper::ValueType TypeHelper::valueTypeForSensor(const TypeHelper::SensorType styp)
 {
-//    return sensorToValueTypeMap.value(styp);
+    //    return sensorToValueTypeMap.value(styp);
     switch (styp) {
     case SensorType::Accel:
         return ValueType::Vector;
@@ -64,6 +64,30 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
         return QString("bool");
     case TypeHelper::Trigger:
         return QString("trig");
+    }
+}
+
+QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
+{
+    switch(nodeType){
+    case TypeHelper::OscInput:
+        return "oscin";
+    case TypeHelper::OscOutput:
+        return "oscout";
+    case TypeHelper::Generic:
+        return "gen";
+    case TypeHelper::Gui:
+        return "gui";
+    case TypeHelper::Input:
+        return "in";
+    case TypeHelper::Process:
+        return "proc";
+    case TypeHelper::Output:
+        return "out";
+    case TypeHelper::Audio:
+        return "audio";
+    case TypeHelper::Audiocontroller:
+        return "aucon";
     }
 }
 
