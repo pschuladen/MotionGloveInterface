@@ -78,7 +78,7 @@ public slots:
     virtual void slot_singleValueChanged(float value, int frame=-1) override;
     virtual void slot_boolValueChanged(bool value, int frame=-1) override;
     virtual void slot_trigger(int frame=-1) override;
-    virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
+    virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
 
 signals:
     void connectedTypesChanged(QList<TypeHelper::ValueType> connectedTypes);

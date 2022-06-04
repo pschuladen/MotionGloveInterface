@@ -78,7 +78,7 @@ void PN_Scale::setOutHigh(float newOutHigh)
     emit outHighChanged(newOutHigh);
 }
 
-bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
     if(!acceptsInputType(type)) return false;
 
@@ -89,11 +89,11 @@ bool PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::V
         subProcessor.append(newSubprocessor);
 
         emit newSubprocessorWasCreated(newSubprocessor);
-        return true;
+        return subProcessor.size() -1;
     }
     else {
         newSubprocessor->deleteLater();
-        return false;
+        return -1;
     }
 }
 

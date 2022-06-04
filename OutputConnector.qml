@@ -3,10 +3,14 @@ import MotionGloveInterface
 
 Item {
     id: root
+
+//    Component.onCompleted: console.log("outputconnector", mapToGlobal(x, y))
+
     //required properties dont seem to work with repeater -model
     property string parentID: "unknown" //important for identifying sender of connection
 
     property int vIdx: -1 //identifies potential subvalues; -1 means the whole datatype
+//    onVIdxChanged: console.log("node",parent.x,parent.y)
 
     property int vType: TypeHelper.Undefined // type of connection that will be initiated
 

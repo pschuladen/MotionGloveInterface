@@ -1,11 +1,13 @@
 #ifndef INPUTNODECONTROLLER_H
 #define INPUTNODECONTROLLER_H
 
-#include <QQuickItem>
+//#include <QQuickItem>
+
 #include <QtQml/qqmlregistration.h>
 #include "inputvalueviewcontroller.h"
+#include "nodeviewcontroller.h"
 
-class InputNodeController : public QQuickItem
+class InputNodeController : public NodeViewController
 {
     Q_OBJECT
     QML_ELEMENT

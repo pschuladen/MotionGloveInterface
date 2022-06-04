@@ -5,18 +5,18 @@ OutputNodeController::OutputNodeController()
 
 }
 
-const QString &OutputNodeController::uniqueId() const
-{
-    return m_uniqueId;
-}
+//const QString &OutputNodeController::uniqueId() const
+//{
+//    return m_uniqueId;
+//}
 
-void OutputNodeController::setUniqueId(const QString &newUniqueId)
-{
-    if (m_uniqueId == newUniqueId)
-        return;
-    m_uniqueId = newUniqueId;
-    emit uniqueIdChanged();
-}
+//void OutputNodeController::setUniqueId(const QString &newUniqueId)
+//{
+//    if (m_uniqueId == newUniqueId)
+//        return;
+//    m_uniqueId = newUniqueId;
+//    emit uniqueIdChanged();
+//}
 
 const QString &OutputNodeController::outputAddress() const
 {

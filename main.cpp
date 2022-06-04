@@ -53,6 +53,8 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterType<OscInputViewController>("MotionGloveInterface", 1, 0, "OscInputViewController");
     qmlRegisterType<OutputNodeController>("MotionGloveInterface", 1, 0, "OutputNodeController");
     qmlRegisterType<InputNodeController>("MotionGloveInterface", 1, 0, "InputNodeController");
+    qmlRegisterType<NodeViewController>("MotionGloveInterface", 1, 0, "NodeViewController");
+    qmlRegisterType<ConnectionViewController>("MotionGloveInterface", 1, 0, "ConnectionViewController");
 
 //    qmlRegisterType<ProcessNodeController>("MotionGloveInterface", 1, 0, "ProcessNodeController"); //obsolet
 

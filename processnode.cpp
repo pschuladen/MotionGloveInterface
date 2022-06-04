@@ -38,9 +38,9 @@ quint8 ProcessNode::process(quint8 value)
 }
 
 
-bool ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    return false;
+    return -1;
 }
 
 bool ProcessNode::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)

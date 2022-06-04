@@ -62,7 +62,7 @@ public slots:
     void slot_boolValueChanged(bool value, int frame) override;
     void slot_trigger(int frame) override;
 
-    bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
+    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
 
 signals:
     void gotNewConnectionWithType(int idx, TypeHelper::ValueType vtype);

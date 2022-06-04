@@ -4,8 +4,9 @@ import MotionGloveInterface
 InputNodeController {
 
     id: root
+    z:1
 
-    required property string uniqueId
+//    required property string uniqueId
 
     required property string inputPath
 
@@ -46,7 +47,7 @@ InputNodeController {
 
     OutputConnector {
 
-        parentID: root.uniqueId
+        parentID: root.uniqueID
 
         anchors {
             horizontalCenter: root.right
@@ -55,6 +56,9 @@ InputNodeController {
 
         vName: _typehelper.getStringForValueType(vType)
         vType: root.valueType// _typehelper.valueTypeForSensor(viewmode)
+
+
+        onYChanged: root.setOutConOffsetAtIndex(0, y)
 
     }
 }

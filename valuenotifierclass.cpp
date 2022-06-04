@@ -124,9 +124,9 @@ void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
     }
 }
 
-bool ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    return false;
+    return -1;
 }
 
 void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)

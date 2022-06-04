@@ -6,12 +6,13 @@ import QtQuick.Layouts
 import MotionGloveInterface
 
 
-Item {
+NodeViewController {
 
     id: root
     objectName: uniqueID+"-view"
 
-    required property string uniqueID //set this when creating the view
+    z:1
+//    required property string uniqueID //set this when creating the view
 
 
 
@@ -209,6 +210,8 @@ Item {
         anchors.fill: parent
         uniqueID: root.uniqueID
         connectedTypes: backend.connectedTypes
+        viewControl: root
+//        xxx: "hase"
 
     }
 }

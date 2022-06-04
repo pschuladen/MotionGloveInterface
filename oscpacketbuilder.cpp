@@ -64,14 +64,14 @@ size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
 }
 
 
-bool OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
     if (valueInputConnected) return false;
 
     typedef TypeHelper::ValueType _vt;
     if(type == _vt::BoolValue || type==_vt::Undefined || type==_vt::Trigger ) {
         unimplementedValueTypeWarning(type);
-        return false;
+        return -1;
     }
 //    qDebug() << "connection request in thread" << QThread::currentThread();
 //    qDebug() << "this object thread" << this->thread();
@@ -84,7 +84,7 @@ bool OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeH
     emit gotNewConnectionWithType(oscMessIdx(), type);
     connectValueTypeSignalToSlot(sender, this, type);
 
-    return true;
+    return 0;
 }
 
 void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)

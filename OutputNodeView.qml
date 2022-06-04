@@ -10,6 +10,7 @@ OutputNodeController {
 //    property string outputaddress: ""
 
 //    property int valueType: 0
+    z: 1
 
     height: outputAddressLabel.implicitHeight +10
     width: outputAddressLabel.implicitWidth + 18
@@ -48,7 +49,7 @@ OutputNodeController {
     }
 
     InputConnector {
-        parentID: root.uniqueId
+        parentID: root.uniqueID
 
         anchors {
             horizontalCenter: root.left
@@ -57,5 +58,8 @@ OutputNodeController {
 
         vName: _typehelper.getStringForValueType(root.valueType)
         vType: root.valueType
+
+        onYChanged: root.setInConOffsetAtIndex(0, y)
+
     }
 }

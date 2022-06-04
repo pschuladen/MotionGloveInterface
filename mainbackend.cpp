@@ -55,7 +55,7 @@ bool MainBackend::createProcessingNodeDrop(QPoint atPosition, int type)//float p
         return false;
     }
     QString _id = createUniqueId(TypeHelper::Process); //name = QString("proc-%1").arg(processingNodes.size());
-    QQuickItem *newProcessingView = qobject_cast<QQuickItem*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", _id},
+    NodeViewController *newProcessingView = qobject_cast<NodeViewController*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", _id},
                                                                                                                   {"x", atPosition.x()-40},
                                                                                                                   {"y", atPosition.y()-20}}));
 
@@ -82,7 +82,7 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
     QString _id = createUniqueId(TypeHelper::Output);
 
 
-    OutputNodeController *newOutPutNode = qobject_cast<OutputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueId", _id},
+    OutputNodeController *newOutPutNode = qobject_cast<OutputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", _id},
                                                                                                           {"outputAddress", oscOutputDevices.value(targetDevice).viewController->oscPaths().at(outputIndex)},
                                                                                                           {"x", atPoint.x()-30},
                                                                                                           {"y", atPoint.y()-10}}));
@@ -141,20 +141,55 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         qWarning() << "no sending and/or receiving notifier found!";
         return false;
     }
+    QString connectionId = senderNodeId+"-*-"+receiverNodeId;
+    if(allConnections.contains(connectionId)) {
+        qInfo() << "connection already exists";
+        return false;
+    }
+    int _rcvIdx = receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
+    if(_rcvIdx < 0) {
+        qWarning() << "receiver does not accept connection";
+        return false;
+    }
 
-//TODO: for now the controller (living in main thread is responsible for managing connections...
-    // so no sig/slot necessary
-    //    connect(this, &MainBackend::sig_connectRequestFromSender, receivingNotifier, &ValueNotifierClass::newConnectionFromSender, Qt::SingleShotConnection);
-    //    emit sig_connectRequestFromSender(sendingNotifier, valueType);
+    QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/ConnectionView.qml")));
+    if(newDeviceComponent.isError()) {
+        qWarning() << "connectionview error" << newDeviceComponent.errorString();
+        return false;
+    }
+//    qDebug() << "indices" << sourceValueIdx << targetValueIdx;
+    ConnectionViewController *newConnectionView = qobject_cast<ConnectionViewController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", connectionId},
+                                                                                                                                          {"valueType", valueType}}));
+//    qDebug() << "set indices" << newConnectionView->sourceIdx() << newConnectionView->targetIdx();
+    if(newConnectionView == nullptr) {
+        qWarning() << "ERROR! while creating connecitonview";
+        return false;
+    }
 
-    //    bool acceptsConnection = receivingNotifier->acceptsInputType(valueType);
-    bool acceptsConnection = receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
 
-    allConnections.insert(senderNodeId+"-"+receiverNodeId, ValueConnection(
+//    qDebug() << "viewcreation successfull";
+
+    if(!newConnectionView->initialSetup(allConnectableObjects.value(senderNodeId).qmlView, qMax(sourceValueIdx, 0),
+                                    allConnectableObjects.value(receiverNodeId).qmlView, qMax(_rcvIdx, 0)))
+    {
+        qWarning() << "Initial connection setup failed";
+        return false;
+    }
+
+//    newConnectionView->setSourceView(allConnectableObjects.value(senderNodeId).qmlView);
+//    newConnectionView->setTargetView(allConnectableObjects.value(receiverNodeId).qmlView);
+//    newConnectionView->setSourceIdx(qMax(sourceValueIdx, 0));
+//    newConnectionView->setTargetIdx(qMax(_rcvIdx, 0));
+//    newConnectionView->setSigSlotConnections();
+
+
+    allConnections.insert(connectionId, ValueConnection(
                               senderNodeId, sourceValueIdx, receiverNodeId, targetValueIdx,
-                              valueType));
+                              valueType, newConnectionView));
+//    qDebug() << "set parent item for connection";
+    newConnectionView->setParentItem(processingGraphView);
 
-    return acceptsConnection;
+    return true;
 }
 
 bool MainBackend::createOscOutputDevice()
@@ -207,7 +242,7 @@ bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QStr
     }
     QString _id = createUniqueId(TypeHelper::Input);
 
-    InputNodeController *inputNodeViewCtrl = qobject_cast<InputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueId", _id},
+    InputNodeController *inputNodeViewCtrl = qobject_cast<InputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", _id},
                                                                                                           {"inputPath", inputPath},
                                                                                                           {"sourceDevice", sourceDevice},
                                                                                                           {"valueType", valType},

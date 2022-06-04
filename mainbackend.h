@@ -35,6 +35,8 @@
 #include "oscinputviewcontroller.h"
 #include "outputnodecontroller.h"
 #include "inputnodecontroller.h"
+#include "connectionviewcontroller.h"
+#include "nodeviewcontroller.h"
 
 #include "typehelper.h"
 
@@ -94,8 +96,8 @@ private:
     struct ProcessingNode {
         ProcessNode* controller;
         QList<ProcessNode*> processor;
-        QQuickItem* qmlView;
-        ProcessingNode(ProcessNode* _viewContr, QQuickItem *_qmlV, QList<ProcessNode*> _processor=QList<ProcessNode*>())
+        NodeViewController* qmlView;
+        ProcessingNode(ProcessNode* _viewContr, NodeViewController *_qmlV, QList<ProcessNode*> _processor=QList<ProcessNode*>())
             : controller{_viewContr}, processor{_processor}, qmlView{_qmlV} {}
         ProcessingNode() {}
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
@@ -103,22 +105,22 @@ private:
     QHash<QString, ProcessingNode> processingNodes;
 
     struct InputNode {
-        QQuickItem *qmlView;
+        InputNodeController *qmlView;
         QString inputDevice;
         QString inputAddress;
-        InputNode(QQuickItem *_qmlView, QString _inputDevice, QString _inputAddress)
+        InputNode(InputNodeController *_qmlView, QString _inputDevice, QString _inputAddress)
             : qmlView{_qmlView}, inputDevice{_inputDevice}, inputAddress{_inputAddress} {}
         InputNode() {}
     };
     QMap<QString, InputNode> inputNodes;
 
     struct OutputNode {
-        QQuickItem *qmlView;
+        OutputNodeController *qmlView;
         //QList<QString> outputDevice;
         QString outputDevice;
         //QList<QString> outputAddress;
         quint16 outputIndex;
-        OutputNode(QQuickItem *_qmlView, QString _outputDevice, quint16 _outputIndex)
+        OutputNode(OutputNodeController *_qmlView, QString _outputDevice, quint16 _outputIndex)
             : qmlView{_qmlView}, outputDevice{_outputDevice}, outputIndex{_outputIndex} {}
         OutputNode() {}
     };
@@ -127,11 +129,11 @@ private:
 
     struct ConnectableObject {
         ValueNotifierClass *notifier;
-        QQuickItem *qmlView;
+        NodeViewController *qmlView;
         TypeHelper::NodeType nodeType;
         QList<QString> receivingConnections;
         QList<QSet<QString>> sendConnections;
-        ConnectableObject(ValueNotifierClass *_notifier, QQuickItem *_qmlView, TypeHelper::NodeType _nodeType)
+        ConnectableObject(ValueNotifierClass *_notifier, NodeViewController *_qmlView, TypeHelper::NodeType _nodeType)
             :notifier{_notifier}, qmlView{_qmlView}, nodeType{_nodeType} {}
         ConnectableObject() {}
     };
@@ -144,10 +146,10 @@ private:
         QString receiverId;
         int receiverIdx;
         TypeHelper::ValueType valType;
-        QQuickItem *connectionView;
+        ConnectionViewController *connectionView;
         ValueConnection(QString _sourceId, int _sourceIdx,
                         QString _receiverId, int _receiverIdx,
-                        TypeHelper::ValueType _valType, QQuickItem *_connectionView=nullptr)
+                        TypeHelper::ValueType _valType, ConnectionViewController *_connectionView=nullptr)
             : sourceId{_sourceId}, sourceIdx{_sourceIdx},
               receiverId{_receiverId}, receiverIdx{_receiverIdx},
               valType{_valType}, connectionView{_connectionView} {}

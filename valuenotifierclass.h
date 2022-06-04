@@ -119,7 +119,7 @@ public slots:
      virtual void slot_trigger(int frame=-1);
 
      virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier=true);
-     virtual bool newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+     virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
 };
 
 #endif // VALUENOTIFIERCLASS_H

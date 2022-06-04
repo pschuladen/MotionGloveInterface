@@ -1,17 +1,18 @@
 #ifndef OUTPUTNODECONTROLLER_H
 #define OUTPUTNODECONTROLLER_H
 
-#include <QQuickItem>
+//#include <QQuickItem>
 #include <QtQml/qqmlregistration.h>
 
+#include "nodeviewcontroller.h"
 #include "typehelper.h"
 
-class OutputNodeController : public QQuickItem
+class OutputNodeController : public NodeViewController
 {
     Q_OBJECT
     QML_ELEMENT
 
-    Q_PROPERTY(QString uniqueId READ uniqueId WRITE setUniqueId NOTIFY uniqueIdChanged)
+//    Q_PROPERTY(QString uniqueId READ uniqueId WRITE setUniqueId NOTIFY uniqueIdChanged)
     Q_PROPERTY(QString outputAddress READ outputAddress WRITE setOutputAddress NOTIFY outputAddressChanged)
     Q_PROPERTY(TypeHelper::ValueType valueType READ valueType WRITE setValueType NOTIFY valueTypeChanged)
     Q_PROPERTY(quint32 targetIdx READ targetIdx WRITE setTargetIdx NOTIFY targetIdxChanged)
@@ -22,8 +23,8 @@ class OutputNodeController : public QQuickItem
 public:
     OutputNodeController();
 
-    const QString &uniqueId() const;
-    void setUniqueId(const QString &newUniqueId);
+//    const QString &uniqueId() const;
+//    void setUniqueId(const QString &newUniqueId);
 
     const QString &outputAddress() const;
 
