@@ -63,6 +63,7 @@ public slots:
     void slot_trigger(int frame) override;
 
     int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
+    void inputsDisconnected() override;
 
 signals:
     void gotNewConnectionWithType(int idx, TypeHelper::ValueType vtype);

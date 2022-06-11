@@ -142,4 +142,13 @@ ValueNotifierClass *ProcessNode::getNotifier(int idx)
     else return nullptr;
 }
 
+void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
+{
+    qDebug() << this << subProcessor;
+    subProcessor.at(idx)->deleteLater();
+    subProcessor.removeAt(idx);
+    m_connectedTypes.removeAt(idx);
+    emit connectedTypesChanged(connectedTypes());
+}
+
 

@@ -56,7 +56,7 @@ public:
 
     virtual ValueNotifierClass* getNotifier(int idx=-1) override;
 
-
+    virtual void deleteSubprocessorAtIdx(quint16 idx);
 
 protected:
     QList<ProcessNode*> subProcessor;

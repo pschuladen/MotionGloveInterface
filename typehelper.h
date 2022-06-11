@@ -35,7 +35,7 @@ public:
     Q_ENUM(NodeConnectionType);
 
     enum NodeType: quint8 {
-        Generic, Gui, Input, Process, Output, Audio, Audiocontroller, OscInput, OscOutput
+        Generic, Gui, Input, Process, Output, Audio, Audiocontroller, OscInput, OscOutput, Connection
     };
     Q_ENUM(NodeType);
 

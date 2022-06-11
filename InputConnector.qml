@@ -1,5 +1,6 @@
 import QtQuick
 import MotionGloveInterface
+import QtQuick.Controls
 
 Item {
     id:root
@@ -34,6 +35,12 @@ Item {
             id: inConnectorMa
             anchors.fill: parent
             hoverEnabled: true
+            acceptedButtons: Qt.RightButton | Qt.LeftButton
+            onClicked: (mouse) => {
+                           if(mouse.button === Qt.RightButton) {
+                               contextMenu.popup()
+                           }
+                       }
         }
 
 
@@ -41,7 +48,7 @@ Item {
             id: inDrop
             enabled: root.dropAreaEnabled
             anchors.fill: parent
-            anchors.margins: -4
+            anchors.margins: -8
             keys: ["valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]"nodeId",
 //            onEntered:(drag) =>  console.log(drag.keys)
             onDropped: (drop) => {
@@ -59,6 +66,14 @@ Item {
                            }
                        }
 
+        }
+
+    }
+    Menu {
+        width: 80
+        id: contextMenu
+        MenuItem {text: "del connection"
+            onClicked: _mbackend.deleteReceiveConnectionForObjectAtIdx(root.parentID, vIdx)
         }
     }
 }

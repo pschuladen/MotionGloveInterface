@@ -129,6 +129,11 @@ int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, Type
     return -1;
 }
 
+void ValueNotifierClass::inputsDisconnected()
+{
+    setConnectedValueType(TypeHelper::Undefined, false);
+}
+
 void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)
 {
     if(m_autoEmit) callQuatChanged(quat, frame);

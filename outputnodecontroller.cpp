@@ -38,6 +38,7 @@ const TypeHelper::ValueType &OutputNodeController::valueType() const
 
 void OutputNodeController::setValueType(const TypeHelper::ValueType &newValueType)
 {
+    qDebug() << "outputnode controller value type" << newValueType;
     if (m_valueType == newValueType)
         return;
     m_valueType = newValueType;

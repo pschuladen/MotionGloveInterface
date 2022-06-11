@@ -66,7 +66,7 @@ size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
 
 int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    if (valueInputConnected) return false;
+    if (valueInputConnected) return -1;
 
     typedef TypeHelper::ValueType _vt;
     if(type == _vt::BoolValue || type==_vt::Undefined || type==_vt::Trigger ) {
@@ -75,6 +75,9 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
     }
 //    qDebug() << "connection request in thread" << QThread::currentThread();
 //    qDebug() << "this object thread" << this->thread();
+
+
+    qDebug() << "oscpacketbuilder new connection request" << type;
 
     setConnectedValueType(type, false);
     valueInputConnected = true;
@@ -85,6 +88,12 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
     connectValueTypeSignalToSlot(sender, this, type);
 
     return 0;
+}
+
+void OscPacketBuilder::inputsDisconnected()
+{
+    setConnectedValueType(TypeHelper::Undefined, false);
+    valueInputConnected = false;
 }
 
 void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)

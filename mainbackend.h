@@ -65,8 +65,15 @@ public:
     Q_INVOKABLE bool createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex,
                                          TypeHelper::ValueType valType=TypeHelper::Undefined, int subIdx=-1);
 
+    Q_INVOKABLE bool deleteObjectWithId(const QString uniqueID);
+    Q_INVOKABLE bool deleteConnectionWithId(const QString uniqueID);
+    Q_INVOKABLE bool deleteSendConnectionsForObjectAtIdx(const QString uniqueID, int idx);
+    Q_INVOKABLE bool deleteReceiveConnectionForObjectAtIdx(const QString uniqueID, int idx);
+
 
     Q_INVOKABLE QString createUniqueId(TypeHelper::NodeType forNodeType);
+    Q_INVOKABLE void showConnectionLists(QString objectID);
+
 
 private:
     struct NodesData {
@@ -132,10 +139,17 @@ private:
         NodeViewController *qmlView;
         TypeHelper::NodeType nodeType;
         QList<QString> receivingConnections;
+        const QList<QString> getRcvCon() {return receivingConnections;}
         QList<QSet<QString>> sendConnections;
         ConnectableObject(ValueNotifierClass *_notifier, NodeViewController *_qmlView, TypeHelper::NodeType _nodeType)
             :notifier{_notifier}, qmlView{_qmlView}, nodeType{_nodeType} {}
         ConnectableObject() {}
+//        ~ConnectableObject() {
+//            qDebug() << "deleting connectable object" << notifier << qmlView;
+
+////            qmlView->deleteLater();
+////            notifier->deleteLater();
+//        };
     };
     QMap<QString, ConnectableObject> allConnectableObjects;
 
@@ -143,8 +157,17 @@ private:
     struct ValueConnection {
         QString sourceId;
         int sourceIdx;
+        void setSourceIdx(int idx) {
+            sourceIdx = idx;
+            connectionView->setSourceIdx(idx);
+        }
         QString receiverId;
         int receiverIdx;
+        void setReceiverIdx(int idx) {
+            receiverIdx = idx;
+            connectionView->setTargetIdx(idx);
+        }
+
         TypeHelper::ValueType valType;
         ConnectionViewController *connectionView;
         ValueConnection(QString _sourceId, int _sourceIdx,
@@ -156,6 +179,8 @@ private:
         ValueConnection() {}
     };
     QMap<QString, ValueConnection> allConnections;
+
+    void updateConnectionIndices(ConnectableObject &cobject, quint16 startIdx = 0);
 
 
     struct OscOutDeviceStruct {
@@ -194,6 +219,8 @@ signals:
     void inputViewReady();
     void sig_connectRequestFromSender(ValueNotifierClass *sender, TypeHelper::ValueType valType, quint16 nValues=0);
     void deviceWithNameCreated(QString deviceName, QString deviceId);
+
+    void sig_connectionDisconnected();
 
 public slots:
 

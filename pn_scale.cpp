@@ -80,9 +80,12 @@ void PN_Scale::setOutHigh(float newOutHigh)
 
 int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    if(!acceptsInputType(type)) return false;
+    if(!acceptsInputType(type)) return -1;
 
     PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
+    connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
+
+    qDebug() << "newconnection subprocessors" << this << subProcessor;
 
     appendToConnectedTypes(type);
     if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {

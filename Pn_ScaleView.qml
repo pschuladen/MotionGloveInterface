@@ -47,8 +47,18 @@ NodeViewController {
             anchors {
                 fill: outerShape
             }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             hoverEnabled: true
-            onClicked: focus=true
+            onClicked: (mouse) => {
+                           focus=true
+                           if(mouse.button === Qt.RightButton) {
+                               contextMenu.popup()
+                           }
+                           if(mouse.button === Qt.LeftButton) {
+                               _mbackend.showConnectionLists(root.uniqueID);
+
+                           }
+            }
             drag.target: root
         }
 
@@ -212,6 +222,16 @@ NodeViewController {
         connectedTypes: backend.connectedTypes
         viewControl: root
 //        xxx: "hase"
+
+    }
+
+    Menu {
+        width: 80
+        id: contextMenu
+        MenuItem {text: "delete"
+            onClicked: _mbackend.deleteObjectWithId(root.uniqueID)
+        }
+//        MenuItem {text: "do something good"}
 
     }
 }

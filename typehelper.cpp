@@ -70,6 +70,8 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
 QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
 {
     switch(nodeType){
+    case TypeHelper::Connection:
+        return "con";
     case TypeHelper::OscInput:
         return "oscin";
     case TypeHelper::OscOutput:

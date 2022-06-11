@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import MotionGloveInterface
 
 InputNodeController {
@@ -43,6 +44,12 @@ InputNodeController {
         anchors.fill:root
         hoverEnabled: true
         onContainsMouseChanged: root.mouseHover = containsMouse
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: (mouse) => {
+                       if(mouse.button === Qt.RightButton) {
+                           contextMenu.popup()
+                       }
+                   }
     }
 
     OutputConnector {
@@ -60,5 +67,14 @@ InputNodeController {
 
         onYChanged: root.setOutConOffsetAtIndex(0, y)
 
+//        vIdx: 0
+
+    }
+    Menu {
+        width: 80
+        id: contextMenu
+        MenuItem {text: "delete"
+            onClicked: _mbackend.deleteObjectWithId(root.uniqueID)
+        }
     }
 }

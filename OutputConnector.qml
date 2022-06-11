@@ -1,5 +1,6 @@
 import QtQuick
 import MotionGloveInterface
+import QtQuick.Controls
 
 Item {
     id: root
@@ -43,9 +44,15 @@ Item {
         MouseArea {
             id: conectorMouseArea
             anchors.fill: parent
-            anchors.margins: -2
+            anchors.margins: -4
             hoverEnabled: true
             drag.target: draggableItem
+            acceptedButtons: Qt.RightButton | Qt.LeftButton
+            onClicked: (mouse) => {
+                           if(mouse.button === Qt.RightButton) {
+                               contextMenu.popup()
+                           }
+                       }
         }
         Item {
 
@@ -64,6 +71,13 @@ Item {
                 "valueIndex": root.vIdx}
 //                "sourceObjectId": sourceObjectId}
 
+        }
+    }
+    Menu {
+        width: 80
+        id: contextMenu
+        MenuItem {text: "del connections"
+            onClicked: _mbackend.deleteSendConnectionsForObjectAtIdx(root.parentID, vIdx)
         }
     }
 }

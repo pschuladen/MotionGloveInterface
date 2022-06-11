@@ -65,14 +65,14 @@ bool MainBackend::createProcessingNodeDrop(QPoint atPosition, int type)//float p
     processingNodes.insert(_id.toUtf8(), ProcessingNode(viewBackend, newProcessingView));
     allConnectableObjects.insert(_id.toUtf8(), ConnectableObject(viewBackend, newProcessingView, TypeHelper::Process));
     connect(viewBackend, &ProcessNode::newSubprocessorWasCreated, this, &MainBackend::moveSubprocessorToProcessThread);
-
+    qDebug() << "going out of scope";
     return true;
 }
 
 bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex, TypeHelper::ValueType valType, int subIdx)
 {
     qInfo() << atPoint << targetDevice << outputIndex << valType << subIdx;
-//    qWarning() << "create ouput node drop not implemented";
+
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/OutputNodeView.qml")));
     if(newDeviceComponent.isError()) {
         qWarning() << "ERROR! while creating output node" << newDeviceComponent.errorString();
@@ -90,12 +90,14 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
         qWarning() << "ERROR! could not create outputnode view";
         return false;
     }
-
+    qDebug() << "oscoutputdevices" << oscOutputDevices.keys();
+    qDebug() << "oscsender" << oscOutputDevices.value(targetDevice).oscSender;
     OscPacketBuilder *outputNotifier = qobject_cast<OscPacketBuilder*>(oscOutputDevices.value(targetDevice).oscSender->getNotifier(outputIndex));
     if(outputNotifier == nullptr) {
         qWarning() << "ERROR! could not find output notifier";
         return false;
     }
+    qDebug() << "outputnode connecting to packetbuilder";
 
     connect(outputNotifier, &ValueNotifierClass::connectedValueTypeChanged, newOutPutNode, &OutputNodeController::setValueType);
     connect(outputNotifier, &OscPacketBuilder::oscAddressChanged, newOutPutNode, &OutputNodeController::setOutputAddress);
@@ -110,9 +112,143 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
     allConnectableObjects.insert(_id, ConnectableObject(outputNotifier, newOutPutNode, TypeHelper::Output));
     outputNodes.insert(_id, OutputNode(newOutPutNode, targetDevice, outputIndex));
 //    oscOutputDevices[targetDevice].;
+    qDebug() << "outputnode created, setting parentItem";
 
     newOutPutNode->setParentItem(processingGraphView);
 
+
+    return true;
+}
+
+bool MainBackend::deleteObjectWithId(const QString uniqueID)
+{
+    qDebug() << "delete request" << uniqueID << allConnectableObjects.contains(uniqueID);
+    qDebug() << "Pointers" << allConnectableObjects.value(uniqueID).qmlView << allConnectableObjects.value(uniqueID).notifier;
+
+    if(!allConnectableObjects.contains(uniqueID)) {
+        qWarning() << "Object to delete not found" << uniqueID;
+        return false;
+    }
+
+    const ConnectableObject &_delObj = allConnectableObjects.value(uniqueID);
+
+    for(const QString &_cid: _delObj.receivingConnections) {
+        deleteConnectionWithId(_cid);
+//        allConnections.value(_cid).connectionView->deleteLater();
+//        allConnections.remove(_cid);
+    }
+    for (const QSet<QString> &_cset: _delObj.sendConnections) {
+        for(const QString &_cid: _cset) {
+            deleteConnectionWithId(_cid);
+//            allConnections.value(_cid).connectionView->deleteLater();
+//            allConnections.remove(_cid);
+        }
+    }
+    switch (_delObj.nodeType) {
+
+    case TypeHelper::Input:
+        inputNodes.remove(uniqueID);
+        break;
+    case TypeHelper::Process:
+        processingNodes.remove(uniqueID);
+        break;
+    case TypeHelper::Output:
+        outputNodes.remove(uniqueID);
+        break;
+    default:
+        break;
+
+    }
+
+
+    _delObj.qmlView->deleteLater();
+
+    if(_delObj.nodeType != TypeHelper::Output)
+        _delObj.notifier->deleteLater();
+
+    allConnectableObjects.remove(uniqueID);
+
+    qDebug() << "all connectable objects size" << allConnectableObjects.size();
+
+    return true;
+}
+
+bool MainBackend::deleteConnectionWithId(const QString uniqueID)
+{
+    const ValueConnection &_co = allConnections.value(uniqueID);
+    ConnectableObject &_sendObj = allConnectableObjects[_co.sourceId];
+    ConnectableObject &_rcvObj = allConnectableObjects[_co.receiverId];
+
+    QSet<QString> &_sendCon = _sendObj.sendConnections[_co.sourceIdx];
+
+    _sendCon.remove(uniqueID);
+    qDebug() << "removed send";
+    _rcvObj.receivingConnections[_co.receiverIdx] = "";
+    qDebug() << "removed receive";
+    if(_sendObj.nodeType == TypeHelper::Process) {
+        if(_sendCon.isEmpty() && _sendObj.receivingConnections.value(_co.sourceIdx, "") == "") {
+            qDebug() << "remove stuff at sendobject";
+            _sendObj.receivingConnections.removeAt(_co.sourceIdx);
+            _sendObj.sendConnections.removeAt(_co.sourceIdx);
+
+            updateConnectionIndices(_sendObj, _co.sourceIdx);
+            qobject_cast<ProcessNode*>(_sendObj.notifier)->deleteSubprocessorAtIdx(_co.sourceIdx);
+        }
+    }
+
+    if(_rcvObj.nodeType == TypeHelper::Process) {
+        if(_rcvObj.receivingConnections.value(_co.receiverIdx, "") == "" && _rcvObj.sendConnections.value(_co.receiverIdx).isEmpty()) {
+            qDebug() << "remove stuff at receiveobject";
+            qDebug() << "rcvObj rcvConnections" << _rcvObj.receivingConnections;
+            _rcvObj.sendConnections.removeAt(_co.receiverIdx);
+            _rcvObj.receivingConnections.removeAt(_co.receiverIdx);
+            qDebug() << "rcvObj rcvConnections" << _rcvObj.receivingConnections;
+
+            updateConnectionIndices(_rcvObj, _co.receiverIdx);
+            qobject_cast<ProcessNode*>(_rcvObj.notifier)->deleteSubprocessorAtIdx(_co.receiverIdx);
+        }
+    }
+    if(_rcvObj.nodeType == TypeHelper::Output) {
+        if(_rcvObj.receivingConnections.size() > _co.receiverIdx) {
+            _rcvObj.receivingConnections.removeAt(_co.receiverIdx);
+            connect(this, &MainBackend::sig_connectionDisconnected, _rcvObj.notifier, &ValueNotifierClass::inputsDisconnected, Qt::SingleShotConnection);
+            emit sig_connectionDisconnected();
+        }
+    }
+
+    _co.connectionView->deleteLater();
+    allConnections.remove(uniqueID);
+
+    return true;
+}
+
+bool MainBackend::deleteSendConnectionsForObjectAtIdx(const QString uniqueID, int idx)
+{
+    if(!allConnectableObjects.contains(uniqueID)) return false;
+    ConnectableObject _cObj = allConnectableObjects[uniqueID];
+
+    qDebug() << "deleting connections" << uniqueID << idx;
+    qDebug() << _cObj.sendConnections;
+    int _idx = qMax(idx, 0);
+    if(_idx >= _cObj.sendConnections.length()) return false;
+
+//    QSet<QString> _connections = _cObj.sendConnections[idx];
+    for(const QString &_conId: _cObj.sendConnections.at(_idx)) {
+//    for(const QString &_conId: _connections) {
+        qDebug() << "deleting" << _conId;
+        deleteConnectionWithId(_conId);
+    }
+    return true;
+}
+
+bool MainBackend::deleteReceiveConnectionForObjectAtIdx(const QString uniqueID, int idx)
+{
+    if(!allConnectableObjects.contains(uniqueID)) return false;
+    ConnectableObject _cObj = allConnectableObjects[uniqueID];
+    int _idx = qMax(idx, 0);
+    if(_idx >= _cObj.receivingConnections.length()) return false;
+
+    deleteConnectionWithId(_cObj.receivingConnections.at(_idx));
 
     return true;
 }
@@ -128,11 +264,13 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         qWarning() << "no objects found for connection";
         return false;
     }
-    //TODO: create ConnectionView/Object
-    ValueNotifierClass *sendingNotifier = allConnectableObjects[senderNodeId].notifier->getNotifier(sourceValueIdx);
-    ValueNotifierClass *receivingNotifier = allConnectableObjects[receiverNodeId].notifier->getNotifier(targetValueIdx);
-//    qDebug() << allConnectableObjects[senderNodeId].notifier << sendingNotifier;
-//    qDebug() << valueType;
+
+
+    ConnectableObject &_srcObj = allConnectableObjects[senderNodeId];
+    ConnectableObject &_rcvObj = allConnectableObjects[receiverNodeId];
+    ValueNotifierClass *sendingNotifier = _srcObj.notifier->getNotifier(sourceValueIdx);
+    ValueNotifierClass *receivingNotifier = _rcvObj.notifier->getNotifier(targetValueIdx);
+    qDebug() << "receiving notifier" << receivingNotifier;
 
     if (sendingNotifier == nullptr || receivingNotifier == nullptr) {
         qWarning() << "Connection request" << senderNodeId << sourceValueIdx << senderConnector <<
@@ -141,53 +279,59 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         qWarning() << "no sending and/or receiving notifier found!";
         return false;
     }
-    QString connectionId = senderNodeId+"-*-"+receiverNodeId;
+    QString connectionId = createUniqueId(TypeHelper::Connection);//senderNodeId+"-*-"+receiverNodeId;
     if(allConnections.contains(connectionId)) {
         qInfo() << "connection already exists";
         return false;
     }
+
     int _rcvIdx = receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
+    qDebug() << "receive idx" << _rcvIdx;
     if(_rcvIdx < 0) {
         qWarning() << "receiver does not accept connection";
         return false;
     }
+    int _srcIdx = qMax(sourceValueIdx, 0);
 
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/ConnectionView.qml")));
     if(newDeviceComponent.isError()) {
         qWarning() << "connectionview error" << newDeviceComponent.errorString();
         return false;
     }
-//    qDebug() << "indices" << sourceValueIdx << targetValueIdx;
     ConnectionViewController *newConnectionView = qobject_cast<ConnectionViewController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", connectionId},
                                                                                                                                           {"valueType", valueType}}));
-//    qDebug() << "set indices" << newConnectionView->sourceIdx() << newConnectionView->targetIdx();
     if(newConnectionView == nullptr) {
         qWarning() << "ERROR! while creating connecitonview";
         return false;
     }
 
 
-//    qDebug() << "viewcreation successfull";
-
-    if(!newConnectionView->initialSetup(allConnectableObjects.value(senderNodeId).qmlView, qMax(sourceValueIdx, 0),
-                                    allConnectableObjects.value(receiverNodeId).qmlView, qMax(_rcvIdx, 0)))
+    if(!newConnectionView->initialSetup(_srcObj.qmlView, _srcIdx,
+                                    _rcvObj.qmlView, _rcvIdx))
     {
         qWarning() << "Initial connection setup failed";
         return false;
     }
 
-//    newConnectionView->setSourceView(allConnectableObjects.value(senderNodeId).qmlView);
-//    newConnectionView->setTargetView(allConnectableObjects.value(receiverNodeId).qmlView);
-//    newConnectionView->setSourceIdx(qMax(sourceValueIdx, 0));
-//    newConnectionView->setTargetIdx(qMax(_rcvIdx, 0));
-//    newConnectionView->setSigSlotConnections();
-
-
     allConnections.insert(connectionId, ValueConnection(
-                              senderNodeId, sourceValueIdx, receiverNodeId, targetValueIdx,
+                              senderNodeId, _srcIdx, receiverNodeId, _rcvIdx,
                               valueType, newConnectionView));
-//    qDebug() << "set parent item for connection";
+
+    if(_srcObj.sendConnections.size() <= _srcIdx) _srcObj.sendConnections.resize(_srcIdx+1);
+    _srcObj.sendConnections[_srcIdx].insert(connectionId);
+
+    if(_rcvObj.receivingConnections.size() <= _rcvIdx ) _rcvObj.receivingConnections.resize(_rcvIdx+1);
+    _rcvObj.receivingConnections[_rcvIdx] =  connectionId;
+
+    if(_rcvObj.nodeType == TypeHelper::Process && _rcvObj.sendConnections.size() <= _rcvIdx) {
+         _rcvObj.sendConnections.resize(_rcvIdx+1);
+    }
+
     newConnectionView->setParentItem(processingGraphView);
+
+    qDebug() << "connection list size" << allConnectableObjects[receiverNodeId].sendConnections.size() << allConnectableObjects[receiverNodeId].receivingConnections.size();
+    qDebug() << "sender node size" << allConnectableObjects.value(senderNodeId).sendConnections;
+
 
     return true;
 }
@@ -299,6 +443,22 @@ MainBackend::ThreadRole MainBackend::threadRoleForNodeType(TypeHelper::NodeType 
     }
 }
 
+void MainBackend::updateConnectionIndices(ConnectableObject &cobject, quint16 startIdx)
+{
+    qDebug() << "update receive indices for object"<< cobject.receivingConnections.length() << startIdx;
+    qDebug() << "all connections" << allConnections.keys();
+    qDebug() << "receiving connections" << cobject.receivingConnections;
+    for(int i = startIdx; i < cobject.receivingConnections.length(); i++) {
+        allConnections[cobject.receivingConnections.at(i)].setReceiverIdx(i);
+    }
+    qDebug() << "update send indices for object" << cobject.sendConnections.length() << startIdx;
+    for(int i = startIdx; i < cobject.sendConnections.length(); i++) {
+        for(const QString &_cid: cobject.sendConnections.at(i)) {
+            allConnections[_cid].setSourceIdx(i);
+        }
+    }
+}
+
 QString MainBackend::createUniqueId(TypeHelper::NodeType nodeType)
 {
     QString _tmpId = TypeHelper::getPrefixForNodetype(nodeType).append("-%1");
@@ -325,6 +485,9 @@ QString MainBackend::createUniqueId(TypeHelper::NodeType nodeType)
         else if(nodeType == TypeHelper::OscInput) {
             idOk = !oscInputDevices.contains(_tmpId2) && !allConnectableObjects.contains(_tmpId2);
         }
+        else if(nodeType == TypeHelper::Connection) {
+            idOk = !allConnections.contains(_tmpId2);
+        }
         else {
             idOk = !allConnectableObjects.contains(_tmpId2);
         }
@@ -332,6 +495,13 @@ QString MainBackend::createUniqueId(TypeHelper::NodeType nodeType)
     }
 //    qInfo() << _tmpId2;
     return _tmpId2;
+}
+
+void MainBackend::showConnectionLists(QString objectID)
+{
+    ConnectableObject _obj = allConnectableObjects[objectID];
+    qDebug() << "send connections for objects" << objectID << _obj.sendConnections;
+    qDebug() << "receive connections for obejct" << objectID << _obj.receivingConnections;
 }
 
 
@@ -401,7 +571,6 @@ void MainBackend::createSensorViewsForMotionDevice(const QString sendername, con
         newValDevice->setParentItem(parentForSensorView);
 //        allConnectableObjects.insert(sensor->identifier, ConnectableObject(sensor->oscHandler, newValDevice, TypeHelper::Input));
     }
-
 }
 
 void MainBackend::moveObjectToThread(QObject *obj, TypeHelper::NodeType nodeType)

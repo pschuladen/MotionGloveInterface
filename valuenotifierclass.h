@@ -120,6 +120,8 @@ public slots:
 
      virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier=true);
      virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+
+     virtual void inputsDisconnected();
 };
 
 #endif // VALUENOTIFIERCLASS_H

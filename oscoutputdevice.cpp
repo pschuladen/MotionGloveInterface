@@ -150,6 +150,7 @@ void OscOutputDevice::sendOscMsgBuffer(const QByteArray &oscBuffer, size_t msgSi
 
 ValueNotifierClass *OscOutputDevice::getNotifier(int idx)
 {
+    qDebug() << "OSCoutputdevice notifier" << packetBuilder;
     if (idx < packetBuilder.size()) return packetBuilder.at(idx);
     else return nullptr;
 }
