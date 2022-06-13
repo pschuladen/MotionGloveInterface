@@ -49,6 +49,7 @@ public:
 
     const TypeHelper::ValueType &connectedValueType() const;
 
+    static bool completeConnectValueNotifier(const ValueNotifierClass* sender, const ValueNotifierClass *receiver);
     static bool connectValueTypeSignalToSlot(const ValueNotifierClass* sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType);
     static bool disconnectValueTypeSignalToSlot(const ValueNotifierClass* sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType);
 
@@ -84,7 +85,7 @@ private:
 
     quint16 m_valueNumber;
 
-    bool m_supportsSubValues;
+    bool m_supportsSubValues = false;
 
     QByteArray m_identifier;
 
@@ -118,7 +119,7 @@ public slots:
      virtual void slot_boolValueChanged(bool value, int frame=-1);
      virtual void slot_trigger(int frame=-1);
 
-     virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier=true);
+     virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
      virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
 
      virtual void inputsDisconnected();

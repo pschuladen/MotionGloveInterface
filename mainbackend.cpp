@@ -92,27 +92,35 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
     }
     qDebug() << "oscoutputdevices" << oscOutputDevices.keys();
     qDebug() << "oscsender" << oscOutputDevices.value(targetDevice).oscSender;
-    OscPacketBuilder *outputNotifier = qobject_cast<OscPacketBuilder*>(oscOutputDevices.value(targetDevice).oscSender->getNotifier(outputIndex));
-    if(outputNotifier == nullptr) {
+    OscPacketBuilder *oscPackBuilder = qobject_cast<OscPacketBuilder*>(oscOutputDevices.value(targetDevice).oscSender->getNotifier(outputIndex));
+    if(oscPackBuilder == nullptr) {
         qWarning() << "ERROR! could not find output notifier";
         return false;
     }
     qDebug() << "outputnode connecting to packetbuilder";
+    ValueNotifierClass *_outputNotifier = new ValueNotifierClass(_id.toUtf8(), -1);
+    _outputNotifier->setAutoEmit(true);
 
-    connect(outputNotifier, &ValueNotifierClass::connectedValueTypeChanged, newOutPutNode, &OutputNodeController::setValueType);
-    connect(outputNotifier, &OscPacketBuilder::oscAddressChanged, newOutPutNode, &OutputNodeController::setOutputAddress);
-    connect(outputNotifier, &OscPacketBuilder::oscMessIdxChanged, newOutPutNode, &OutputNodeController::setTargetIdx);
-    emit outputNotifier->oscMessIdxChanged(outputNotifier->oscMessIdx());
+    ValueNotifierClass::completeConnectValueNotifier(_outputNotifier, oscPackBuilder);
+
+    connect(oscPackBuilder, &ValueNotifierClass::connectedValueTypeChanged, newOutPutNode, &OutputNodeController::setValueType);
+    connect(oscPackBuilder, &OscPacketBuilder::oscAddressChanged, newOutPutNode, &OutputNodeController::setOutputAddress);
+    connect(oscPackBuilder, &OscPacketBuilder::oscMessIdxChanged, newOutPutNode, &OutputNodeController::setTargetIdx);
+    connect(this, &MainBackend::sig_trigger, oscPackBuilder, &OscPacketBuilder::outputNodeWasDropped, Qt::SingleShotConnection);
+    emit sig_trigger();
+//    emit oscPackBuilder->oscMessIdxChanged(oscPackBuilder->oscMessIdx());
 //    newOutPutNode->setTargetIdx(outputNotifier->oscMessIdx());
 
     connect(oscOutputDevices.value(targetDevice).viewController, &OscOutputViewController::sig_viewAtIndexHovered, newOutPutNode, &OutputNodeController::mouseAtTargetHoveredAtIdx);
     connect(newOutPutNode, &OutputNodeController::mouseHoveredOnNode, oscOutputDevices.value(targetDevice).viewController, &OscOutputViewController::viewAtIndexHovered);
 
 
-    allConnectableObjects.insert(_id, ConnectableObject(outputNotifier, newOutPutNode, TypeHelper::Output));
+    allConnectableObjects.insert(_id, ConnectableObject(_outputNotifier, newOutPutNode, TypeHelper::Output));
     outputNodes.insert(_id, OutputNode(newOutPutNode, targetDevice, outputIndex));
 //    oscOutputDevices[targetDevice].;
     qDebug() << "outputnode created, setting parentItem";
+
+    moveObjectToThread(_outputNotifier, TypeHelper::Process);
 
     newOutPutNode->setParentItem(processingGraphView);
 
@@ -178,6 +186,13 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
     const ValueConnection &_co = allConnections.value(uniqueID);
     ConnectableObject &_sendObj = allConnectableObjects[_co.sourceId];
     ConnectableObject &_rcvObj = allConnectableObjects[_co.receiverId];
+
+    if(_sendObj.notifier->getNotifier(_co.sourceIdx) && _rcvObj.notifier->getNotifier(_co.receiverIdx))
+    {
+        ValueNotifierClass::disconnectValueTypeSignalToSlot(_sendObj.notifier->getNotifier(_co.sourceIdx),
+                                                            _rcvObj.notifier->getNotifier(_co.receiverIdx),
+                                                            _co.valType);
+    }
 
     QSet<QString> &_sendCon = _sendObj.sendConnections[_co.sourceIdx];
 
@@ -504,6 +519,16 @@ void MainBackend::showConnectionLists(QString objectID)
     qDebug() << "receive connections for obejct" << objectID << _obj.receivingConnections;
 }
 
+void MainBackend::saveAsButtonPressed(QUrl fileUrl)
+{
+    qDebug() << "save function " << fileUrl;
+
+}
+
+void MainBackend::loadButtonPressed()
+{
+
+}
 
 void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDevice)
 {

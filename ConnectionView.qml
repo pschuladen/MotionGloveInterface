@@ -7,8 +7,15 @@ ConnectionViewController {
 
     id: root
 //z: -1
+    layer.enabled: true
+    layer.smooth: true
+    layer.samples: 4
 
-antialiasing: true
+//    Rectangle {
+//        anchors.fill: parent
+//        color: "lightgrey"
+//    }
+
 
     Shape {
         id: rshape
@@ -24,19 +31,29 @@ antialiasing: true
 
 //layer.enabled: true
 //layer.samples: 2
+//        layer.enabled: true
+//        layer.smooth: true
+//        layer.textureSize: Qt.size(supersampledItem.width * 2, supersampledItem.height * 2)
+//        antialiasing: true
         ShapePath {
+
             id: visPath
             strokeColor: hoha.hovered ? rshape.cColor.lighter(1.5) : rshape.cColor
             strokeWidth: 3
             fillColor: "transparent"
-            startX: root.targetXhigher ? 0 : root.width;
-            startY: root.targetYhigher ? 0 : root.height
+            property int _loX:  0 + root.ctlPointXoffset
+            property int _loY: 0 + root.addMargins
+            property int _hiX: root.width - root.ctlPointXoffset
+            property int _hiY: root.height - root.addMargins
+
+            startX: root.targetXhigher ? _loX :_hiX
+            startY: root.targetYhigher ? _loY : _hiY
             PathCubic {
-                x: root.targetXhigher ? root.width : 0
-                y: root.targetYhigher ? root.height : 0
-                control1X: spath.startX + spath.ctlPointOff
-                control1Y: spath.startY - 5
-                control2X: x - spath.ctlPointOff
+                x: root.targetXhigher ? visPath._hiX : visPath._loX
+                y: root.targetYhigher ? visPath._hiY : visPath._loY
+                control1X: visPath.startX + root.ctlPointXoffset
+                control1Y: visPath.startY
+                control2X: x - root.ctlPointXoffset
                 control2Y: y
             }
         }

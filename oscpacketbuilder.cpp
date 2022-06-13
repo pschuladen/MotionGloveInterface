@@ -49,7 +49,7 @@ size_t OscPacketBuilder::reservedSize() const
     return m_reservedSize;
 }
 
-size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
+void OscPacketBuilder::setMsgBufferSize()
 {
     //TODO: implement different list sizes
     qsizetype _addrSize = m_oscAddress.size();
@@ -60,7 +60,7 @@ size_t OscPacketBuilder::setMsgBufferSize(size_t valueSize)
     m_reservedSize = _size;
 
     m_oscPacket.reset(m_msgBuffer.data(), _size);
-    return _size;
+//    return _size;
 }
 
 
@@ -79,7 +79,7 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
 
     qDebug() << "oscpacketbuilder new connection request" << type;
 
-    setConnectedValueType(type, false);
+    setConnectedValueType(type);
     valueInputConnected = true;
     valueListSize = nValuesInList;
     setMsgBufferSize();
@@ -92,8 +92,15 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
 
 void OscPacketBuilder::inputsDisconnected()
 {
-    setConnectedValueType(TypeHelper::Undefined, false);
+    setConnectedValueType(TypeHelper::Undefined);
     valueInputConnected = false;
+}
+
+void OscPacketBuilder::outputNodeWasDropped()
+{
+    emit connectedValueTypeChanged(connectedValueType());
+    emit oscAddressChanged(oscAddress());
+    emit oscMessIdxChanged(oscMessIdx());
 }
 
 void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)
@@ -110,6 +117,7 @@ void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)
 
 void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
 {
+//    qDebug() << "getting vector";
     m_oscPacket.reset();
 
     m_oscPacket.openMessage(oscAddress(), nValuesInMsg())
@@ -166,4 +174,16 @@ void OscPacketBuilder::slot_trigger(int frame)
 bool OscPacketBuilder::acceptsInputType(TypeHelper::ValueType typ) const
 {
     return !valueInputConnected;
+}
+
+
+void OscPacketBuilder::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
+{
+    if(newConnectedValueType == m_connectedValueType) return;
+
+    m_connectedValueType = newConnectedValueType;
+
+   setMsgBufferSize();
+
+    emit connectedValueTypeChanged(newConnectedValueType);
 }

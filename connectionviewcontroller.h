@@ -25,6 +25,9 @@ class ConnectionViewController : public QQuickItem
     Q_PROPERTY(bool targetYhigher READ targetYhigher WRITE setTargetYhigher NOTIFY targetYhigherChanged)
     Q_PROPERTY(bool targetXhigher READ targetXhigher WRITE setTargetXhigher NOTIFY targetXhigherChanged)
 
+    Q_PROPERTY(int addMargins READ addMargins WRITE setAddMargins NOTIFY addMarginsChanged)
+    Q_PROPERTY(int ctlPointXoffset READ ctlPointXoffset WRITE setCtlPointXoffset NOTIFY ctlPointXoffsetChanged)
+
 public:
     ConnectionViewController();
 
@@ -62,6 +65,12 @@ public:
     bool targetXhigher() const;
     void setTargetXhigher(bool newTargetXhigher);
 
+    int addMargins() const;
+    void setAddMargins(int newAddMargins);
+
+    int ctlPointXoffset() const;
+    void setCtlPointXoffset(int newCtlPointXoffset);
+
 public slots:
     void targetPositionChanged();
     void sourcePositionChanged();
@@ -90,6 +99,10 @@ signals:
 
     void targetXhigherChanged();
 
+    void addMarginsChanged();
+
+    void ctlPointXoffsetChanged();
+
 private:
     TypeHelper::ValueType m_valueType = TypeHelper::Undefined;
     quint16 m_sourceIdx = 0;
@@ -110,6 +123,8 @@ private:
     int addYoff = 5; // half connector width
     bool setSigSlotConnections();
     bool m_targetXhigher;
+    int m_addMargins = 10;
+    int m_ctlPointXoffset = 35;
 };
 
 #endif // CONNECTIONVIEWCONTROLLER_H

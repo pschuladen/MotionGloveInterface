@@ -40,7 +40,7 @@ private:
     qsizetype m_nValuesInMsg = 0;
 
 
-    size_t setMsgBufferSize(size_t valueSize=0);
+
     size_t valueListSize;
 
     // ValueNotifierClass interface
@@ -65,12 +65,20 @@ public slots:
     int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
     void inputsDisconnected() override;
 
+
+    void outputNodeWasDropped();
+    void setMsgBufferSize();
+
 signals:
     void gotNewConnectionWithType(int idx, TypeHelper::ValueType vtype);
 
     // ValueNotifierClass interface
 protected:
 
+
+    // ValueNotifierClass interface
+public slots:
+    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
 };
 
 #endif // OSCPACKETBUILDER_H

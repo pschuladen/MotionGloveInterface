@@ -74,6 +74,9 @@ public:
     Q_INVOKABLE QString createUniqueId(TypeHelper::NodeType forNodeType);
     Q_INVOKABLE void showConnectionLists(QString objectID);
 
+    Q_INVOKABLE void saveAsButtonPressed(QUrl fileUrl);
+    Q_INVOKABLE void loadButtonPressed();
+
 
 private:
     struct NodesData {
@@ -221,6 +224,7 @@ signals:
     void deviceWithNameCreated(QString deviceName, QString deviceId);
 
     void sig_connectionDisconnected();
+    void sig_trigger();
 
 public slots:
 

@@ -159,14 +159,14 @@ void ConnectionViewController::setPositionAndSize()
     int _sourceY = sourceY();
     int _targetX = targetX();
     int _sourceX = sourceX();
-    setY(qMin(_targetY, _sourceY));
-    setX(qMin(_targetX, _sourceX));
+    setX(qMin(_targetX, _sourceX) - ctlPointXoffset());
+    setY(qMin(_targetY, _sourceY) - addMargins());
 
-    setHeight(qAbs(_sourceY - _targetY));
-    setWidth(qAbs(_sourceX - _targetX));
+    setHeight(qAbs(_sourceY - _targetY) + (addMargins()*2));
+    setWidth(qAbs(_sourceX - _targetX) + (2*ctlPointXoffset()));
 
-    setTargetYhigher(_targetY > _sourceY);
     setTargetXhigher(_targetX > _sourceX);
+    setTargetYhigher(_targetY > _sourceY);
 }
 
 int ConnectionViewController::targetY()
@@ -260,4 +260,30 @@ void ConnectionViewController::setTargetXhigher(bool newTargetXhigher)
         return;
     m_targetXhigher = newTargetXhigher;
     emit targetXhigherChanged();
+}
+
+int ConnectionViewController::addMargins() const
+{
+    return m_addMargins;
+}
+
+void ConnectionViewController::setAddMargins(int newAddMargins)
+{
+    if (m_addMargins == newAddMargins)
+        return;
+    m_addMargins = newAddMargins;
+    emit addMarginsChanged();
+}
+
+int ConnectionViewController::ctlPointXoffset() const
+{
+    return m_ctlPointXoffset;
+}
+
+void ConnectionViewController::setCtlPointXoffset(int newCtlPointXoffset)
+{
+    if (m_ctlPointXoffset == newCtlPointXoffset)
+        return;
+    m_ctlPointXoffset = newCtlPointXoffset;
+    emit ctlPointXoffsetChanged();
 }

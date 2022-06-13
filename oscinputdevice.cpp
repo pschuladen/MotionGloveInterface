@@ -219,6 +219,7 @@ void OscInputDevice::handlePingMessage(OSCPP::Server::ArgStream oscArgs)
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
         setDevicePort(oscArgs.int32());
+        qInfo() << "pingback on port" << devicePort();
     } else deviceData_ok = false;
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {

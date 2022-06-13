@@ -49,6 +49,7 @@ ValueNotifierClass::ValueNotifierClass(QByteArray identifier, int objectIdx, Typ
 void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 {
     //TODO: possibly dangerous for existing (sub-)connections...
+    subNotifier.clear();
     subNotifier.reserve(numberOfSubs);
     for(int i = 0; i < numberOfSubs; i++) {
         subNotifier.append(new ValueNotifierClass(this));
@@ -64,6 +65,8 @@ void ValueNotifierClass::createSubnotifierForValueType(TypeHelper::ValueType val
 
 ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
 {
+    if(!supportsSubValues()) return this;
+
     if(idx < 0) return this;
 
     else if(idx < subNotifier.size()) return subNotifier.at(idx);
@@ -71,13 +74,13 @@ ValueNotifierClass *ValueNotifierClass::getNotifier(int idx)
     else return nullptr;
 }
 
-void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType, bool createSubnotifier)
+void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType)
 {
     if(newConnectedValueType == m_connectedValueType) return;
 
     m_connectedValueType = newConnectedValueType;
-    setSupportsSubValues(createSubnotifier);
-    if(createSubnotifier)
+
+    if(supportsSubValues())
         createSubnotifierForValueType(newConnectedValueType, valueNumber());
 
     emit connectedValueTypeChanged(newConnectedValueType);
@@ -126,12 +129,18 @@ void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
 
 int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
 {
-    return -1;
+    if(type == TypeHelper::Undefined) return -1;
+    if(connectedValueType() != TypeHelper::Undefined) return -1;
+
+    setConnectedValueType(type);
+    connectValueTypeSignalToSlot(sender, this, type);
+
+    return 0;
 }
 
 void ValueNotifierClass::inputsDisconnected()
 {
-    setConnectedValueType(TypeHelper::Undefined, false);
+    setConnectedValueType(TypeHelper::Undefined);
 }
 
 void ValueNotifierClass::slot_quatChanged(QQuaternion quat, int frame)
@@ -174,6 +183,23 @@ const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
     return m_connectedValueType;
 }
 
+bool ValueNotifierClass::completeConnectValueNotifier(const ValueNotifierClass *sender, const ValueNotifierClass *receiver)
+{
+    if(sender == nullptr || receiver == nullptr) return false;
+    typedef ValueNotifierClass _vc;
+
+    connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged);
+    connect(sender, &_vc::quatChanged, receiver, &_vc::slot_quatChanged);
+    connect(sender, &_vc::valuesChanged, receiver, &_vc::slot_valuesChanged);
+    connect(sender, &_vc::singleValueChanged, receiver, &_vc::slot_singleValueChanged);
+    connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
+    connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
+
+    connect(sender, &_vc::connectedValueTypeChanged, receiver, &_vc::setConnectedValueType);
+
+    return true;
+}
+
 
 bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *sender, const ValueNotifierClass *receiver, const TypeHelper::ValueType vType)
 {
@@ -184,7 +210,7 @@ bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *
     case TypeHelper::Undefined:
         return false;
     case TypeHelper::Vector:
-        _co = connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged, Qt::QueuedConnection);
+        _co = connect(sender, &_vc::vectorChanged, receiver, &_vc::slot_vectorChanged);
         break;
     case TypeHelper::Quat:
         _co = connect(sender, &_vc::quatChanged, receiver, &_vc::slot_quatChanged);

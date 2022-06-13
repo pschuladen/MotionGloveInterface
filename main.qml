@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Qt.labs.platform 1.1
 import QtQuick.Layouts
 import MotionGloveInterface
+import QtQuick.Dialogs
 
 
 Window {
@@ -29,6 +30,12 @@ Window {
             objectName: "processingGraphView"
             property color bgColor: "#FFA8A8A8"
             color: dropa.containsDrag ? bgColor.lighter(1.1) :  bgColor
+
+//                layer.enabled: true
+//                layer.smooth: true
+//                layer.samples: 4
+//            antialiasing: true
+
 
             anchors {
                 top: processingNodes.bottom
@@ -165,10 +172,27 @@ Window {
                 width: 1
                 color: "black"
             }
+
            Button {
-               text: "click"
-anchors.verticalCenter: outputControl.verticalCenter
-onClicked: console.log(_mbackend.createUniqueId(TypeHelper.Input))
+               id: saveAsButton
+               text: "save as"
+               anchors {
+                   top: parent.top
+                   right: parent.right
+                   margins: 10
+               }
+
+               onClicked: fileDialog.open()//console.log(_mbackend.createUniqueId(TypeHelper.Input))
+
+           }
+           Button {
+               id :loadButton
+               text: "load file"
+               anchors {
+                   right: parent.right
+                   top: saveAsButton.bottom
+                   margins: 10
+               }
            }
 
         }
@@ -207,6 +231,13 @@ onClicked: console.log(_mbackend.createUniqueId(TypeHelper.Input))
             }
 
         }
+    }
+    FileDialog {
+        id: fileDialog
+        fileMode: FileDialog.SaveFile
+        onAccepted: _mbackend.saveAsButtonPressed(selectedFile)
+//        selectedFileChanged: console.log("selected file ", selectedFile)
+//        nameFilters: ["XML File(*.xml)"]
     }
 }
 
