@@ -37,8 +37,11 @@
 #include "inputnodecontroller.h"
 #include "connectionviewcontroller.h"
 #include "nodeviewcontroller.h"
+#include "projectfilemanager.h"
 
 #include "typehelper.h"
+
+#include <QtXml>
 
 
 class MainBackend : public QObject
@@ -52,18 +55,19 @@ public:
     void setQmlEngine(QQmlApplicationEngine *engine);
     void initialSetup();
 
-    Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx, QQuickItem *senderConnector,
-                                       QString receiverNodeId, int targetIdx, QQuickItem *receiverConnector,
-                                       TypeHelper::ValueType valueType);
+    Q_INVOKABLE bool connectionRequest(QString senderNodeId,int sourceIdx,
+                                       QString receiverNodeId, int targetIdx,
+                                       TypeHelper::ValueType valueType, QString conId="");
 
     Q_INVOKABLE bool createOscOutputDevice();
+    bool createOscOutputDevice(QString uniqueID);
 
 //    Q_INVOKABLE bool newNodeDropped(QString mimeData);
     Q_INVOKABLE bool createInputNodeDrop(QPoint atPoint, QString sourceDevice, QString inputPath,
-                                         TypeHelper::ValueType valType=TypeHelper::Undefined, int subIdx=-1);
-    Q_INVOKABLE bool createProcessingNodeDrop(QPoint atPosition, int processorType);
+                                         TypeHelper::ValueType valType=TypeHelper::Undefined, QString id = "", int subIdx=-1);
+    Q_INVOKABLE bool createProcessingNodeDrop(QPoint atPosition, TypeHelper::ProcessorType processorType, QString id = "");
     Q_INVOKABLE bool createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex,
-                                         TypeHelper::ValueType valType=TypeHelper::Undefined, int subIdx=-1);
+                                         TypeHelper::ValueType valType=TypeHelper::Undefined, QString id = "", int subIdx=-1);
 
     Q_INVOKABLE bool deleteObjectWithId(const QString uniqueID);
     Q_INVOKABLE bool deleteConnectionWithId(const QString uniqueID);
@@ -72,11 +76,13 @@ public:
 
 
     Q_INVOKABLE QString createUniqueId(TypeHelper::NodeType forNodeType);
-    Q_INVOKABLE void showConnectionLists(QString objectID);
+
 
     Q_INVOKABLE void saveAsButtonPressed(QUrl fileUrl);
-    Q_INVOKABLE void loadButtonPressed();
+    Q_INVOKABLE void loadButtonPressed(QUrl fileUrl);
 
+    // for debugging
+    Q_INVOKABLE void showConnectionLists(QString objectID);
 
 private:
     struct NodesData {
@@ -94,6 +100,7 @@ private:
     QQuickItem *outputDevcesSidebarView;
 
     QList<DeviceStatusManager*> deviceManager;
+    ProjectFileManager *projectManager;
 
     enum ThreadRole {
         Main, NetIn, NetOut, Process, Audio, Subthread
@@ -107,8 +114,9 @@ private:
         ProcessNode* controller;
         QList<ProcessNode*> processor;
         NodeViewController* qmlView;
-        ProcessingNode(ProcessNode* _viewContr, NodeViewController *_qmlV, QList<ProcessNode*> _processor=QList<ProcessNode*>())
-            : controller{_viewContr}, processor{_processor}, qmlView{_qmlV} {}
+        TypeHelper::ProcessorType procType;
+        ProcessingNode(TypeHelper::ProcessorType _procType, ProcessNode* _viewContr, NodeViewController *_qmlV, QList<ProcessNode*> _processor=QList<ProcessNode*>())
+            : procType{_procType}, controller{_viewContr}, processor{_processor}, qmlView{_qmlV} {}
         ProcessingNode() {}
 //        ProcessingNode(DataProcessingNode* _processingObject, ValueViewBackend* _viewBackend) : viewBackend(_viewBackend), processingObject(_processingObject){};
     };
@@ -210,11 +218,31 @@ private:
     };
     QMap<QString, OscInDeviceStruct> oscInputDevices;
 
+
+    void errorWarningCreate(QString id, TypeHelper::NodeType ntype);
 //    QMetaObject::Connection *pendingRequestConnection;
-    QMap<QString, QMetaObject::Connection *> pendingRequestConnections;
 
 
+// loading from file
+signals:
+    void requestObjectCategory(TypeHelper::NodeType category);
+    void loadedMotionDeviceFromFile(QDomElement element);
 
+public slots:
+    void objectDidFinishLoad(QString uniqueID);
+    void prepareForNewProject();
+    void qDomElementFromFile(QDomElement element, TypeHelper::NodeType type);
+    void loadCategoryFinished(TypeHelper::NodeType type);
+
+private:
+
+
+    QSet<QString> pendingObjectCreation;
+    quint16 loadSceneStatus = 0;
+    void requestNextCategory();
+    QPoint getCreatePosition(QDomElement element);
+    QString getAttributeFromViewNode(QDomElement element, QString attr);
+    bool categoryPending = false;
 
 
 
@@ -223,20 +251,37 @@ signals:
     void sig_connectRequestFromSender(ValueNotifierClass *sender, TypeHelper::ValueType valType, quint16 nValues=0);
     void deviceWithNameCreated(QString deviceName, QString deviceId);
 
+    void newConnectionRequest(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList = 0);
+
     void sig_connectionDisconnected();
     void sig_trigger();
+    void sig_triggerSaveToFile();
+    void sig_increase(int = 1);
+    void sig_sendProjectFileUrl(QUrl fileUrl, bool loadIt=false);
+    void sig_triggerLoadFromFile();
+    void sig_sceneCleared();
+
+    void sendQdomElement(QDomElement dElement);
+
+    void testSendDomNode(QDomNode);
+
 
 public slots:
 
-    void createNewMotionDeviceView(QString name, OscInputDevice* newDevice);
+    void createNewMotionDeviceView(QString name, OscInputDevice* newDevice, QString uniqueID);
     void createSensorViewsForMotionDevice(const QString sendername, const QList<OscInputDevice::OscSensorInputStruct> sensors);
     //QString identifier, TypeHelper::SensorType sensType, ValueNotifierClass *oscHandler);
 
     void moveObjectToThread(QObject *objToMove, TypeHelper::NodeType nodeType);
     void moveSubprocessorToProcessThread(ProcessNode* processor);
 
-    void newConnectionEstablished();
 
+
+    //connection related
+    void newConnectionEstablished(QString connectionId, bool accepted);
+
+private:
+    QMap<QString, ValueConnection> pendingConnectionRequests;
 
 
 };

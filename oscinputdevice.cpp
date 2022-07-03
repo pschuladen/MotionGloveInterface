@@ -258,6 +258,7 @@ void OscInputDevice::viewWasCreated()
     }
 
     emit sendSensorStructList(uniqueId(), oscStructs);
+    emit didFinishLoad(uniqueId());
 }
 
 const QString &OscInputDevice::uniqueId() const
@@ -271,4 +272,31 @@ void OscInputDevice::setUniqueId(const QString &newUniqueId)
         return;
     m_uniqueId = newUniqueId;
     emit uniqueIdChanged();
+}
+
+
+void OscInputDevice::initSaveData()
+{
+    QDomDocument _doc("tmpdoc");
+    QDomElement root = _doc.createElement("oscinput-device");
+    _doc.appendChild(root);
+    root.setAttribute("deviceName", deviceName());
+    root.setAttribute("nSensors", nSensors());
+    root.setAttribute("type", "glove");
+
+    connect(this, &OscInputDevice::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree, Qt::SingleShotConnection);
+    emit sendSubNodeTree(uniqueId(), _doc);
+
+//    QDomElement _deviceName = _doc.createElement("deviceName");
+//    _deviceName.setAttribute("name", deviceName());
+//    root.appendChild(_deviceName);
+
+//    QDomElement _nSensors = _doc.createElement("nSensors");
+
+
+
+}
+
+void OscInputDevice::loadDataFromQdomElement(QDomElement domElement)
+{
 }

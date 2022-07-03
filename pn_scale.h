@@ -26,7 +26,7 @@ public:
     explicit PN_Scale(QObject *parent = nullptr);
     explicit PN_Scale(QByteArray identifier, int idxInControlller,
                       PN_Scale *controller,
-                      TypeHelper::ValueType type, quint16 valueNumber=0,
+                      TypeHelper::ValueType type=TypeHelper::Undefined, quint16 valueNumber=0,
                       QObject *parent = nullptr);
 
     float inLow() const;
@@ -39,11 +39,13 @@ public:
     float multi() const;
     void setMulti(float newMulti);
 
-    bool acceptsInputType(TypeHelper::ValueType typ) const override;
-    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override;
+    bool acceptsInputType(TypeHelper::ValueType typ, int atIdx=0) const override;
+    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override;
     bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //TODO: implement
 
     ProcessNode* createProcessControl(QString objectname_id) override;
+    ProcessNode *createSubprocessor(QString objectname_id) override;
+
 
 
 public slots:
@@ -72,6 +74,14 @@ signals:
     void outLowChanged(float newValue);
     void outHighChanged(float newValue);
     void clipOutputChanged(bool newClipbool);
+
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    void initSaveData() override;
+    void loadDataFromQdomElement(QDomElement domElement) override;
+
+    // ProcessNode interface
 
 };
 

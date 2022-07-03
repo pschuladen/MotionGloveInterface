@@ -11,7 +11,7 @@ ProcessNode::ProcessNode(QByteArray identifier, int idxInController, TypeHelper:
 
 }
 
-bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ) const
+bool ProcessNode::acceptsInputType(TypeHelper::ValueType typ, int atIdx) const
 {
     if(typ == TypeHelper::Undefined) return false;
     else return true;
@@ -24,6 +24,7 @@ bool ProcessNode::setConnectionFromSender(ValueNotifierClass *sender, TypeHelper
     setValueNumber(nValuesInList);
     setConnectedValueType(type);
 
+    emit connectedTypeAtIdxChanged(indexInObject(), type);
     return connectValueTypeSignalToSlot(sender, this, type);
 }
 
@@ -38,7 +39,7 @@ quint8 ProcessNode::process(quint8 value)
 }
 
 
-int ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
     return -1;
 }
@@ -129,6 +130,14 @@ void ProcessNode::setConnectedTypes(const QList<TypeHelper::ValueType> &newConne
     emit connectedTypesChanged(m_connectedTypes);
 }
 
+void ProcessNode::setConnectedTypesAtIdx(int idx, TypeHelper::ValueType valType)
+{
+    if(idx < connectedTypes().size()) {
+        m_connectedTypes[idx] = valType;
+        emit connectedTypesChanged(m_connectedTypes);
+    }
+}
+
 void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
 {
     m_connectedTypes.append(appendType);
@@ -137,9 +146,10 @@ void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
 
 ValueNotifierClass *ProcessNode::getNotifier(int idx)
 {
-    if(idx < 0) return this;
-    else if(idx < subProcessor.size()) return subProcessor.at(idx);
-    else return nullptr;
+    return this;
+//    if(idx < 0) return this;
+//    else if(idx < subProcessor.size()) return subProcessor.at(idx);
+//    else return nullptr;
 }
 
 void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
@@ -152,3 +162,41 @@ void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
 }
 
 
+
+
+void ProcessNode::initSaveData()
+{
+}
+
+void ProcessNode::loadDataFromQdomElement(QDomElement domElement)
+{
+}
+TypeHelper::ProcessorType ProcessNode::processorType() const
+{
+    return m_processorType;
+}
+
+void ProcessNode::setProcessorType(TypeHelper::ProcessorType newProcessorType)
+{
+    if (m_processorType == newProcessorType)
+        return;
+    m_processorType = newProcessorType;
+    emit processorTypeChanged();
+}
+
+
+void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx, quint16 nValuesInList)
+{
+
+    if(!acceptsInputType(type)) {
+        emit connectionAccepted(connectionId, false);
+    }
+    if(connectToIdx < 0)
+    while(connectToIdx >= subProcessor.size()) {
+        subProcessor.append(createSubprocessor(identifier()));
+        appendToConnectedTypes(TypeHelper::Undefined);
+    }
+    connect(this, &ProcessNode::sig_connectToSender, subProcessor[connectToIdx], &ProcessNode::slot_connectToSender, Qt::SingleShotConnection);
+    connect(subProcessor[connectToIdx], &ProcessNode::connectionAccepted, this, &ProcessNode::connectionAccepted, Qt::SingleShotConnection);
+    emit sig_connectToSender(sender, connectionId, type);
+}

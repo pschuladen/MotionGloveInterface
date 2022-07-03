@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON) #added from me
 
-find_package(Qt6 6.2 COMPONENTS Quick Qml REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Qml Xml REQUIRED)
 
 qt_add_executable(appMotionGloveInterface
     main.cpp
@@ -36,6 +36,7 @@ qt_add_executable(appMotionGloveInterface
     inputnodecontroller.h inputnodecontroller.cpp
     connectionviewcontroller.h connectionviewcontroller.cpp
     nodeviewcontroller.h nodeviewcontroller.cpp
+    projectfilemanager.h projectfilemanager.cpp
 )
 
 
@@ -74,7 +75,7 @@ set_target_properties(appMotionGloveInterface PROPERTIES
 target_compile_definitions(appMotionGloveInterface
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(appMotionGloveInterface
-    PRIVATE Qt6::Quick)
+    PRIVATE Qt6::Quick Qt6::Xml)
 
 #target_include_directories(oscpp)
 #include_directories(oscpp)

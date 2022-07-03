@@ -6,6 +6,12 @@ OscOutputViewController::OscOutputViewController(QObject *parent)
     setObjectName(standardObjectName()); //should maybe just be set in qml?
 }
 
+OscOutputViewController::OscOutputViewController(QString uniqueID, QObject *parent)
+    : ValueNotifierClass{parent}, m_uniqueID{uniqueID}
+{
+    setObjectName(standardObjectName());
+}
+
 const QString &OscOutputViewController::destIp() const
 {
     return m_destIp;

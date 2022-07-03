@@ -71,21 +71,21 @@ QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
 {
     switch(nodeType){
     case TypeHelper::Connection:
-        return "con";
+        return "connection";
     case TypeHelper::OscInput:
-        return "oscin";
+        return "oscinput";
     case TypeHelper::OscOutput:
-        return "oscout";
+        return "oscoutput";
     case TypeHelper::Generic:
         return "gen";
     case TypeHelper::Gui:
         return "gui";
     case TypeHelper::Input:
-        return "in";
+        return "input";
     case TypeHelper::Process:
-        return "proc";
+        return "process";
     case TypeHelper::Output:
-        return "out";
+        return "output";
     case TypeHelper::Audio:
         return "audio";
     case TypeHelper::Audiocontroller:

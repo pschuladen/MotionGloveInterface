@@ -29,6 +29,7 @@ class OscOutputViewController : public ValueNotifierClass
 
 public:
     explicit OscOutputViewController(QObject *parent = nullptr);
+    explicit OscOutputViewController(QString uniqueID, QObject *parent = nullptr);
 
     const QString &destIp() const;
 

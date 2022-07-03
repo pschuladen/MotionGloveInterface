@@ -9,11 +9,11 @@ InputNodeController {
 
 //    required property string uniqueId
 
-    required property string inputPath
+//    required property string inputPath
 
-    required property string sourceDevice//: "/fla/acc/0"
+//    required property string sourceDevice//: "/fla/acc/0"
 
-    property int valueType: 0
+//    property int valueType: 0
 
     height: sourceAddressLabel.implicitHeight + 10
     width: sourceAddressLabel.implicitWidth + 18

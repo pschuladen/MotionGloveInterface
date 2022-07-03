@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import MotionGloveInterface
 
 
+
 NodeViewController {
 
     id: root
@@ -23,6 +24,8 @@ NodeViewController {
     PN_Scale {
         id: backend
         objectName: root.uniqueID+"-viewcontroller"
+
+        identifier: root.uniqueID
 
         clipOutput: clipValueCheckbox.checked
 
@@ -235,3 +238,4 @@ NodeViewController {
 
     }
 }
+

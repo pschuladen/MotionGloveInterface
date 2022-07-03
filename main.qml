@@ -63,7 +63,7 @@ Window {
                                                                                      drop.getDataAsString("processorType"))
                                }
                                else if(nodetype === TypeHelper.Output.toString()) {
-                                   shouldAccept =_mbackend.createOutputNodeDrop(Qt.point(drop.x, drop.y),
+                                   shouldAccept = _mbackend.createOutputNodeDrop(Qt.point(drop.x, drop.y),
                                                                  drop.getDataAsString("targetDevice"),
                                                                  drop.getDataAsString("outputIndex"),
                                                                                drop.getDataAsString("valueType"))
@@ -182,7 +182,7 @@ Window {
                    margins: 10
                }
 
-               onClicked: fileDialog.open()//console.log(_mbackend.createUniqueId(TypeHelper.Input))
+               onClicked: saveFileDialog.open()//console.log(_mbackend.createUniqueId(TypeHelper.Input))
 
            }
            Button {
@@ -193,6 +193,7 @@ Window {
                    top: saveAsButton.bottom
                    margins: 10
                }
+               onClicked: loadFileDialog.open()
            }
 
         }
@@ -233,11 +234,17 @@ Window {
         }
     }
     FileDialog {
-        id: fileDialog
+        id: saveFileDialog
         fileMode: FileDialog.SaveFile
         onAccepted: _mbackend.saveAsButtonPressed(selectedFile)
 //        selectedFileChanged: console.log("selected file ", selectedFile)
 //        nameFilters: ["XML File(*.xml)"]
+    }
+    FileDialog {
+        id: loadFileDialog
+        fileMode: FileDialog.OpenFile
+         nameFilters: ["XML files (*.xml)"]
+        onAccepted: _mbackend.loadButtonPressed(selectedFile)
     }
 }
 

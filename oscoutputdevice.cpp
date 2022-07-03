@@ -1,16 +1,24 @@
 #include "oscoutputdevice.h"
 
 OscOutputDevice::OscOutputDevice(QObject *parent)
+    : OscOutputViewController{parent}
 {
-    setParent(parent);
     initialiseOscDevice();
 }
 
-OscOutputDevice::OscOutputDevice(OscOutputViewController *viewController, QObject *parent)
-    : OscOutputViewController{parent}
+OscOutputDevice::OscOutputDevice(QString uniqueID, OscOutputViewController *viewController, QObject *parent)
+    : OscOutputViewController{uniqueID, parent}
 {
     setViewControllerObject(viewController);
     initialiseOscDevice();
+
+//    ProjectFileManager *pm = projManager::Instance();
+
+//    connect(this, &OscOutputDevice::registerSaveableObject, pm, &ProjectFileManager::addSaveableObject);
+//    connect(this, &QObject::destroyed, pm, &ProjectFileManager::removeSaveableObject);
+//    connect(this, &OscOutputDevice::sendPropertyMapElement, pm, &ProjectFileManager::addSubNode);
+//    connect(this, &OscOutputDevice::announceAdditionalData, pm, &ProjectFileManager::increaseSaveObjectCounter);
+//    emit registerSaveableObject(this);
 }
 
 bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
@@ -24,10 +32,10 @@ bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
 
     connect(vc, &ovc::destIpChanged, this, &ood::setDestIp);
     connect(vc, &ovc::destPortChanged, this, &ood::setDestPort);
-    connect(vc, &ovc::oscPathsChanged, this, &ood::setOscPaths);
+//    connect(vc, &ovc::oscPathsChanged, this, &ood::setOscPaths);
     connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::oscPathAdded, this, &ood::setOscPathAtIndex);
-    connect(vc, &ovc::valueTypesChanged, this, &ood::setValueTypes);
+//    connect(vc, &ovc::valueTypesChanged, this, &ood::setValueTypes);
     connect(vc, &ovc::sig_addOscPath, this, &ood::slot_addOscPath);
 
     connect(this, &ood::destIpChanged, vc, &ovc::setDestIp);
@@ -92,11 +100,11 @@ void OscOutputDevice::setOscPaths(const QList<QString> &newOscPaths)
 {
     if(oscPaths() == newOscPaths) return;
     m_oscPaths = newOscPaths;
+    qDebug() << "setting oscpaths" << newOscPaths;
 
     for (int i = 0; i<oscPaths().size(); i++) {
         packetBuilder.at(i)->setOscAddress(oscPaths().at(i).toUtf8());
     }
-
     emit oscPathsChanged(oscPaths());
 
 }
@@ -154,3 +162,100 @@ ValueNotifierClass *OscOutputDevice::getNotifier(int idx)
     if (idx < packetBuilder.size()) return packetBuilder.at(idx);
     else return nullptr;
 }
+
+
+void OscOutputDevice::initSaveData()
+{
+    qDebug() << "this data should be saved" << m_destinationAddress.toString() << m_destPort;
+    qDebug() << "oscPaths" << oscPaths();
+    typedef ProjectFileManager::SLI_element _sliEl;
+
+    QDomDocument _doc("tmpdoc");
+    QDomElement root = _doc.createElement("device-settings");
+    _doc.appendChild(root);
+    QDomElement dest = _doc.createElement("destinations");
+    root.appendChild(dest);
+
+    // multiple destinations?
+    QDomElement addr = _doc.createElement("address");
+    dest.appendChild(addr);
+    addr.setAttribute("port", m_destPort);
+    addr.setAttribute("ip", m_destinationAddress.toString());
+
+    QDomElement _oscPaths = _doc.createElement("oscPaths");
+    for(auto iter = oscPaths().constBegin(); iter!=oscPaths().constEnd(); ++iter) {
+
+    }
+    for(const QString &_oaddr: oscPaths()) {
+        QDomElement _onePath = _doc.createElement("osc");
+        _onePath.setAttribute("path", _oaddr);
+        _oscPaths.appendChild(_onePath);
+    }
+    root.appendChild(_oscPaths);
+    connect(this, &OscOutputDevice::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree, Qt::SingleShotConnection);
+    emit sendSubNodeTree(uniqueID(), _doc);
+
+/*
+    QVariantMap _pMap;
+    QVariantList _addrList;
+    _addrList.append(QVariant::fromValue<_sliEl>(_sliEl("address",
+                                                              {{"ip", QVariant(m_destinationAddress.toString())},
+                                                               {"port", QVariant(m_destPort)}
+                                                        })));
+    _pMap["destinations"] = _addrList;
+
+    QVariantList _pathVarList;
+    for(const QString &_oaddr: oscPaths()) {
+        _pathVarList.append(QVariant::fromValue<_sliEl>(_sliEl("osc",
+                                                        {{"path", QVariant(_oaddr)}})));//QVariantMap({{"oscOutPath", QVariant(_oaddr)}}));
+    }
+    _pMap[ps_oscPaths] = _pathVarList;//QVariant(QVariantList(m_oscPaths));
+
+    connect(this, &OscOutputDevice::sendPropertyMapElement, projManager::Instance(), &ProjectFileManager::addSubNode, Qt::SingleShotConnection);
+    emit sendPropertyMapElement(uniqueID(), "device", _pMap);
+    */
+}
+
+
+
+void OscOutputDevice::loadDataFromQdomElement(QDomElement domElement)
+{
+    QDomElement _destinations = domElement.firstChildElement("destinations");
+    if(!_destinations.isNull()) {
+        QDomNodeList _addrs = _destinations.elementsByTagName("address");
+        for(int i = 0; i < _addrs.count(); i++) {
+            if(_addrs.at(i).isElement()) {
+                QDomElement _add = _addrs.at(i).toElement();
+                if(_add.hasAttribute("ip")) {
+                   QDomAttr _ip = _add.attributeNode("ip");
+                   setDestIp(_ip.value());
+                   qDebug() << "setting ip" << _ip.value();
+                }
+                if(_add.hasAttribute("port")) {
+                    QDomAttr _port = _add.attributeNode("port");
+                    bool _suc;
+                    quint16 _uintport = _port.value().toUInt(&_suc);
+                    if(_suc) setDestPort(_uintport);
+                }
+            }
+        }
+    }
+    QDomElement _oscPaths = domElement.firstChildElement("oscPaths");
+    if(!_oscPaths.isNull()) {
+        QDomNodeList _paths = _oscPaths.elementsByTagName("osc");
+        qDebug() << "paths found" << _paths.count();
+        qDebug() << "children of" << _oscPaths.tagName() << _oscPaths.childNodes().length();
+        for(int i = 0; i < _paths.count(); i++) {
+            if(_paths.at(i).isElement()) {
+                QDomElement _pat = _paths.at(i).toElement();
+                if(_pat.hasAttribute("path")) {
+                    QDomAttr _opat = _pat.attributeNode("path");
+                    addOscPath(_opat.value());
+                }
+            }
+        }
+    }
+    emit didFinishLoad(uniqueID());
+}
+
+

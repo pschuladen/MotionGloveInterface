@@ -4,6 +4,8 @@
 #include "valuenotifierclass.h"
 #include "QtQml/qqmlregistration.h"
 
+#include "saveloadinterfaceclass.h"
+
 /*
  * This is the base class for processing nodes. It
  * should be seen as virtual class and not actually be instantiated.
@@ -25,7 +27,7 @@
  * types to single values) and emit the result as signal.
 */
 
-class ProcessNode : public ValueNotifierClass
+class ProcessNode : public ValueNotifierClass, public SaveLoadInterfaceClass
 {
     Q_OBJECT
 public:
@@ -34,16 +36,20 @@ public:
 
 //    Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged)
     Q_PROPERTY(QList<TypeHelper::ValueType> connectedTypes READ connectedTypes WRITE setConnectedTypes NOTIFY connectedTypesChanged);
+    Q_PROPERTY(TypeHelper::ProcessorType processorType READ processorType WRITE setProcessorType NOTIFY processorTypeChanged)
 
     enum ProcessRole {
         ViewController, ProcessController, Processor
     };
     ProcessRole processRole = ViewController;
 
+
+
 //    void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
 
-    virtual bool acceptsInputType(TypeHelper::ValueType typ) const override; //override for asking if connection allowed
-    virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
+    virtual bool acceptsInputType(TypeHelper::ValueType typ, int atIdx=0) const override; //override for asking if connection allowed
+
+
     // there is something doppeltgemoppelt
 
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
@@ -58,8 +64,12 @@ public:
 
     virtual void deleteSubprocessorAtIdx(quint16 idx);
 
+    TypeHelper::ProcessorType processorType() const;
+    void setProcessorType(TypeHelper::ProcessorType newProcessorType);
+
 protected:
     QList<ProcessNode*> subProcessor;
+    TypeHelper::ProcessorType m_processorType;
 //    TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined; //has to be set otherwise the process function will not be called. this is usually done by the setConnectionFromSender function.
 
 private:
@@ -69,8 +79,8 @@ private:
     //this should in theory already be used in ValueNotifierClass?
     QList<TypeHelper::ValueType> m_connectedTypes;
 
+
 public slots:
-    void setConnectedTypes(const QList<TypeHelper::ValueType> &newConnectedTypes);
     virtual void slot_quatChanged(QQuaternion quat, int frame=-1) override;
     virtual void slot_vectorChanged(QVector3D vect, int frame=-1) override;
     virtual void slot_touchChanged(QList<float> touch, int frame=-1) override;
@@ -78,13 +88,38 @@ public slots:
     virtual void slot_singleValueChanged(float value, int frame=-1) override;
     virtual void slot_boolValueChanged(bool value, int frame=-1) override;
     virtual void slot_trigger(int frame=-1) override;
-    virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //this is currently used !!
+    void setConnectedTypes(const QList<TypeHelper::ValueType> &newConnectedTypes);
+    void setConnectedTypesAtIdx(int idx, TypeHelper::ValueType valType);
+    virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override; //this is currently used !!
+    virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
+
 
 signals:
     void connectedTypesChanged(QList<TypeHelper::ValueType> connectedTypes);
 
     void newSubprocessorWasCreated(ProcessNode *newSubproc);
 
+//    void connectionRequestFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+
+    void connectedTypeAtIdxChanged(int idx, TypeHelper::ValueType valType);
+
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    virtual void initSaveData() override;
+    void loadDataFromQdomElement(QDomElement domElement) override;
+
+    // SaveLoadInterfaceClass interface
+signals:
+    void sendSubNodeTree(QString uniqueID, QDomDocument subTree) override;
+    void announceAdditionalData(int add) override;
+
+    void didFinishLoad(QString uniqueID) override;
+    void processorTypeChanged();
+
+    // ValueNotifierClass interface
+public slots:
+    void connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx=0, quint16 nValuesInList=0) override;
 };
 
 #endif // PROCESSNODE_H

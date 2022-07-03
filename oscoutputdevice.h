@@ -8,14 +8,15 @@
 //#include "valuenotifierclass.h"
 #include "oscoutputviewcontroller.h"
 #include "oscpacketbuilder.h"
+#include "saveloadinterfaceclass.h"
 
-class OscOutputDevice : public OscOutputViewController
+class OscOutputDevice : public OscOutputViewController, public SaveLoadInterfaceClass
 {
     Q_OBJECT
 
 public:
     explicit OscOutputDevice(QObject *parent = nullptr);
-    explicit OscOutputDevice(OscOutputViewController *viewController, QObject *parent = nullptr);
+    explicit OscOutputDevice(QString uniqueID, OscOutputViewController *viewController, QObject *parent = nullptr);
 
     bool setViewControllerObject(OscOutputViewController* viewController);
 
@@ -31,6 +32,10 @@ private:
     OscOutputViewController *m_viewController;
 
     QList<OscPacketBuilder*> packetBuilder;
+
+    static inline QString ps_destinationPort = "destinationPort";
+    static inline QString ps_destinationAddress = "destinationAddress";
+    static inline QString ps_oscPaths = "oscPaths";
 
 public slots:
     virtual void addOscPath() override;
@@ -55,6 +60,19 @@ public slots:
 public:
     ValueNotifierClass *getNotifier(int idx) override;
     const QHostAddress &destinationAddress() const;
+
+    // SaveLoadInterfaceClass interface
+signals:
+//    void sendPropertyMapElement(QString uniqueID, QString subtype, QVariantMap) override;
+    void announceAdditionalData(int add = 1) override;
+//    void registerSaveableObject(QObject *obj) override;
+    void sendSubNodeTree(QString uniqueID, QDomDocument subTreeDocument) override;
+    void didFinishLoad(QString uniqueID) override;
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    void initSaveData() override;
+    void loadDataFromQdomElement(QDomElement domElement) override;
 };
 
 #endif // OSCOUTPUTDEVICE_H

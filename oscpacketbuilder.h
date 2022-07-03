@@ -51,7 +51,7 @@ public:
 
     qsizetype nValuesInMsg() const;
 
-    bool acceptsInputType(TypeHelper::ValueType typ) const override;
+    bool acceptsInputType(TypeHelper::ValueType typ, int atIdx=0) const override;
 
 public slots:
     void slot_quatChanged(QQuaternion quat, int frame) override;
@@ -62,7 +62,7 @@ public slots:
     void slot_boolValueChanged(bool value, int frame) override;
     void slot_trigger(int frame) override;
 
-    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList) override;
+    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList) override;
     void inputsDisconnected() override;
 
 

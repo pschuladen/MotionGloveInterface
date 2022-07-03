@@ -30,6 +30,28 @@ void DeviceStatusManager::setIdForNamedDevice(QString deviceName, QString device
     }
 }
 
+void DeviceStatusManager::loadMotionDeviceFromDomElement(QDomElement element)
+{
+    QString _id = element.tagName();
+    QString _name = element.attribute("deviceName", "no!!name!!");
+
+    OscInputDevice *newMotionDevice = new OscInputDevice(_name, this);
+    oscInputDevices.insert(_name.toUtf8(), newMotionDevice);
+
+    setIdForNamedDevice(_name, _id);
+
+    emit newOscInputDevice(_name, newMotionDevice, _id);
+
+    /*
+    QDomNode _attrNode = element.firstChildElement("oscinput-device");
+    if(_attrNode.isElement()) {
+        QDomElement _attrElement = _attrNode.toElement();
+        if(_attrElement.hasAttribute("nSensors")) {
+
+        }
+    }*/
+}
+
 void DeviceStatusManager::readIncomingUdpData()
 {
     QByteArray buffer(socket->pendingDatagramSize(), char());

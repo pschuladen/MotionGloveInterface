@@ -1,17 +1,18 @@
 #include "saveloadinterfaceclass.h"
 
-saveLoadInterfaceClass::saveLoadInterfaceClass(QObject *parent)
-    : QObject{parent}
+//saveLoadInterfaceClass::saveLoadInterfaceClass()
+//{
+
+//}
+
+
+//void SaveLoadInterfaceClass::forwardPropertyMapElement(QString uniqueID, QMap<QString, QString> propMap)
+//{
+//    emit sendPropertyMapElement(uniqueID, propMap);
+//}
+
+void SaveLoadInterfaceClass::connectToProjectFileManager(QObject *saveableObj)
 {
-
-}
-
-void saveLoadInterfaceClass::createPropertyMap()
-{
-
-}
-
-void saveLoadInterfaceClass::getDataForSaving(QString nodeID, QMap<QString, float>)
-{
+//    QObject::connect();
 
 }

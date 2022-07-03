@@ -56,10 +56,10 @@ Item {
                            if(_mbackend.connectionRequest(//drop.getDataAsString("sourceObjectId"),
                                                           drop.getDataAsString("sourceObjectId"),
                                                           drop.getDataAsString("valueIndex"),
-                                                          inputConnector,
+                                                          //inputConnector,
                                                           root.parentID,
                                                           root.vIdx,
-                                                          drop.source,
+                                                          //drop.source,
                                                           drop.getDataAsString("valueType"))) {
                                drop.acceptProposedAction()
 

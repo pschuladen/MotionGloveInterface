@@ -6,6 +6,7 @@
 
 #include "nodeviewcontroller.h"
 #include "typehelper.h"
+#include "saveloadinterfaceclass.h"
 
 class OutputNodeController : public NodeViewController
 {
@@ -66,6 +67,10 @@ private:
     quint32 m_targetIdx;
     bool m_mouseHover;
     bool m_mouseRemoteHover;
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    void initSaveData() override;
 };
 
 #endif // OUTPUTNODECONTROLLER_H

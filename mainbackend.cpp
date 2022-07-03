@@ -25,6 +25,9 @@ void MainBackend::initialSetup()
 {
     DeviceStatusManager *_dma = new DeviceStatusManager();
     deviceManager.append(_dma);
+
+    projectManager = new ProjectFileManager();
+
     QList<ThreadRole> _threadList = {Main, NetIn, NetOut, Process};//, Audio};
     QList<QString> _threadNames = {"Main-Thread", "Net-In", "Net-Out", "Process-Thread"};//, "Audio-Thread"};
 //    foreach(const ThreadRole &_thread, _threadList) {
@@ -39,6 +42,28 @@ void MainBackend::initialSetup()
     _dma->moveToThread(threads.value(NetIn));
     connect(_dma, &DeviceStatusManager::newOscInputDevice, this, &MainBackend::createNewMotionDeviceView);
     connect(this, &MainBackend::deviceWithNameCreated, _dma, &DeviceStatusManager::setIdForNamedDevice);
+    connect(this, &MainBackend::loadedMotionDeviceFromFile, _dma, &DeviceStatusManager::loadMotionDeviceFromDomElement);
+
+    projectManager = projManager::Instance();
+    connect(this, &MainBackend::sig_increase, projectManager, &ProjectFileManager::increaseSaveObjectCounter);
+    connect(this, &MainBackend::sig_sendProjectFileUrl, projectManager, &ProjectFileManager::setXmlFilePath);
+    connect(this, &MainBackend::sig_sceneCleared, projectManager, &ProjectFileManager::loadSceneFromCurrentFile);
+    connect(projectManager, &ProjectFileManager::selectedXmlFileReadyLoad, this, &MainBackend::prepareForNewProject);
+    connect(projectManager, &ProjectFileManager::qDomElemToScene, this, &MainBackend::qDomElementFromFile);
+    connect(projectManager, &ProjectFileManager::finishedSendingCategory, this, &MainBackend::loadCategoryFinished);
+    connect(this, &MainBackend::requestObjectCategory, projectManager, &ProjectFileManager::extractNodesWithType);
+
+    //tes qdomstufft
+    connect(this, &MainBackend::testSendDomNode, projectManager, &ProjectFileManager::testReceiveDomeNode);
+    QDomDocument tmpDoc;
+    QDomElement xxx = tmpDoc.createElement("blabla");
+//    xxx.setTagName("blabla");
+    xxx.setAttribute("hase", "loeffel");
+    emit testSendDomNode(xxx);
+    //
+
+
+//    connect(this, &MainBackend::sig_triggerLoadFromFile, projectManager, &ProjectFileManager::setXmlFilePath);
 
 //    connect(_dma, &DeviceStatusManager::receivedNewDevice, this, &MainBackend::createNewInputViews, Qt::QueuedConnection);
 
@@ -46,7 +71,7 @@ void MainBackend::initialSetup()
 //    threads.value(NetIn)->start();
 }
 
-bool MainBackend::createProcessingNodeDrop(QPoint atPosition, int type)//float posX, float posY)
+bool MainBackend::createProcessingNodeDrop(QPoint atPosition, TypeHelper::ProcessorType type, QString id)//float posX, float posY)
 {
 
     QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml")));
@@ -54,22 +79,22 @@ bool MainBackend::createProcessingNodeDrop(QPoint atPosition, int type)//float p
         qWarning() << "WARNING! New Processing Component:" << newProcessingComponent.errorString();
         return false;
     }
-    QString _id = createUniqueId(TypeHelper::Process); //name = QString("proc-%1").arg(processingNodes.size());
-    NodeViewController *newProcessingView = qobject_cast<NodeViewController*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", _id},
+    if(id == "") id = createUniqueId(TypeHelper::Process); //name = QString("proc-%1").arg(processingNodes.size());
+    NodeViewController *newProcessingView = qobject_cast<NodeViewController*>(newProcessingComponent.createWithInitialProperties({{"uniqueID", id},
                                                                                                                   {"x", atPosition.x()-40},
                                                                                                                   {"y", atPosition.y()-20}}));
 
-    ProcessNode *viewBackend = newProcessingView->findChild<ProcessNode*>(_id+"-viewcontroller");
+    ProcessNode *viewBackend = newProcessingView->findChild<ProcessNode*>(id+"-viewcontroller");
     newProcessingView->setParentItem(processingGraphView);
 
-    processingNodes.insert(_id.toUtf8(), ProcessingNode(viewBackend, newProcessingView));
-    allConnectableObjects.insert(_id.toUtf8(), ConnectableObject(viewBackend, newProcessingView, TypeHelper::Process));
+    processingNodes.insert(id.toUtf8(), ProcessingNode(type, viewBackend, newProcessingView));
+    allConnectableObjects.insert(id.toUtf8(), ConnectableObject(viewBackend, newProcessingView, TypeHelper::Process));
     connect(viewBackend, &ProcessNode::newSubprocessorWasCreated, this, &MainBackend::moveSubprocessorToProcessThread);
     qDebug() << "going out of scope";
     return true;
 }
 
-bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex, TypeHelper::ValueType valType, int subIdx)
+bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, quint16 outputIndex, TypeHelper::ValueType valType, QString id,int subIdx)
 {
     qInfo() << atPoint << targetDevice << outputIndex << valType << subIdx;
 
@@ -79,10 +104,10 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
         newDeviceComponent.deleteLater();
         return false;
     }
-    QString _id = createUniqueId(TypeHelper::Output);
 
+    if(id == "") id = createUniqueId(TypeHelper::Output);
 
-    OutputNodeController *newOutPutNode = qobject_cast<OutputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", _id},
+    OutputNodeController *newOutPutNode = qobject_cast<OutputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", id},
                                                                                                           {"outputAddress", oscOutputDevices.value(targetDevice).viewController->oscPaths().at(outputIndex)},
                                                                                                           {"x", atPoint.x()-30},
                                                                                                           {"y", atPoint.y()-10}}));
@@ -98,7 +123,7 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
         return false;
     }
     qDebug() << "outputnode connecting to packetbuilder";
-    ValueNotifierClass *_outputNotifier = new ValueNotifierClass(_id.toUtf8(), -1);
+    ValueNotifierClass *_outputNotifier = new ValueNotifierClass(id.toUtf8(), -1);
     _outputNotifier->setAutoEmit(true);
 
     ValueNotifierClass::completeConnectValueNotifier(_outputNotifier, oscPackBuilder);
@@ -115,8 +140,8 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
     connect(newOutPutNode, &OutputNodeController::mouseHoveredOnNode, oscOutputDevices.value(targetDevice).viewController, &OscOutputViewController::viewAtIndexHovered);
 
 
-    allConnectableObjects.insert(_id, ConnectableObject(_outputNotifier, newOutPutNode, TypeHelper::Output));
-    outputNodes.insert(_id, OutputNode(newOutPutNode, targetDevice, outputIndex));
+    allConnectableObjects.insert(id, ConnectableObject(_outputNotifier, newOutPutNode, TypeHelper::Output));
+    outputNodes.insert(id, OutputNode(newOutPutNode, targetDevice, outputIndex));
 //    oscOutputDevices[targetDevice].;
     qDebug() << "outputnode created, setting parentItem";
 
@@ -124,7 +149,7 @@ bool MainBackend::createOutputNodeDrop(QPoint atPoint, QString targetDevice, qui
 
     newOutPutNode->setParentItem(processingGraphView);
 
-
+    objectDidFinishLoad(id);
     return true;
 }
 
@@ -140,12 +165,14 @@ bool MainBackend::deleteObjectWithId(const QString uniqueID)
 
     const ConnectableObject &_delObj = allConnectableObjects.value(uniqueID);
 
-    for(const QString &_cid: _delObj.receivingConnections) {
+    QList<QString> _rCons = _delObj.receivingConnections;
+    for(const QString &_cid: _rCons) {// _delObj.receivingConnections) {
         deleteConnectionWithId(_cid);
 //        allConnections.value(_cid).connectionView->deleteLater();
 //        allConnections.remove(_cid);
     }
-    for (const QSet<QString> &_cset: _delObj.sendConnections) {
+    QList<QSet<QString>> _sCons = _delObj.sendConnections;
+    for (const QSet<QString> &_cset: _sCons) { //_delObj.sendConnections) {
         for(const QString &_cid: _cset) {
             deleteConnectionWithId(_cid);
 //            allConnections.value(_cid).connectionView->deleteLater();
@@ -171,8 +198,8 @@ bool MainBackend::deleteObjectWithId(const QString uniqueID)
 
     _delObj.qmlView->deleteLater();
 
-    if(_delObj.nodeType != TypeHelper::Output)
-        _delObj.notifier->deleteLater();
+//    if(_delObj.nodeType != TypeHelper::Output)
+//        _delObj.notifier->deleteLater();
 
     allConnectableObjects.remove(uniqueID);
 
@@ -183,6 +210,7 @@ bool MainBackend::deleteObjectWithId(const QString uniqueID)
 
 bool MainBackend::deleteConnectionWithId(const QString uniqueID)
 {
+    if(!allConnections.contains(uniqueID)) return false;
     const ValueConnection &_co = allConnections.value(uniqueID);
     ConnectableObject &_sendObj = allConnectableObjects[_co.sourceId];
     ConnectableObject &_rcvObj = allConnectableObjects[_co.receiverId];
@@ -268,13 +296,13 @@ bool MainBackend::deleteReceiveConnectionForObjectAtIdx(const QString uniqueID, 
     return true;
 }
 
-bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueIdx, QQuickItem *senderConnector,
-                                    const QString receiverNodeId, int targetValueIdx, QQuickItem *receiverConnector,
-                                    TypeHelper::ValueType valueType)
+bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueIdx,
+                                    const QString receiverNodeId, int targetValueIdx,
+                                    TypeHelper::ValueType valueType, QString conId)
 {
     if(!allConnectableObjects.contains(senderNodeId) || !allConnectableObjects.contains(receiverNodeId)) {
-        qWarning() << "Connection request" << senderNodeId << sourceValueIdx << senderConnector <<
-                   receiverNodeId << targetValueIdx << receiverConnector <<
+        qWarning() << "Connection request" << senderNodeId << sourceValueIdx <<
+                   receiverNodeId << targetValueIdx  <<
                    valueType;
         qWarning() << "no objects found for connection";
         return false;
@@ -283,24 +311,43 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
 
     ConnectableObject &_srcObj = allConnectableObjects[senderNodeId];
     ConnectableObject &_rcvObj = allConnectableObjects[receiverNodeId];
+
     ValueNotifierClass *sendingNotifier = _srcObj.notifier->getNotifier(sourceValueIdx);
     ValueNotifierClass *receivingNotifier = _rcvObj.notifier->getNotifier(targetValueIdx);
+
     qDebug() << "receiving notifier" << receivingNotifier;
 
     if (sendingNotifier == nullptr || receivingNotifier == nullptr) {
-        qWarning() << "Connection request" << senderNodeId << sourceValueIdx << senderConnector <<
-                   receiverNodeId << targetValueIdx << receiverConnector <<
+        qWarning() << "Connection request" << senderNodeId << sourceValueIdx <<
+                   receiverNodeId << targetValueIdx  <<
                    valueType;
         qWarning() << "no sending and/or receiving notifier found!";
         return false;
     }
-    QString connectionId = createUniqueId(TypeHelper::Connection);//senderNodeId+"-*-"+receiverNodeId;
-    if(allConnections.contains(connectionId)) {
+    if(conId == "") conId = createUniqueId(TypeHelper::Connection);//senderNodeId+"-*-"+receiverNodeId;
+    if(allConnections.contains(conId)) {
         qInfo() << "connection already exists";
         return false;
     }
 
-    int _rcvIdx = receivingNotifier->newConnectionFromSender(sendingNotifier, valueType);
+//    if(targetValueIdx < 0) {
+//    }
+    int _rcvIdx;
+//    if(_rcvObj.nodeType == TypeHelper::Process) {
+//        _rcvIdx = _rcvObj.receivingConnections.size();
+//    }
+
+    if(_rcvObj.nodeType == TypeHelper::Output) {
+        if(_rcvObj.receivingConnections.value(0, "") == "") {
+            _rcvIdx = 0;
+            connect(this, &MainBackend::newConnectionRequest, receivingNotifier, &ValueNotifierClass::newConnectionFromSender, Qt::SingleShotConnection);
+            emit newConnectionRequest(sendingNotifier, valueType, targetValueIdx);
+        }
+        else return false;
+    }
+    else {
+        _rcvIdx = receivingNotifier->newConnectionFromSender(sendingNotifier, valueType, -1);
+    }
     qDebug() << "receive idx" << _rcvIdx;
     if(_rcvIdx < 0) {
         qWarning() << "receiver does not accept connection";
@@ -313,7 +360,7 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         qWarning() << "connectionview error" << newDeviceComponent.errorString();
         return false;
     }
-    ConnectionViewController *newConnectionView = qobject_cast<ConnectionViewController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", connectionId},
+    ConnectionViewController *newConnectionView = qobject_cast<ConnectionViewController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", conId},
                                                                                                                                           {"valueType", valueType}}));
     if(newConnectionView == nullptr) {
         qWarning() << "ERROR! while creating connecitonview";
@@ -328,15 +375,12 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         return false;
     }
 
-    allConnections.insert(connectionId, ValueConnection(
-                              senderNodeId, _srcIdx, receiverNodeId, _rcvIdx,
-                              valueType, newConnectionView));
-
+    qDebug() << "registering connection";
     if(_srcObj.sendConnections.size() <= _srcIdx) _srcObj.sendConnections.resize(_srcIdx+1);
-    _srcObj.sendConnections[_srcIdx].insert(connectionId);
+    _srcObj.sendConnections[_srcIdx].insert(conId);
 
     if(_rcvObj.receivingConnections.size() <= _rcvIdx ) _rcvObj.receivingConnections.resize(_rcvIdx+1);
-    _rcvObj.receivingConnections[_rcvIdx] =  connectionId;
+    _rcvObj.receivingConnections[_rcvIdx] =  conId;
 
     if(_rcvObj.nodeType == TypeHelper::Process && _rcvObj.sendConnections.size() <= _rcvIdx) {
          _rcvObj.sendConnections.resize(_rcvIdx+1);
@@ -344,16 +388,39 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
 
     newConnectionView->setParentItem(processingGraphView);
 
+    allConnections.insert(conId, ValueConnection(
+                              senderNodeId, _srcIdx, receiverNodeId, _rcvIdx,
+                              valueType, newConnectionView));
+
     qDebug() << "connection list size" << allConnectableObjects[receiverNodeId].sendConnections.size() << allConnectableObjects[receiverNodeId].receivingConnections.size();
     qDebug() << "sender node size" << allConnectableObjects.value(senderNodeId).sendConnections;
 
 
     return true;
+
+}
+
+void MainBackend::newConnectionEstablished(QString connectionId, bool accepted)
+{
+    if(pendingConnectionRequests.contains(connectionId)) {
+        if(accepted) {
+
+        }
+        else {
+            pendingConnectionRequests.remove(connectionId);
+        }
+    }
+
 }
 
 bool MainBackend::createOscOutputDevice()
 {
     QString uniqueID = createUniqueId(TypeHelper::OscOutput);//QString("oscout-%1").arg(oscOutputDevices.size());
+    return createOscOutputDevice(uniqueID);
+}
+
+bool MainBackend::createOscOutputDevice(QString uniqueID)
+{
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/OscOutputDeviceView.qml")));
 
     if(newDeviceComponent.isError()) {
@@ -369,7 +436,7 @@ bool MainBackend::createOscOutputDevice()
         return false;
     }
 
-    OscOutputDevice *oscDevice = new OscOutputDevice(viewController, nullptr);
+    OscOutputDevice *oscDevice = new OscOutputDevice(uniqueID, viewController, nullptr);
 
     if(oscDevice == nullptr || viewController == nullptr || newDeviceItem == nullptr) {
         if(oscDevice == nullptr) qWarning() << "oscDevice Not Created found!!";
@@ -389,7 +456,8 @@ bool MainBackend::createOscOutputDevice()
 }
 
 
-bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QString inputPath, TypeHelper::ValueType valType, int subIdx)
+bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QString inputPath, TypeHelper::ValueType valType,
+                                      QString id, int subIdx)
 {   
 //    qInfo() << "create input" << atPoint << sourceDevice << identifier << valType << subIdx;
 
@@ -399,9 +467,9 @@ bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QStr
         newDeviceComponent.deleteLater();
         return false;
     }
-    QString _id = createUniqueId(TypeHelper::Input);
+    if(id == "") id = createUniqueId(TypeHelper::Input);
 
-    InputNodeController *inputNodeViewCtrl = qobject_cast<InputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", _id},
+    InputNodeController *inputNodeViewCtrl = qobject_cast<InputNodeController*>(newDeviceComponent.createWithInitialProperties({{"uniqueID", id},
                                                                                                           {"inputPath", inputPath},
                                                                                                           {"sourceDevice", sourceDevice},
                                                                                                           {"valueType", valType},
@@ -413,7 +481,7 @@ bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QStr
         return false;
     }
 
-    ValueNotifierClass *inNodeNoti = new ValueNotifierClass(_id.toUtf8(), -1, valType);
+    ValueNotifierClass *inNodeNoti = new ValueNotifierClass(id.toUtf8(), -1, valType);
     inNodeNoti->setAutoEmit(true);
 
     if(!ValueNotifierClass::connectValueTypeSignalToSlot(oscInputDevices.value(sourceDevice).oscReceiver->getNotifierForOsc(inputPath.toUtf8()),
@@ -429,10 +497,11 @@ bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QStr
     moveObjectToThread(inNodeNoti, TypeHelper::Process);
     inputNodeViewCtrl->setInputValueController(oscInputDevices.value(sourceDevice).inputViewController.value(inputPath));
 
-    inputNodes.insert(_id, InputNode(inputNodeViewCtrl, sourceDevice, inputPath));
-    allConnectableObjects.insert(_id, ConnectableObject(inNodeNoti, inputNodeViewCtrl, TypeHelper::Input));
+    inputNodes.insert(id, InputNode(inputNodeViewCtrl, sourceDevice, inputPath));
+    allConnectableObjects.insert(id, ConnectableObject(inNodeNoti, inputNodeViewCtrl, TypeHelper::Input));
     inputNodeViewCtrl->setParentItem(processingGraphView);
 
+    objectDidFinishLoad(id);
     return true;
 }
 
@@ -464,7 +533,9 @@ void MainBackend::updateConnectionIndices(ConnectableObject &cobject, quint16 st
     qDebug() << "all connections" << allConnections.keys();
     qDebug() << "receiving connections" << cobject.receivingConnections;
     for(int i = startIdx; i < cobject.receivingConnections.length(); i++) {
-        allConnections[cobject.receivingConnections.at(i)].setReceiverIdx(i);
+//    for(const QString &_rcId: cobject.receivingConnections) {
+        if(cobject.receivingConnections.at(i) != "")
+            allConnections[cobject.receivingConnections.at(i)].setReceiverIdx(i);
     }
     qDebug() << "update send indices for object" << cobject.sendConnections.length() << startIdx;
     for(int i = startIdx; i < cobject.sendConnections.length(); i++) {
@@ -473,6 +544,12 @@ void MainBackend::updateConnectionIndices(ConnectableObject &cobject, quint16 st
         }
     }
 }
+
+void MainBackend::errorWarningCreate(QString id, TypeHelper::NodeType ntype)
+{
+    qWarning() << "error while creating" << TypeHelper::getPrefixForNodetype(ntype) << id;
+}
+
 
 QString MainBackend::createUniqueId(TypeHelper::NodeType nodeType)
 {
@@ -519,18 +596,7 @@ void MainBackend::showConnectionLists(QString objectID)
     qDebug() << "receive connections for obejct" << objectID << _obj.receivingConnections;
 }
 
-void MainBackend::saveAsButtonPressed(QUrl fileUrl)
-{
-    qDebug() << "save function " << fileUrl;
-
-}
-
-void MainBackend::loadButtonPressed()
-{
-
-}
-
-void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDevice)
+void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDevice, QString uniqueID)
 {
     QQmlComponent newDeviceComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/SensorInputContainer.qml")));
 
@@ -547,17 +613,24 @@ void MainBackend::createNewMotionDeviceView(QString name, OscInputDevice *newDev
         return;
     }
 
-    QString _id = createUniqueId(TypeHelper::OscInput);
+    bool updateIdInStatusManager = false;
+    if(uniqueID == "") {
+        uniqueID = createUniqueId(TypeHelper::OscInput);
+        updateIdInStatusManager = true;
+    }
+
     newDeviceItem->setObjectName(QString(name+"-view"));
-    oscInputDevices.insert(_id, OscInDeviceStruct(name, newDevice, viewCon, newDeviceItem));
+    oscInputDevices.insert(uniqueID, OscInDeviceStruct(name, newDevice, viewCon, newDeviceItem));
     connect(viewCon, &OscInputViewController::connectDeviceChanged, newDevice, &OscInputDevice::setSendPong);
 
     newDeviceItem->setParentItem(inputDevicesSidebarView);
 
     connect(this, &MainBackend::inputViewReady, newDevice, &OscInputDevice::viewWasCreated, Qt::SingleShotConnection);
     connect(newDevice, &OscInputDevice::sendSensorStructList, this, &MainBackend::createSensorViewsForMotionDevice, Qt::SingleShotConnection);
+    connect(newDevice, &OscInputDevice::didFinishLoad, this, &MainBackend::objectDidFinishLoad, Qt::SingleShotConnection);
 
-    emit deviceWithNameCreated(name, _id);
+    if(updateIdInStatusManager) emit deviceWithNameCreated(name, uniqueID);
+
     emit inputViewReady();
 }
 
@@ -608,7 +681,304 @@ void MainBackend::moveSubprocessorToProcessThread(ProcessNode *processor)
     moveObjectToThread(processor, TypeHelper::Process);
 }
 
-void MainBackend::newConnectionEstablished()
+
+void MainBackend::saveAsButtonPressed(QUrl fileUrl)
 {
+    qDebug() << "save function " << fileUrl;
+    emit sig_sendProjectFileUrl(fileUrl);
+
+    projectManager->prepareXmlDoc();
+    int saveCount = 0;
+
+    for (auto iter = oscInputDevices.constBegin(); iter != oscInputDevices.constEnd(); ++iter) {
+        projectManager->oscInputDeviceElement(iter.key(), iter->deviceName);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->oscReceiver, &OscInputDevice::initSaveData, Qt::SingleShotConnection);
+        saveCount += 1;
+    }
+    for (auto iter = oscOutputDevices.constBegin(); iter != oscOutputDevices.constEnd(); ++iter) {
+        projectManager->oscOutputdeviceElement(iter.key());
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->oscSender, &OscOutputDevice::initSaveData, Qt::SingleShotConnection);
+        saveCount += 1;
+    }
+    for (auto iter = inputNodes.constBegin(); iter != inputNodes.constEnd(); ++iter) {
+        projectManager->inputNodeElement(iter.key(), iter->inputDevice, iter->inputAddress);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->qmlView, &InputNodeController::initSaveData, Qt::SingleShotConnection);
+        saveCount += 1;
+    }
+    for(auto iter = outputNodes.constBegin(); iter != outputNodes.constEnd(); ++iter) {
+        projectManager->outputNodeElement(iter.key(), iter->outputDevice, iter->outputIndex);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->qmlView, &OutputNodeController::initSaveData);
+        saveCount += 1;
+    }
+    for(auto iter = processingNodes.constBegin(); iter != processingNodes.constEnd(); ++iter) {
+        projectManager->processingNodeElement(iter.key(), iter->procType);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->qmlView, &NodeViewController::initSaveData, Qt::SingleShotConnection);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->controller, &ProcessNode::initSaveData, Qt::SingleShotConnection);
+        saveCount += 2;
+    }
+    for(auto iter = allConnections.constBegin(); iter != allConnections.constEnd(); ++iter) {
+        projectManager->valueConnectionElement(iter.key(), iter->sourceId, iter->sourceIdx, iter->receiverId, iter->receiverIdx, iter->valType);
+    }
+
+    emit sig_increase(saveCount);
+
+    emit sig_triggerSaveToFile();
+
+//    for(QString &_id: oscInputDevices.keys()) {
+//        projectManager->oscInputDevice(_id, oscInputDevices[_id].deviceName);
+//    }
+//    for(QString &_id: oscOutputDevices.keys()) {
+//        projectManager->oscOutputdevice(_id);
+//    }
+//    for(QString &_id: oscInputDevices.keys()) {
+////        projectManager.
+//    }
+
+//    projectManager->writeXmlFile(fileUrl);
 
 }
+
+void MainBackend::loadButtonPressed(QUrl fileUrl)
+{
+    qDebug() << "load file" << fileUrl;
+
+    emit sig_sendProjectFileUrl(fileUrl, true);
+}
+
+void MainBackend::prepareForNewProject()
+{
+    //TODO: delete everything that is there (but not Input/Output? )
+
+    qDebug() << "scene cleared";
+
+//    loadSceneStatus = 1;
+//    emit requestObjectCategory(TypeHelper::OscInput);
+    requestNextCategory();
+
+//    emit sig_sceneCleared();
+}
+
+void MainBackend::qDomElementFromFile(QDomElement element, TypeHelper::NodeType type)
+{
+
+    switch(type) {
+
+    case TypeHelper::Input:
+    {
+//        QString _id = element.tagName();
+        QString _sDev = element.attribute("inputDevice", "");
+        QString _inPath = element.attribute("inputAddress", "");
+        if(_sDev != "" && _inPath != "") {
+            QPoint _p = getCreatePosition(element);//(10,10);
+            bool _typeOk;
+            quint16 _typeint = getAttributeFromViewNode(element, "valueType").toUInt(&_typeOk);
+            qDebug() << "creating inputnode "<< element.tagName();
+            if(_typeOk) {
+                TypeHelper::ValueType _vtyp = static_cast<TypeHelper::ValueType>(_typeint);
+                pendingObjectCreation.insert(element.tagName());
+                qDebug() << "creating input" << element.tagName();
+                if(!createInputNodeDrop(_p, _sDev, _inPath, _vtyp, element.tagName())) qWarning() << "could not create inputnode";
+            }
+            else {
+                qWarning() << "type for input not ok" << _typeint;
+            }
+        }
+    }
+        break;
+
+    case TypeHelper::Process:
+    {
+        bool _typeOk;
+        int _sType = element.attribute("processor-type", "").toInt(&_typeOk);
+        if(_typeOk) {
+            TypeHelper::ProcessorType _pType = static_cast<TypeHelper::ProcessorType>(_sType);
+            if(createProcessingNodeDrop(getCreatePosition(element), _pType, element.tagName())) {
+                QDomElement _proc = element.firstChildElement("processor");
+                pendingObjectCreation.insert(element.tagName());
+                if(!_proc.isNull()) {
+
+
+                    connect(this, &MainBackend::sendQdomElement,
+                            processingNodes[element.tagName()].controller,
+                            &ProcessNode::loadDataFromQdomElement, Qt::SingleShotConnection);
+                    connect(processingNodes[element.tagName()].controller,
+                            &ProcessNode::didFinishLoad,
+                            this, &MainBackend::objectDidFinishLoad,
+                            Qt::SingleShotConnection);
+                    emit sendQdomElement(element);
+                }
+                else {
+                    objectDidFinishLoad(element.tagName());
+                }
+            }
+        }
+
+    }
+        break;
+
+    case TypeHelper::Output:
+    {
+        QString _tDev = element.attribute("ouputDevice", "");
+        bool idxOk;
+        int _tIdx = element.attribute("outputIdx", "").toInt(&idxOk);
+        if(idxOk) {
+            pendingObjectCreation.insert(element.tagName());
+            createOutputNodeDrop(getCreatePosition(element),
+                                 _tDev, _tIdx, TypeHelper::Undefined,
+                                 element.tagName());
+        }
+    }
+        break;
+
+    case TypeHelper::OscInput:
+        pendingObjectCreation.insert(element.tagName());
+        emit loadedMotionDeviceFromFile(element);
+        break;
+
+    case TypeHelper::OscOutput:
+    {
+        if(createOscOutputDevice(element.tagName())) {
+            QDomElement devSetElement = element.firstChildElement("device-settings");
+            if(!devSetElement.isNull()) {
+                pendingObjectCreation.insert(element.tagName());
+                connect(this, &MainBackend::sendQdomElement,
+                        oscOutputDevices[element.tagName()].oscSender,
+                        &OscOutputDevice::loadDataFromQdomElement,
+                        Qt::SingleShotConnection);
+                emit sendQdomElement(devSetElement);
+                connect(oscOutputDevices[element.tagName()].oscSender,
+                        &OscOutputDevice::didFinishLoad,
+                        this, &MainBackend::objectDidFinishLoad,
+                        Qt::SingleShotConnection);
+            }
+        }
+        else errorWarningCreate(element.tagName(), type);
+    }
+        break;
+
+    case TypeHelper::Connection:
+    {
+        QString _sId = element.attribute("sourceId", "");
+        QString _rId = element.attribute("receiverId", "");
+        bool _sOk, _rOk, _vOk;
+        int _sIdx = element.attribute("srcIdx", "-1").toInt(&_sOk);
+        int _rIdx = element.attribute("rcvIdx", "-1").toInt(&_rOk);
+        int _vTypi = element.attribute("valueType", "0").toInt(&_vOk);
+        if(_sOk && _rOk && _vOk) {
+            TypeHelper::ValueType _vTyp = static_cast<TypeHelper::ValueType>(_vTypi);
+            connectionRequest(_sId, _sIdx, _rId, _rIdx, _vTyp);
+        }
+    }
+        break;
+    default:
+        break;
+    }
+}
+
+QPoint MainBackend::getCreatePosition(QDomElement element)
+{
+    QPoint _p(10,10);
+    QDomElement _viewnode = element.firstChildElement("view-node");
+    if(!_viewnode.isNull()) {
+        QDomElement _pos = _viewnode.firstChildElement("position");
+        if(!_pos.isNull()) {
+            _p.setX(_pos.attribute("x", "10").toFloat());
+            _p.setY(_pos.attribute("y", "10").toFloat());
+        }
+    }
+    return _p;
+}
+
+QString MainBackend::getAttributeFromViewNode(QDomElement element, QString attr)
+{
+    QDomElement _viewnode = element.firstChildElement("view-node");
+    if(!_viewnode.isNull()) {
+        QDomElement _attr = _viewnode.firstChildElement("attributes");
+        if(!_attr.isNull()) {
+            return _attr.attribute(attr, "");
+        }
+    }
+    return "";
+}
+
+void MainBackend::objectDidFinishLoad(QString uniqueID)
+{
+
+    qDebug() << "finished loading object" << uniqueID;
+    if(pendingObjectCreation.remove(uniqueID)) {
+        requestNextCategory();
+    }
+}
+
+void MainBackend::loadCategoryFinished(TypeHelper::NodeType type)
+{
+    qDebug() << "finished read category" << type;
+    categoryPending = false;
+    requestNextCategory();
+}
+
+
+void MainBackend::requestNextCategory()
+{
+    qDebug() << "load scene status:" << loadSceneStatus;
+    if(pendingObjectCreation.isEmpty() && !categoryPending) {
+        typedef TypeHelper _th;
+        const QList<_th::NodeType> _cats = {_th::OscInput, _th::OscOutput,
+                                            _th::Input, _th::Output,
+                                            _th::Process, _th::Connection};
+        if(loadSceneStatus < _cats.length()) {
+            loadSceneStatus++;
+            categoryPending = true;
+            emit requestObjectCategory(_cats.at(loadSceneStatus-1));
+        }
+        else {
+            loadSceneStatus = 0;
+        }
+    }
+    else {
+        qDebug() << "pending objects" << pendingObjectCreation;
+    }
+}
+
+
+
+
+
+
+//        qDebug() << "read to load oscouput" << element.tagName();
+//        QDomNodeList _nodes = element.childNodes();
+//        for(int i = 0; i < _nodes.count(); i++) {
+//            if(_nodes.at(i).isElement()) {
+//                const QDomElement _subElement = _nodes.at(i).toElement();
+//            }
+//        }
+//    }
+
+//    qDebug() << "receiving nodeElement";
+//    QDomNodeList _subNodes = element.childNodes();
+//    for(int i = 0; i < _subNodes.count(); i++) {
+//        if(_subNodes.at(i).isElement()) {
+//            const QDomElement _subElement = _subNodes.at(i).toElement();
+//            qDebug() << "getting tags from devie" << element.tagName() << ":" <<_subElement.tagName();
+//            QDomNodeList sssubs = _subElement.childNodes();
+//            for(int i = 0; i < sssubs.length(); i++) {
+//                if(sssubs.at(i).isElement()) {
+//                    QDomElement xx = sssubs.at(i).toElement();
+//                    qDebug() << xx.tagName();
+//                    for(int i = 0; i < xx.childNodes().length(); i++) {
+//                        QDomElement xxx = xx.childNodes().at(i).toElement();
+//                        qDebug() << xxx.tagName();
+//                        for (int i = 0; i < xxx.attributes().length(); i++) {
+//                            QDomNode _aa = xxx.attributes().item(i);
+//                            QDomAttr _a = _aa.toAttr();
+//                            qDebug() << _a.name() << _a.value();
+//                        }
+//                        if(xxx.childNodes().at(i).isAttr()) {
+//                            QDomAttr _a = xxx.childNodes().at(i).toAttr();
+//                            qDebug() << _a.name() << _a.value();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }

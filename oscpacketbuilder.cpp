@@ -64,7 +64,7 @@ void OscPacketBuilder::setMsgBufferSize()
 }
 
 
-int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
     if (valueInputConnected) return -1;
 
@@ -171,7 +171,7 @@ void OscPacketBuilder::slot_trigger(int frame)
 }
 
 
-bool OscPacketBuilder::acceptsInputType(TypeHelper::ValueType typ) const
+bool OscPacketBuilder::acceptsInputType(TypeHelper::ValueType typ, int atIdx) const
 {
     return !valueInputConnected;
 }

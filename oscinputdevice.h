@@ -26,8 +26,10 @@
 
 #include "oscinputparser.h"
 
+#include "saveloadinterfaceclass.h"
 
-class OscInputDevice : public QObject
+
+class OscInputDevice : public QObject, public SaveLoadInterfaceClass
 {
     Q_OBJECT
 
@@ -143,6 +145,17 @@ private:
     void sendPongMessage();
 
     QString m_uniqueId;
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    void initSaveData() override;
+    void loadDataFromQdomElement(QDomElement domElement) override;
+
+
+signals:
+    void sendSubNodeTree(QString uniqueID, QDomDocument subTree) override;
+    void announceAdditionalData(int add) override;
+    void didFinishLoad(QString uniqueID) override;
 };
 
 /*

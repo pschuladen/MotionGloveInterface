@@ -71,11 +71,11 @@ Item {
             id: createProcessModel
             ListElement {
                 name: "sum"
-                type: 0//ProcessNodeController.Scale
+                type: TypeHelper.GenericProcessor//ProcessNodeController.Scale
             }
             ListElement {
                 name: "scale"
-                type: 1//ProcessNodeController.ViewOnly
+                type: TypeHelper.Scale//1//ProcessNodeController.ViewOnly
             }
         }
     }

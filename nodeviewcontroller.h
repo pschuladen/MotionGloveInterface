@@ -3,8 +3,9 @@
 
 #include <QQuickItem>
 #include <QtQml/qqmlregistration.h>
+#include "saveloadinterfaceclass.h"
 
-class NodeViewController : public QQuickItem
+class NodeViewController : public QQuickItem, public SaveLoadInterfaceClass
 {
     Q_OBJECT
     QML_ELEMENT
@@ -44,6 +45,18 @@ private:
     QList<int> m_inConOffsets = {0};
     QList<int> m_outConOffsets = {0};
     QString m_uniqueID;
+
+    // SaveLoadInterfaceClass interface
+signals:
+    void sendSubNodeTree(QString uniqueID, QDomDocument subTree) override;
+    void announceAdditionalData(int add) override;
+    void didFinishLoad(QString uniqueID) override;
+
+    // SaveLoadInterfaceClass interface
+public slots:
+    virtual void initSaveData() override;
+    void loadDataFromQdomElement(QDomElement domElement) override;
+
 };
 
 #endif // NODEVIEWCONTROLLER_H

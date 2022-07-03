@@ -82,3 +82,22 @@ void NodeViewController::setUniqueID(const QString &newUniqueID)
     m_uniqueID = newUniqueID;
     emit uniqueIDChanged();
 }
+
+
+void NodeViewController::initSaveData()
+{
+    QDomDocument _doc("tmpdoc");
+    QDomElement root = _doc.createElement("view-node");
+    _doc.appendChild(root);
+    QDomElement _pos = _doc.createElement("position");
+    _pos.setAttribute("x", x());
+    _pos.setAttribute("y", y());
+    root.appendChild(_pos);
+
+    connect(this, &NodeViewController::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree, Qt::SingleShotConnection);
+    emit sendSubNodeTree(uniqueID(), _doc);
+}
+
+void NodeViewController::loadDataFromQdomElement(QDomElement domElement)
+{
+}

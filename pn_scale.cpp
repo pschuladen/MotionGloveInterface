@@ -3,6 +3,7 @@
 PN_Scale::PN_Scale(QObject *parent)
     : ProcessNode{parent}
 {
+    m_processorType = TypeHelper::Scale;
     m_inHigh = 1;
     m_inLow = 0;
     m_outHigh = 1;
@@ -18,6 +19,7 @@ PN_Scale::PN_Scale(QByteArray identifier, int idxInControlller, PN_Scale *contro
       m_inHigh{controller->inHigh()}, m_inLow{controller->inLow()},
       m_outHigh{controller->outHigh()}, m_outLow{controller->outLow()}
 {
+    m_processorType = TypeHelper::Scale;
     evalMultip();
     connectPropertiesToProcessor(controller, this);
 }
@@ -78,26 +80,40 @@ void PN_Scale::setOutHigh(float newOutHigh)
     emit outHighChanged(newOutHigh);
 }
 
-int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
     if(!acceptsInputType(type)) return -1;
 
-    PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
-    connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
+    if(atIdx < 0 ) atIdx = subProcessor.size();
 
-    qDebug() << "newconnection subprocessors" << this << subProcessor;
 
-    appendToConnectedTypes(type);
-    if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
+    while(atIdx + 1 > subProcessor.size()) {
+        PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
+        connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
+        appendToConnectedTypes(TypeHelper::Undefined);
         subProcessor.append(newSubprocessor);
-
         emit newSubprocessorWasCreated(newSubprocessor);
-        return subProcessor.size() -1;
     }
-    else {
-        newSubprocessor->deleteLater();
-        return -1;
-    }
+
+//    connect(this, &PN_Scale::connectionRequestFromSender, subProcessor[atIdx], &PN_Scale::setConnectionFromSender, Qt::SingleShotConnection);
+//    emit connectionRequestFromSender(sender, type, nValuesInList);
+
+    return atIdx;
+
+
+//    qDebug() << "newconnection subprocessors" << this << subProcessor;
+
+
+//    if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
+////        subProcessor.append(newSubprocessor);
+
+//        emit newSubprocessorWasCreated(newSubprocessor);
+//        return subProcessor.size() -1;
+//    }
+//    else {
+//        newSubprocessor->deleteLater();
+//        return -1;
+//    }
 }
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
@@ -112,6 +128,15 @@ ProcessNode *PN_Scale::createProcessControl(QString objectname_id)
     setInitialProperties(this, scale);
     connectPropertiesToProcessor(this, scale);
     return qobject_cast<ProcessNode*>(scale);
+}
+
+ProcessNode *PN_Scale::createSubprocessor(QString objectname_id)
+{
+    PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this);
+    connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
+//    subProcessor.append(newSubprocessor);
+    emit newSubprocessorWasCreated(newSubprocessor);
+    return newSubprocessor;
 }
 
 float PN_Scale::process(float value)
@@ -152,7 +177,7 @@ void PN_Scale::setMulti(float newMulti)
     m_multi = newMulti;
 }
 
-bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ) const
+bool PN_Scale::acceptsInputType(TypeHelper::ValueType typ, int atIdx) const
 {
         if(typ == TypeHelper::Undefined) return false;
         else return true;
@@ -166,6 +191,8 @@ void PN_Scale::connectPropertiesToProcessor(PN_Scale *propertyMaster, PN_Scale *
     connect(propertyMaster, &PN_Scale::outLowChanged, propertySlave, &PN_Scale::setOutLow);
     connect(propertyMaster, &PN_Scale::outHighChanged, propertySlave, &PN_Scale::setOutHigh);
     connect(propertyMaster, &PN_Scale::clipOutputChanged, propertySlave, &PN_Scale::setClipOutput);
+    connect(propertySlave, &PN_Scale::connectedTypeAtIdxChanged, propertyMaster, &PN_Scale::setConnectedTypesAtIdx);
+
     // has to be in another way...
 //    connect(propertySlave, &PN_Scale::connectedTypesChanged, propertyMaster, &PN_Scale::setConnectedTypes);
 }
@@ -179,6 +206,44 @@ void PN_Scale::setInitialProperties(PN_Scale *propertyMaster, PN_Scale *property
     propertySlave->setOutLow(propertyMaster->outLow());
     propertySlave->setOutHigh(propertyMaster->outHigh());
     propertySlave->setClipOutput(propertyMaster->clipOutput());
+}
+
+void PN_Scale::initSaveData()
+{
+    QDomDocument _doc("tmpdoc");
+    QDomElement root = _doc.createElement("processor");
+    root.setAttribute("nSubprocessors", subProcessor.count());
+    _doc.appendChild(root);
+    QDomElement _params = _doc.createElement("parameter");
+    _params.setAttribute("inLow", inLow());
+    _params.setAttribute("inHigh", inHigh());
+    _params.setAttribute("outLow", outLow());
+    _params.setAttribute("outHigh", outHigh());
+    _params.setAttribute("clipOutput", clipOutput());
+    root.appendChild(_params);
+
+    connect(this, &ProcessNode::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree);
+    emit sendSubNodeTree(identifier(), _doc);
+}
+
+void PN_Scale::loadDataFromQdomElement(QDomElement domElement)
+{
+
+    QDomElement _paras = domElement.firstChildElement("parameter");
+    if(!_paras.isNull()) {
+        const QList<QString> _propNames = {"inLow", "outHigh", "outLow", "inHigh", "clipOutput"};
+        bool _paraOk;
+        for(const QString &_prop: _propNames) {
+            float _val = _paras.attribute(_prop, "0").toFloat(&_paraOk);
+            if(_paraOk) {
+                qDebug() << "setting property" << _prop;
+                if(!setProperty(_prop.toLocal8Bit(), _val)) {
+                    qWarning() << "Property" << _prop << "for object" << identifier() << processorType() << "not properly set!";
+                }
+            }
+        }
+    }
+    emit didFinishLoad(identifier());
 }
 
 bool PN_Scale::clipOutput() const

@@ -39,6 +39,11 @@ public:
     };
     Q_ENUM(NodeType);
 
+    enum ProcessorType {
+        GenericProcessor, Scale
+    };
+    Q_ENUM(ProcessorType);
+
     static QString getPrefixForNodetype(NodeType nodeType);
 
     static size_t getSizeForValueType(const TypeHelper::ValueType vType);

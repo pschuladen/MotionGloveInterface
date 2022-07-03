@@ -17,35 +17,6 @@ ValueNotifierClass::ValueNotifierClass(QByteArray identifier, int objectIdx, Typ
     createSubnotifierForValueType(valType, valueNumber);
 }
 
-//ValueNotifierClass::ValueNotifierClass(TypeHelper::SensorType sensType, QObject *parent, int valueNumber)
-//    : QObject{parent}
-//{
-//    setParent(parent);
-//    int _nVals = 0;
-//    switch (sensType) {
-
-//    case SensType::Accel:
-//        _nVals = 3;
-//        break;
-//    case SensType::Gyro:
-//        _nVals = 3;
-//        break;
-//    case SensType::Grav:
-//        _nVals = 3;
-//        break;
-//    case SensType::RotQuat:
-//        _nVals = 4;
-//        break;
-//    case SensType::Touch:
-//        _nVals = 6;
-//        break;
-//    case SensType::Custom:
-//        int _nVals = valueNumber;
-//        break;
-//    }
-//    createSubnotifier(_nVals);
-//}
-
 void ValueNotifierClass::createSubnotifier(int numberOfSubs)
 {
     //TODO: possibly dangerous for existing (sub-)connections...
@@ -127,7 +98,7 @@ void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
     }
 }
 
-int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList)
+int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
     if(type == TypeHelper::Undefined) return -1;
     if(connectedValueType() != TypeHelper::Undefined) return -1;
@@ -136,6 +107,23 @@ int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, Type
     connectValueTypeSignalToSlot(sender, this, type);
 
     return 0;
+}
+
+void ValueNotifierClass::connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type,
+                                                     int connectToIdx, quint16 nValuesInList)
+{
+    if(newConnectionFromSender(sender, type) >= 0) {
+        emit connectionAccepted(connectionId);
+    }
+    else emit connectionAccepted(connectionId, false);
+}
+
+void ValueNotifierClass::slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type)
+{
+    if(newConnectionFromSender(sender, type) >= 0) {
+        emit connectionAccepted(connectionId);
+    }
+    else emit connectionAccepted(connectionId, false);
 }
 
 void ValueNotifierClass::inputsDisconnected()
@@ -291,7 +279,7 @@ void ValueNotifierClass::unimplementedValueTypeWarning(TypeHelper::ValueType val
     qInfo() << this << ": valueType" << valType << "not implemented yet" << extraMsg;
 }
 
-bool ValueNotifierClass::acceptsInputType(TypeHelper::ValueType typ) const
+bool ValueNotifierClass::acceptsInputType(TypeHelper::ValueType typ, int atIdx) const
 {
     return false;
 }

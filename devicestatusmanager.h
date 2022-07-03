@@ -21,6 +21,7 @@
 #include <QQuickItem>
 #include <QQmlProperty>
 #include <QQuickWindow>
+#include <QDomElement>
 
 #include "oscpp/server.hpp"
 #include "oscpp/client.hpp"
@@ -43,10 +44,13 @@ public:
 
 signals:
 
-    void newOscInputDevice(QString name, OscInputDevice *newDevice);
+    void newOscInputDevice(QString name, OscInputDevice *newDevice, QString uniqueId="");
 
 public slots:
     void setIdForNamedDevice(QString deviceName, QString deviceId);
+
+    void loadMotionDeviceFromDomElement(QDomElement element);
+
 
 private:
     QUdpSocket *socket;

@@ -61,7 +61,7 @@ public:
 
     bool supportsSubValues() const;
     void setSupportsSubValues(bool newSupportsSubValues);
-    virtual bool acceptsInputType(TypeHelper::ValueType typ) const;
+    virtual bool acceptsInputType(TypeHelper::ValueType typ, int atIdx=0) const;
 
     const QByteArray &identifier() const;
     void setIdentifier(const QByteArray &newIdentifier);
@@ -110,6 +110,12 @@ signals:
 
      void autoEmitChanged();
 
+     void connectionAccepted(QString connectionId, bool accepted=true);
+
+     void sig_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type);
+
+
+
 public slots:
      virtual void slot_quatChanged(QQuaternion quat, int frame=-1);
      virtual void slot_vectorChanged(QVector3D vect, int frame=-1);
@@ -120,7 +126,11 @@ public slots:
      virtual void slot_trigger(int frame=-1);
 
      virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
-     virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0);
+     virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx=0, quint16 nValuesInList=0);
+
+     virtual void connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx=0, quint16 nValuesInList=0);
+     virtual void slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type);
+
 
      virtual void inputsDisconnected();
 };
