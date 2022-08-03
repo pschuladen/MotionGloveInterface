@@ -49,7 +49,7 @@ Item {
                 text = root.controller.oscPaths[root.viewIdx]
                 focus = false
             }
-            onEditingFinished: root.controller.setOscPathAtIndex(text, root.viewIdx)//root.ipAddress = text
+            onEditingFinished: root.controller.oscPathAtIndexChanged(text, root.viewIdx)//root.ipAddress = text
             onFocusChanged: {
                 if(!focus) {text = root.controller.oscPaths[root.viewIdx]}
             }

@@ -94,7 +94,7 @@ private:
 
     QQmlApplicationEngine *m_engine;
     QQuickWindow *mainWindow;
-    QQuickItem *deviceStatusView;
+//    QQuickItem *deviceStatusView;
     QQuickItem *inputDevicesSidebarView;
     QQuickItem *processingGraphView;
     QQuickItem *outputDevcesSidebarView;
@@ -138,7 +138,7 @@ private:
         QString outputDevice;
         //QList<QString> outputAddress;
         quint16 outputIndex;
-        OutputNode(OutputNodeController *_qmlView, QString _outputDevice, quint16 _outputIndex)
+        OutputNode(QString _outputDevice, quint16 _outputIndex, OutputNodeController *_qmlView=nullptr)
             : qmlView{_qmlView}, outputDevice{_outputDevice}, outputIndex{_outputIndex} {}
         OutputNode() {}
     };
@@ -236,7 +236,6 @@ public slots:
 
 private:
 
-
     QSet<QString> pendingObjectCreation;
     quint16 loadSceneStatus = 0;
     void requestNextCategory();
@@ -248,7 +247,7 @@ private:
 
 signals:
     void inputViewReady();
-    void sig_connectRequestFromSender(ValueNotifierClass *sender, TypeHelper::ValueType valType, quint16 nValues=0);
+
     void deviceWithNameCreated(QString deviceName, QString deviceId);
 
     void newConnectionRequest(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList = 0);
@@ -278,10 +277,26 @@ public slots:
 
 
     //connection related
-    void newConnectionEstablished(QString connectionId, bool accepted);
+public slots:
+    void newConnectionEstablished(QString connectionId, bool accepted, TypeHelper::ValueType type, int atIdx);
+
+signals:
+    void sig_connectRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType valType, int connectToIdx=0, quint16 nValues=0);
 
 private:
     QMap<QString, ValueConnection> pendingConnectionRequests;
+
+
+public slots:
+    void slot_getNotifierPtrForOutputNode(ValueNotifierClass* notifier, QString pendingNodeId);
+
+signals:
+    void sig_requestNotifierPtr(int atIdx, QString pendingNodeId);
+
+private:
+    QMap<QString, OutputNode> pendingOutputNodes;
+    QMap<QString, QPoint> pendingPointForId;
+
 
 
 };

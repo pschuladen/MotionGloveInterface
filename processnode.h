@@ -90,7 +90,7 @@ public slots:
     virtual void slot_trigger(int frame=-1) override;
     void setConnectedTypes(const QList<TypeHelper::ValueType> &newConnectedTypes);
     void setConnectedTypesAtIdx(int idx, TypeHelper::ValueType valType);
-    virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override; //this is currently used !!
+//    virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override; //this is currently used !!
     virtual bool setConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, quint16 nValuesInList=0); //use this function for setting up connections!
 
 
@@ -120,6 +120,8 @@ signals:
     // ValueNotifierClass interface
 public slots:
     void connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx=0, quint16 nValuesInList=0) override;
+
+    void slot_subConnectionAccepted(QString connectionId, bool accepted, TypeHelper::ValueType type, int atIdx) override;
 };
 
 #endif // PROCESSNODE_H

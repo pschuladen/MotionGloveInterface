@@ -110,9 +110,9 @@ signals:
 
      void autoEmitChanged();
 
-     void connectionAccepted(QString connectionId, bool accepted=true);
+     void connectionAccepted(QString connectionId, bool accepted=true, TypeHelper::ValueType type=TypeHelper::Undefined, int atIdx=0);
 
-     void sig_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type);
+     void sig_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int atIdx=0);
 
 
 
@@ -129,7 +129,8 @@ public slots:
      virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx=0, quint16 nValuesInList=0);
 
      virtual void connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx=0, quint16 nValuesInList=0);
-     virtual void slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type);
+     virtual void slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int atIdx=0);
+     virtual void slot_subConnectionAccepted(QString connectionId, bool accepted=true, TypeHelper::ValueType type=TypeHelper::Undefined, int atIdx=0);
 
 
      virtual void inputsDisconnected();

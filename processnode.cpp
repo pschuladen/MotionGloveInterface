@@ -39,10 +39,10 @@ quint8 ProcessNode::process(quint8 value)
 }
 
 
-int ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
-{
-    return -1;
-}
+//int ProcessNode::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
+//{
+//    return -1;
+//}
 
 bool ProcessNode::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
 {
@@ -146,10 +146,10 @@ void ProcessNode::appendToConnectedTypes(TypeHelper::ValueType appendType)
 
 ValueNotifierClass *ProcessNode::getNotifier(int idx)
 {
-    return this;
-//    if(idx < 0) return this;
-//    else if(idx < subProcessor.size()) return subProcessor.at(idx);
-//    else return nullptr;
+//    return this;
+    if(idx < 0) return this;
+    else if(idx < subProcessor.size()) return subProcessor.at(idx);
+    else return nullptr;
 }
 
 void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
@@ -187,16 +187,27 @@ void ProcessNode::setProcessorType(TypeHelper::ProcessorType newProcessorType)
 
 void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx, quint16 nValuesInList)
 {
+    qDebug() << this << identifier() << connectionId << connectToIdx;
 
     if(!acceptsInputType(type)) {
         emit connectionAccepted(connectionId, false);
     }
-    if(connectToIdx < 0)
-    while(connectToIdx >= subProcessor.size()) {
+    if(connectToIdx < 0) {connectToIdx = subProcessor.size();}
+    while(connectToIdx + 1 > subProcessor.size()) {
+        qDebug() << "creating subprocessor";
         subProcessor.append(createSubprocessor(identifier()));
         appendToConnectedTypes(TypeHelper::Undefined);
+        qDebug() << "fnished creating subprocessor" << subProcessor.size();
     }
+    qDebug() << "emitting signal, prc size" << subProcessor.size();
     connect(this, &ProcessNode::sig_connectToSender, subProcessor[connectToIdx], &ProcessNode::slot_connectToSender, Qt::SingleShotConnection);
-    connect(subProcessor[connectToIdx], &ProcessNode::connectionAccepted, this, &ProcessNode::connectionAccepted, Qt::SingleShotConnection);
-    emit sig_connectToSender(sender, connectionId, type);
+    connect(subProcessor[connectToIdx], &ProcessNode::connectionAccepted, this, &ProcessNode::slot_subConnectionAccepted, Qt::SingleShotConnection);
+    emit sig_connectToSender(sender, connectionId, type, connectToIdx);
+}
+
+
+void ProcessNode::slot_subConnectionAccepted(QString connectionId, bool accepted, TypeHelper::ValueType type, int atIdx)
+{
+    if(accepted) setConnectedTypesAtIdx(atIdx, type);
+    emit connectionAccepted(connectionId, accepted, type, atIdx);
 }

@@ -24,7 +24,7 @@ public:
     bool valueInputConnected = false;
 
 signals:
-    void oscMessageBufferReady(const QByteArray &oscBuffer, size_t msgSize, int frame=-1);
+    void oscMessageBufferReady(const QByteArray oscBuffer, size_t msgSize, int frame=-1);
 
     void oscAddressChanged(QByteArray oscAddress);
     void oscMessIdxChanged(quint32 msgIdx);
@@ -41,7 +41,7 @@ private:
 
 
 
-    size_t valueListSize;
+    size_t valueListSize = 0;
 
     // ValueNotifierClass interface
 public:

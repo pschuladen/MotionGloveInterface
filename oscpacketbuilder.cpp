@@ -66,6 +66,7 @@ void OscPacketBuilder::setMsgBufferSize()
 
 int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
+    qDebug() << "oscpacketbuilder new connection request" << type;
     if (valueInputConnected) return -1;
 
     typedef TypeHelper::ValueType _vt;
@@ -77,12 +78,11 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
 //    qDebug() << "this object thread" << this->thread();
 
 
-    qDebug() << "oscpacketbuilder new connection request" << type;
 
     setConnectedValueType(type);
     valueInputConnected = true;
     valueListSize = nValuesInList;
-    setMsgBufferSize();
+//    setMsgBufferSize();
 
     emit gotNewConnectionWithType(oscMessIdx(), type);
     connectValueTypeSignalToSlot(sender, this, type);
@@ -117,7 +117,7 @@ void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)
 
 void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
 {
-//    qDebug() << "getting vector";
+    qDebug() << "getting vector" << vect;
     m_oscPacket.reset();
 
     m_oscPacket.openMessage(oscAddress(), nValuesInMsg())
@@ -125,6 +125,7 @@ void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
             .float32(vect.y())
             .float32(vect.z())
             .closeMessage();
+    qDebug() << "emitting send buffer";
     emit oscMessageBufferReady(m_msgBuffer, m_oscPacket.size(), frame);
 }
 
@@ -183,6 +184,7 @@ void OscPacketBuilder::setConnectedValueType(const TypeHelper::ValueType &newCon
 
     m_connectedValueType = newConnectedValueType;
 
+    qDebug() << "packetbuilder setting connected type";
    setMsgBufferSize();
 
     emit connectedValueTypeChanged(newConnectedValueType);

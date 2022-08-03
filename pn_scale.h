@@ -40,7 +40,7 @@ public:
     void setMulti(float newMulti);
 
     bool acceptsInputType(TypeHelper::ValueType typ, int atIdx=0) const override;
-    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override;
+//    int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList=0) override;
     bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0) override; //TODO: implement
 
     ProcessNode* createProcessControl(QString objectname_id) override;

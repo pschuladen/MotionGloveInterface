@@ -94,5 +94,6 @@ int main(int argc, char *argv[])
     main_backend::Instance()->initialSetup();
 
 
+//    main_backend::Instance()->loadButtonPressed(QUrl("file:///Users/psch/Desktop/saveTest/b.xml"));
     return app.exec();
 }

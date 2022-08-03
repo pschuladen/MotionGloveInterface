@@ -54,6 +54,7 @@ void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newC
     if(supportsSubValues())
         createSubnotifierForValueType(newConnectedValueType, valueNumber());
 
+    qDebug() << "setted valuetype " << this << newConnectedValueType;
     emit connectedValueTypeChanged(newConnectedValueType);
 }
 
@@ -112,18 +113,24 @@ int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, Type
 void ValueNotifierClass::connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type,
                                                      int connectToIdx, quint16 nValuesInList)
 {
+    qDebug() << "getting connection request" << connectToIdx << this;
     if(newConnectionFromSender(sender, type) >= 0) {
-        emit connectionAccepted(connectionId);
+        emit connectionAccepted(connectionId, true, type);
     }
-    else emit connectionAccepted(connectionId, false);
+    else emit connectionAccepted(connectionId, false, type);
 }
 
-void ValueNotifierClass::slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type)
+void ValueNotifierClass::slot_connectToSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int atIdx)
 {
     if(newConnectionFromSender(sender, type) >= 0) {
-        emit connectionAccepted(connectionId);
+        emit connectionAccepted(connectionId, true, type, atIdx);
     }
-    else emit connectionAccepted(connectionId, false);
+    else emit connectionAccepted(connectionId, false, type, atIdx);
+}
+
+void ValueNotifierClass::slot_subConnectionAccepted(QString connectionId, bool accepted, TypeHelper::ValueType type, int atIdx)
+{
+    emit connectionAccepted(connectionId, accepted, type, atIdx);
 }
 
 void ValueNotifierClass::inputsDisconnected()

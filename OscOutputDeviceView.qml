@@ -79,12 +79,12 @@ Item {
                     }
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text = oscviewcontrol.ipAddress
+                        text: oscviewcontrol.ipAddress
                         focus = false
                     }
-                    onEditingFinished: oscviewcontrol.ipAddress = text
+                    onEditingFinished: oscviewcontrol.destIpChanged(text)
                     onFocusChanged: {
-                        if(!focus) { text = oscviewcontrol.ipAddress}
+                        if(!focus) { text: oscviewcontrol.ipAddress}
                     }
                     selectByMouse: true
 
@@ -120,12 +120,12 @@ Item {
                     validator: IntValidator {bottom: 1025;top: 65535}
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text=oscviewcontrol.port
+                        text: oscviewcontrol.port
                         focus=false
                     }
-                    onEditingFinished: oscviewcontrol.port=text
+                    onEditingFinished: oscviewcontrol.destPortChanged(text)
                     onFocusChanged: {
-                        if(!focus) { text = oscviewcontrol.port}
+                        if(!focus) { text: oscviewcontrol.port}
                     }
                     selectByMouse: true
 

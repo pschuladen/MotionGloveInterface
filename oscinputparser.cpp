@@ -80,6 +80,7 @@ void OscInputParser::handleOscArgs(OSCPP::Server::ArgStream args, quint32 frame)
 
 void OscInputParser::oscR_vectorType(OSCPP::Server::ArgStream *args)
 {
+//    qDebug() << "receiving vector" << args;
     set3dVectorFromArgs(args);
     callVectorChanged(m_vector, m_frame);
 }

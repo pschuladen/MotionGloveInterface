@@ -46,7 +46,7 @@ Item {
 
         DropArea {
             id: inDrop
-            enabled: root.dropAreaEnabled
+            enabled: true//root.dropAreaEnabled
             anchors.fill: parent
             anchors.margins: -8
             keys: ["valueType", "valueIndex", "sourceObjectId"]//, "text/nodeId", "text/valueType"]"nodeId",

@@ -10,7 +10,7 @@ OscOutputDevice::OscOutputDevice(QString uniqueID, OscOutputViewController *view
     : OscOutputViewController{uniqueID, parent}
 {
     setViewControllerObject(viewController);
-    initialiseOscDevice();
+//    initialiseOscDevice();
 
 //    ProjectFileManager *pm = projManager::Instance();
 
@@ -33,7 +33,7 @@ bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
     connect(vc, &ovc::destIpChanged, this, &ood::setDestIp);
     connect(vc, &ovc::destPortChanged, this, &ood::setDestPort);
 //    connect(vc, &ovc::oscPathsChanged, this, &ood::setOscPaths);
-    connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
+//    connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::oscPathAdded, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::valueTypesChanged, this, &ood::setValueTypes);
     connect(vc, &ovc::sig_addOscPath, this, &ood::slot_addOscPath);
@@ -149,10 +149,15 @@ void OscOutputDevice::newConnectionAtIndex(int idx, TypeHelper::ValueType valueT
     }
 }
 
-void OscOutputDevice::sendOscMsgBuffer(const QByteArray &oscBuffer, size_t msgSize, int frame)
+void OscOutputDevice::sendOscMsgBuffer(const QByteArray oscBuffer, size_t msgSize, int frame)
 {
     qint64 _seby = socket->writeDatagram(oscBuffer.data(), msgSize, destinationAddress(), destPort());
     if (_seby < msgSize) qWarning() << "Osc message send incomplete in output socket";
+}
+
+void OscOutputDevice::getNotifierRequest(int atIdx, QString nodeId)
+{
+    emit sig_sendNotiferPtr(getNotifier(atIdx), nodeId);
 }
 
 

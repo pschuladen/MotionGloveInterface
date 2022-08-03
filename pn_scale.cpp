@@ -80,41 +80,41 @@ void PN_Scale::setOutHigh(float newOutHigh)
     emit outHighChanged(newOutHigh);
 }
 
-int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
-{
-    if(!acceptsInputType(type)) return -1;
+//int PN_Scale::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
+//{
+//    if(!acceptsInputType(type)) return -1;
 
-    if(atIdx < 0 ) atIdx = subProcessor.size();
-
-
-    while(atIdx + 1 > subProcessor.size()) {
-        PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
-        connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
-        appendToConnectedTypes(TypeHelper::Undefined);
-        subProcessor.append(newSubprocessor);
-        emit newSubprocessorWasCreated(newSubprocessor);
-    }
-
-//    connect(this, &PN_Scale::connectionRequestFromSender, subProcessor[atIdx], &PN_Scale::setConnectionFromSender, Qt::SingleShotConnection);
-//    emit connectionRequestFromSender(sender, type, nValuesInList);
-
-    return atIdx;
+////    if(atIdx < 0 ) atIdx = subProcessor.size();
 
 
-//    qDebug() << "newconnection subprocessors" << this << subProcessor;
-
-
-//    if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
+////    while(atIdx + 1 > subProcessor.size()) {
+////        PN_Scale *newSubprocessor = new PN_Scale(identifier() , subProcessor.size(), this, type, nValuesInList);
+////        connect(this, &QObject::destroyed, newSubprocessor, &QObject::deleteLater);
+////        appendToConnectedTypes(TypeHelper::Undefined);
 ////        subProcessor.append(newSubprocessor);
+////        emit newSubprocessorWasCreated(newSubprocessor);
+////    }
 
-//        emit newSubprocessorWasCreated(newSubprocessor);
-//        return subProcessor.size() -1;
-//    }
-//    else {
-//        newSubprocessor->deleteLater();
-//        return -1;
-//    }
-}
+////    connect(this, &PN_Scale::connectionRequestFromSender, subProcessor[atIdx], &PN_Scale::setConnectionFromSender, Qt::SingleShotConnection);
+////    emit connectionRequestFromSender(sender, type, nValuesInList);
+
+//    return atIdx;
+
+
+////    qDebug() << "newconnection subprocessors" << this << subProcessor;
+
+
+////    if(newSubprocessor->setConnectionFromSender(sender, type, nValuesInList)) {
+//////        subProcessor.append(newSubprocessor);
+
+////        emit newSubprocessorWasCreated(newSubprocessor);
+////        return subProcessor.size() -1;
+////    }
+////    else {
+////        newSubprocessor->deleteLater();
+////        return -1;
+////    }
+//}
 
 bool PN_Scale::connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList)
 {
@@ -141,6 +141,7 @@ ProcessNode *PN_Scale::createSubprocessor(QString objectname_id)
 
 float PN_Scale::process(float value)
 {
+    qDebug() << "processing" << value << this;
     if(clipOutput())
         return qBound(outLow(), ((value - inLow()) * multi()) + outLow(), outHigh());
 

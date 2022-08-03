@@ -21,7 +21,7 @@ public:
     bool setViewControllerObject(OscOutputViewController* viewController);
 
 private:
-    void initialiseOscDevice();
+
 
     bool m_bindSocket;
 
@@ -41,10 +41,12 @@ public slots:
     virtual void addOscPath() override;
 
 signals:
-
+    void sig_sendNotiferPtr(ValueNotifierClass* notifier, QString nodId);
 
     // OscViewController interface
 public slots:
+    void initialiseOscDevice();
+
     void setDestIp(const QString &newDestIp) override;
     void setDestPort(quint16 newDestPort) override;
     void setOscPaths(const QList<QString> &newOscPaths) override;
@@ -54,7 +56,9 @@ public slots:
     void setOscPathAtIndex(QString newPath, quint32 idx) override;
 
     void newConnectionAtIndex(int idx, TypeHelper::ValueType valueType) override;
-    void sendOscMsgBuffer(const QByteArray &oscBuffer, size_t msgSize, int frame=-1 );
+    void sendOscMsgBuffer(const QByteArray oscBuffer, size_t msgSize, int frame=-1 );
+
+    void getNotifierRequest(int atIdx, QString nodeId);
 
     // ValueNotifierClass interface
 public:
