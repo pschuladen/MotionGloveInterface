@@ -117,7 +117,7 @@ void OscPacketBuilder::slot_quatChanged(QQuaternion quat, int frame)
 
 void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
 {
-    qDebug() << "getting vector" << vect;
+//    qDebug() << "getting vector" << vect;
     m_oscPacket.reset();
 
     m_oscPacket.openMessage(oscAddress(), nValuesInMsg())
@@ -125,7 +125,7 @@ void OscPacketBuilder::slot_vectorChanged(QVector3D vect, int frame)
             .float32(vect.y())
             .float32(vect.z())
             .closeMessage();
-    qDebug() << "emitting send buffer";
+//    qDebug() << "emitting send buffer";
     emit oscMessageBufferReady(m_msgBuffer, m_oscPacket.size(), frame);
 }
 

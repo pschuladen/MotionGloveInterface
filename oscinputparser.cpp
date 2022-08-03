@@ -30,7 +30,7 @@ OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::SensorType sen
         m_oscHandle = &OscInputParser::oscR_touchType;
         break;
     }
-    setSupportsSubValues(true);
+    setSupportsSubValues(false);
 }
 
 OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::ValueType valType, quint16 nValues, QObject *parent)
@@ -138,6 +138,7 @@ void OscInputParser::oscR_singleValue(OSCPP::Server::ArgStream *args)
 
 void OscInputParser::oscR_unMapped(OSCPP::Server::ArgStream *args)
 {
+//    qDebug() << "got unmapped";
     emit gotUnmappedMessage();
 }
 
@@ -160,11 +161,12 @@ void OscInputParser::set3dVectorFromArgs(OSCPP::Server::ArgStream *args)
             fc++;
         }
     }
+//    qDebug() << "Did set vector" << m_vector;
 }
 
 void OscInputParser::setQuaternionFromArgs(OSCPP::Server::ArgStream *args)
 {
-    QQuaternion quat;
+//    QQuaternion quat;
     uint8_t fc = 0;
     while(!args->atEnd() && fc < 4) {
         if(args->tag() == 'f') {
@@ -182,6 +184,7 @@ void OscInputParser::setQuaternionFromArgs(OSCPP::Server::ArgStream *args)
             fc++;
         }
     }
+//    qDebug() << "Did set quat" << m_quat;
 }
 
 void OscInputParser::setFloatListFromFloatArgs(OSCPP::Server::ArgStream *args)
@@ -210,6 +213,7 @@ void OscInputParser::setFloatListFromIntArgs(OSCPP::Server::ArgStream *args)
         }
         fc++;
     }
+//    qDebug() << "got touch" << m_valueList;
 }
 
 void OscInputParser::setFloatListFromArgs(OSCPP::Server::ArgStream *args)

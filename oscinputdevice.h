@@ -59,6 +59,7 @@ public:
     //
 
     QMap<QByteArray, OscInputParser*> oscInputParser;
+    OscInputParser *unmappedOscHandler = new OscInputParser(this);
     ValueNotifierClass* getNotifierForOsc(QByteArray oscAddress) const;
 
     const QString &deviceName() const;
@@ -134,7 +135,7 @@ private:
     void createNotifier();
 
 
-    bool m_sendPong;
+    bool m_sendPong = false;
     QString m_deviceAddressStr;
     quint16 m_sendIntervall;
     bool m_deviceReady;

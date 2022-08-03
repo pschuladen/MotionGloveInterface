@@ -141,7 +141,7 @@ ProcessNode *PN_Scale::createSubprocessor(QString objectname_id)
 
 float PN_Scale::process(float value)
 {
-    qDebug() << "processing" << value << this;
+//    qDebug() << "processing" << value << this;
     if(clipOutput())
         return qBound(outLow(), ((value - inLow()) * multi()) + outLow(), outHigh());
 

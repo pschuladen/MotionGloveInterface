@@ -80,7 +80,7 @@ void OscInputDevice::handleOscPacket(const OSCPP::Server::Packet &packet)
 void OscInputDevice::handleOscMessage(const OSCPP::Server::Message &message)
 {
 
-    oscInputParser.value(message.address())->handleOscArgs(OSCPP::Server::ArgStream(message.args()), 0);
+    oscInputParser.value(message.address(), unmappedOscHandler)->handleOscArgs(OSCPP::Server::ArgStream(message.args()), 0);
 }
 
 void OscInputDevice::setupOscInputBindings()
@@ -219,7 +219,7 @@ void OscInputDevice::handlePingMessage(OSCPP::Server::ArgStream oscArgs)
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
         setDevicePort(oscArgs.int32());
-        qInfo() << "pingback on port" << devicePort();
+//        qInfo() << "pingback on port" << devicePort();
     } else deviceData_ok = false;
 
     if(!oscArgs.atEnd() && oscArgs.tag() == 'i') {
