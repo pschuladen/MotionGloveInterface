@@ -7,6 +7,7 @@
 
 //#include "oscoutputdevice.h"
 #include "pn_scale.h"
+#include "pn_sumcomponents.h"
 //#include "oscoutputviewcontroller.h"
 //#include "oscinputviewcontroller.h"
 
@@ -47,7 +48,10 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 void registerQmlTypes(QQmlApplicationEngine *engine) {
 
     qmlRegisterType<InputValueViewController>("MotionGloveInterface", 1, 0, "InputValueViewController");
+
     qmlRegisterType<PN_Scale>("MotionGloveInterface", 1, 0, "PN_Scale");
+    qmlRegisterType<PN_SumComponents>("MotionGloveInterface", 1, 0, "PN_SumComponents");
+
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
     qmlRegisterType<OscOutputViewController>("MotionGloveInterface", 1, 0, "OscOutputViewController");
     qmlRegisterType<OscInputViewController>("MotionGloveInterface", 1, 0, "OscInputViewController");

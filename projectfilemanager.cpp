@@ -66,8 +66,22 @@ void ProjectFileManager::writeXmlFile(QUrl fileUrl)
 //    QDomProcessingInstruction header = xmlDoc.createProcessingInstruction( "xml", "version=\"1.0\" encoding=\"utf-8\"" );
 //    xmlDoc.appendChild( header );
 
-    QDomElement root = xmlDoc.createElement("ProcessElements");
-    xmlDoc.appendChild(root);
+    QDomElement root;
+    if(xmlDoc.hasChildNodes()) {
+        qDebug() << "qdom childnodes" << xmlDoc.firstChild().nodeName();
+    }
+    if(xmlDoc.documentElement().nodeName() == "ProcessElements") {
+        qDebug() << "qdom docelement" << xmlDoc.firstChild().nodeName();
+    }
+
+    if(xmlDoc.documentElement().nodeName() == "ProcessElements") {
+        root = xmlDoc.documentElement();
+    }
+    else {
+        root = xmlDoc.createElement("ProcessElements");
+        xmlDoc.appendChild(root);
+    }
+
 
 
     for(auto iter = singleElems.constBegin(); iter != singleElems.constEnd(); ++iter) {

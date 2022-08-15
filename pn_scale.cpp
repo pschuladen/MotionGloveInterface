@@ -223,12 +223,23 @@ void PN_Scale::initSaveData()
     _params.setAttribute("clipOutput", clipOutput());
     root.appendChild(_params);
 
-    connect(this, &ProcessNode::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree);
+    connect(this, &ProcessNode::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree, Qt::SingleShotConnection);
     emit sendSubNodeTree(identifier(), _doc);
 }
 
 void PN_Scale::loadDataFromQdomElement(QDomElement domElement)
 {
+//    qDebug() << "pn_scale: loading data from file";
+//qDebug() << "pn_scale: number childnodes" << domElement.childNodes().count();
+//qDebug() << "pn_scale: nSubprocessors" << domElement.attribute("nSubprocessors", "-2");
+//QDomNodeList nodes = domElement.childNodes();
+
+//for(int i = 0; i< nodes.count(); i++) {
+//    QDomNode xn = nodes.at(i);
+//    qDebug() << "nodename " << i << " " << xn.nodeName();
+//}
+//QDomElement _procNode = domElement.firstChildElement("processor");
+//if(!_procNode.isNull()) {
 
     QDomElement _paras = domElement.firstChildElement("parameter");
     if(!_paras.isNull()) {
@@ -244,6 +255,14 @@ void PN_Scale::loadDataFromQdomElement(QDomElement domElement)
             }
         }
     }
+    else {
+        qWarning() << "pn_scale: no parameter found in file";
+    }
+//}
+//else {
+//    qWarning() << "pn_scale: no processor-data found in file";
+//}
+
     emit didFinishLoad(identifier());
 }
 

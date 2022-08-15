@@ -37,6 +37,7 @@ qt_add_executable(appMotionGloveInterface
     connectionviewcontroller.h connectionviewcontroller.cpp
     nodeviewcontroller.h nodeviewcontroller.cpp
     projectfilemanager.h projectfilemanager.cpp
+    pn_sumcomponents.h pn_sumcomponents.cpp
 )
 
 
@@ -60,6 +61,7 @@ qt_add_qml_module(appMotionGloveInterface
                 InputNodeView.qml
                 OutputNodeView.qml
                 ConnectionView.qml
+                Pn_SumComponentsView.qml
 )
 
 

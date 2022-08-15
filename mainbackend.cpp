@@ -77,7 +77,7 @@ void MainBackend::initialSetup()
 bool MainBackend::createProcessingNodeDrop(QPoint atPosition, TypeHelper::ProcessorType type, QString id)//float posX, float posY)
 {
 
-    QQmlComponent newProcessingComponent(m_engine, QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml")));
+    QQmlComponent newProcessingComponent(m_engine, TypeHelper::getQmlUrlForProcessorType(type));
     if(newProcessingComponent.isError()) {
         qWarning() << "WARNING! New Processing Component:" << newProcessingComponent.errorString();
         return false;
@@ -765,7 +765,7 @@ void MainBackend::saveAsButtonPressed(QUrl fileUrl)
     }
     for(auto iter = outputNodes.constBegin(); iter != outputNodes.constEnd(); ++iter) {
         projectManager->outputNodeElement(iter.key(), iter->outputDevice, iter->outputIndex);
-        connect(this, &MainBackend::sig_triggerSaveToFile, iter->qmlView, &OutputNodeController::initSaveData);
+        connect(this, &MainBackend::sig_triggerSaveToFile, iter->qmlView, &OutputNodeController::initSaveData, Qt::SingleShotConnection);
         saveCount += 1;
     }
     for(auto iter = processingNodes.constBegin(); iter != processingNodes.constEnd(); ++iter) {
@@ -808,9 +808,16 @@ void MainBackend::clearScene()
 //    for(auto &key : qAsConst(allConnectableObjects)) {
 
 //    }
-    for(const QString &key: allConnectableObjects.keys()) {
-        deleteObjectWithId(key);
+
+    QMutableMapIterator<QString, ConnectableObject> iter(allConnectableObjects);
+    while(iter.hasNext()) {
+        iter.next();
+        deleteObjectWithId(iter.key());
     }
+//    for(const QString &key: allConnectableObjects.keys()) {
+//        deleteObjectWithId(key);
+//    }
+
 //    for (auto iter = allConnectableObjects.begin(); iter != allConnectableObjects.end(); ++iter) {
 //        deleteObjectWithId(iter.key());
 //    }
@@ -877,7 +884,7 @@ void MainBackend::qDomElementFromFile(QDomElement element, TypeHelper::NodeType 
                             &ProcessNode::didFinishLoad,
                             this, &MainBackend::objectDidFinishLoad,
                             Qt::SingleShotConnection);
-                    emit sendQdomElement(element);
+                    emit sendQdomElement(_proc);
                 }
                 else {
                     objectDidFinishLoad(element.tagName());

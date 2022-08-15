@@ -67,6 +67,22 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
     }
 }
 
+QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
+{
+    switch(procType) {
+    case TypeHelper::SumComponents:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_SumComponentsView.qml"));
+        break;
+    case TypeHelper::GenericProcessor:
+        return QUrl("");
+        break;
+    case TypeHelper::Scale:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml"));
+        break;
+
+}
+}
+
 QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
 {
     switch(nodeType){

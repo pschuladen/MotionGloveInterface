@@ -30,6 +30,9 @@ void NodeViewController::setOutConOffsetAtIndex(int idx, int offset)
 
 void NodeViewController::setConOffsetAtIndex(int idx, int offset)
 {
+//    if(idx == 0) {
+//        qDebug() << "nvc: 0-Offset" << offset;
+//    }
     setInConOffsetAtIndex(idx, offset);
     setOutConOffsetAtIndex(idx, offset);
 }

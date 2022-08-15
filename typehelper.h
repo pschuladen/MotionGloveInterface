@@ -40,9 +40,11 @@ public:
     Q_ENUM(NodeType);
 
     enum ProcessorType {
-        GenericProcessor, Scale
+        GenericProcessor, Scale, SumComponents
     };
     Q_ENUM(ProcessorType);
+
+    static QUrl getQmlUrlForProcessorType(ProcessorType procType);
 
     static QString getPrefixForNodetype(NodeType nodeType);
 

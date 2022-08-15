@@ -70,8 +70,8 @@ Item {
         ListModel {
             id: createProcessModel
             ListElement {
-                name: "sum"
-                type: TypeHelper.GenericProcessor//ProcessNodeController.Scale
+                name: "sum\ncomponents"
+                type: TypeHelper.SumComponents//ProcessNodeController.Scale
             }
             ListElement {
                 name: "scale"
