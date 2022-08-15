@@ -149,7 +149,15 @@ ValueNotifierClass *ProcessNode::getNotifier(int idx)
 //    return this;
     if(idx < 0) return this;
     else if(idx < subProcessor.size()) return subProcessor.at(idx);
-    else return nullptr;
+    else {
+        while(idx + 1 > subProcessor.size()) {
+            subProcessor.append(createSubprocessor(identifier()));
+            appendToConnectedTypes(TypeHelper::Undefined);
+        }
+        return subProcessor.value(idx, nullptr);
+    }
+
+    return nullptr;
 }
 
 void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
@@ -187,7 +195,7 @@ void ProcessNode::setProcessorType(TypeHelper::ProcessorType newProcessorType)
 
 void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QString connectionId, TypeHelper::ValueType type, int connectToIdx, quint16 nValuesInList)
 {
-    qDebug() << this << identifier() << connectionId << connectToIdx;
+    qDebug() << "connection request" << this << identifier() << connectionId << connectToIdx;
 
     if(!acceptsInputType(type)) {
         emit connectionAccepted(connectionId, false);
@@ -199,7 +207,7 @@ void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QStrin
         appendToConnectedTypes(TypeHelper::Undefined);
         qDebug() << "fnished creating subprocessor" << subProcessor.size();
     }
-    qDebug() << "emitting signal, prc size" << subProcessor.size();
+    qDebug() << "emitting signal, prc size" << subProcessor.size() << connectToIdx;
     connect(this, &ProcessNode::sig_connectToSender, subProcessor[connectToIdx], &ProcessNode::slot_connectToSender, Qt::SingleShotConnection);
     connect(subProcessor[connectToIdx], &ProcessNode::connectionAccepted, this, &ProcessNode::slot_subConnectionAccepted, Qt::SingleShotConnection);
     emit sig_connectToSender(sender, connectionId, type, connectToIdx);
@@ -208,6 +216,7 @@ void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QStrin
 
 void ProcessNode::slot_subConnectionAccepted(QString connectionId, bool accepted, TypeHelper::ValueType type, int atIdx)
 {
+    qDebug() << "got connectconfirm" << connectionId << accepted << type << atIdx;
     if(accepted) setConnectedTypesAtIdx(atIdx, type);
     emit connectionAccepted(connectionId, accepted, type, atIdx);
 }

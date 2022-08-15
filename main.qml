@@ -103,6 +103,25 @@ Window {
                 text: "%1  -  %2".arg(mainWindow.x).arg(mainWindow.y)
                 x: 20; y: 20
             }
+            Button {
+                id: clearScenenButton
+                onClicked: _mbackend.clearScene()
+                text: "Clear Scene"
+                anchors {
+                    horizontalCenter: inputControl.horizontalCenter
+                    top: inputControl.top
+                    topMargin: 7
+                }
+            }
+            Button {
+                id: autoDetectButton
+                text: "auto detect devices"
+                anchors {
+                    horizontalCenter: inputControl.horizontalCenter
+                    bottom: inputControl.bottom
+                }
+                checkable: true
+            }
         }
         Rectangle {
             // inputdevices are created in here by the mainbackend.

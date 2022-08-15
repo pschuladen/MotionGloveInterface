@@ -80,6 +80,7 @@ public:
 
     Q_INVOKABLE void saveAsButtonPressed(QUrl fileUrl);
     Q_INVOKABLE void loadButtonPressed(QUrl fileUrl);
+    Q_INVOKABLE void clearScene();
 
     // for debugging
     Q_INVOKABLE void showConnectionLists(QString objectID);
@@ -157,9 +158,9 @@ private:
         ConnectableObject() {}
 //        ~ConnectableObject() {
 //            qDebug() << "deleting connectable object" << notifier << qmlView;
-
-////            qmlView->deleteLater();
-////            notifier->deleteLater();
+//        }
+//            qmlView->deleteLater();
+//            notifier->deleteLater();
 //        };
     };
     QMap<QString, ConnectableObject> allConnectableObjects;

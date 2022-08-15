@@ -5,10 +5,10 @@
 #include <QQmlContext>
 #include "mainbackend.h"
 
-#include "oscoutputdevice.h"
+//#include "oscoutputdevice.h"
 #include "pn_scale.h"
-#include "oscoutputviewcontroller.h"
-#include "oscinputviewcontroller.h"
+//#include "oscoutputviewcontroller.h"
+//#include "oscinputviewcontroller.h"
 
 
 
