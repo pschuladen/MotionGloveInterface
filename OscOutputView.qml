@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import MotionGloveInterface
 
 Item {
@@ -78,6 +79,13 @@ Item {
                 hoverEnabled: true
 
                 drag.target: draggableItem
+
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: (mouse) => {
+                               if(mouse.button === Qt.RightButton) {
+                                   contextMenu.popup()
+                               }
+                           }
             }
 
             Item {
@@ -108,5 +116,14 @@ Item {
 //            parentID: root.uniqueID
 //            vIdx: root.viewIdx
 //        }
+    }
+    Menu {
+        width: 110
+        id: contextMenu
+        MenuItem {text: "delete path"
+            onClicked: root.controller.sig_deleteOscPathAtIdx(root.viewIdx)//_mbackend.deleteObjectWithId(root.uniqueID)
+        }
+//        MenuItem {text: "do something good"}
+
     }
 }

@@ -70,12 +70,16 @@ public slots:
 signals:
 
     void destIpChanged(QString destIp);
+    void sig_changeIp(QString port);
     void destPortChanged(quint16 port);
+    void sig_changePort(quint16 port);
     void oscPathsChanged(QList<QString> oscPaths);
     void oscPathAtIndexChanged(QString oscPath, quint32 idx);
     void oscPathAdded(QString oscPath);
     void nPathsChanged();
     void valueTypesChanged(QList<TypeHelper::ValueType> newValueTypes);
+
+    void sig_deleteOscPathAtIdx(int idx);
 
     void sig_addOscPath();
 
@@ -90,8 +94,8 @@ signals:
     void indexHoveredChanged();
 
 protected:
-    QString m_destIp;
-    int m_destPort;
+    QString m_destIp = "127.0.0.1";
+    int m_destPort = 55211;
     QList<QString> m_oscPaths;
 
     int m_nPaths = 0;

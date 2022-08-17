@@ -43,6 +43,8 @@ public slots:
 signals:
     void sig_sendNotiferPtr(ValueNotifierClass* notifier, QString nodId);
 
+    void sig_deleteOscOutputView(QString outDevice, int idx);
+
     // OscViewController interface
 public slots:
     void initialiseOscDevice();
@@ -54,6 +56,7 @@ public slots:
     void addOscPath(QString newPath) override;
     void slot_addOscPath();
     void setOscPathAtIndex(QString newPath, quint32 idx) override;
+    void slot_deleteOscPathAtIdx(int idx);
 
     void newConnectionAtIndex(int idx, TypeHelper::ValueType valueType) override;
     void sendOscMsgBuffer(const QByteArray oscBuffer, size_t msgSize, int frame=-1 );

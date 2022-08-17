@@ -30,13 +30,15 @@ bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
     typedef OscOutputViewController ovc;
     typedef OscOutputDevice ood;
 
-    connect(vc, &ovc::destIpChanged, this, &ood::setDestIp);
-    connect(vc, &ovc::destPortChanged, this, &ood::setDestPort);
+    connect(vc, &ovc::sig_changeIp, this, &ood::setDestIp);
+    connect(vc, &ovc::sig_changePort, this, &ood::setDestPort);
 //    connect(vc, &ovc::oscPathsChanged, this, &ood::setOscPaths);
     connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::oscPathAdded, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::valueTypesChanged, this, &ood::setValueTypes);
     connect(vc, &ovc::sig_addOscPath, this, &ood::slot_addOscPath);
+
+    connect(vc, &ovc::sig_deleteOscPathAtIdx, this, &ood::slot_deleteOscPathAtIdx);
 
     connect(this, &ood::destIpChanged, vc, &ovc::setDestIp);
     connect(this, &ood::destPortChanged, vc, &ovc::setDestPort);
@@ -44,6 +46,8 @@ bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
     connect(this, &ood::oscPathAtIndexChanged, vc, &ovc::setOscPathAtIndex);
 //    connect(this, &ood::sig_addOscPath, vc, &ovc::addOscPath);
     connect(this, &ood::valueTypesChanged, vc, &ovc::setValueTypes);
+
+
 
     return true;
 }
@@ -126,12 +130,28 @@ void OscOutputDevice::addOscPath(QString newPath)
     m_valueTypes.append(TypeHelper::Undefined);
     emit valueTypesChanged(valueTypes());
     emit oscPathsChanged(oscPaths());
+
+
 }
 
 void OscOutputDevice::slot_addOscPath()
 {
     addOscPath(QString("/out/%1").arg(packetBuilder.size()+1));
 }
+
+
+void OscOutputDevice::slot_deleteOscPathAtIdx(int idx)
+{
+    if(idx+1 > packetBuilder.size()) return;
+    packetBuilder.at(idx)->deleteLater();
+    packetBuilder.removeAt(idx);
+    m_oscPaths.removeAt(idx);
+    m_valueTypes.removeAt(idx);
+    emit oscPathsChanged(oscPaths());
+    emit valueTypesChanged(valueTypes());
+    emit sig_deleteOscOutputView(uniqueID(), idx);
+}
+
 
 void OscOutputDevice::setOscPathAtIndex(QString newPath, quint32 idx)
 {
@@ -140,6 +160,8 @@ void OscOutputDevice::setOscPathAtIndex(QString newPath, quint32 idx)
     packetBuilder.at(idx)->setOscAddress(newPath.toUtf8());
     emit oscPathsChanged(oscPaths());
 }
+
+
 
 void OscOutputDevice::newConnectionAtIndex(int idx, TypeHelper::ValueType valueType)
 {

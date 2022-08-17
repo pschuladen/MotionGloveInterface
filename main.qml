@@ -59,17 +59,17 @@ Window {
 
 
                                if( nodetype === TypeHelper.Process.toString()) {
-                                   shouldAccept = _mbackend.createProcessingNodeDrop(Qt.point(drop.x, drop.y),
+                                   shouldAccept = _mbackend.createProcessingNodeDrop(Qt.point(drop.x-40, drop.y-20),
                                                                                      drop.getDataAsString("processorType"))
                                }
                                else if(nodetype === TypeHelper.Output.toString()) {
-                                   shouldAccept = _mbackend.createOutputNodeDrop(Qt.point(drop.x, drop.y),
+                                   shouldAccept = _mbackend.createOutputNodeDrop(Qt.point(drop.x-30, drop.y-10),
                                                                  drop.getDataAsString("targetDevice"),
                                                                  drop.getDataAsString("outputIndex"),
                                                                                drop.getDataAsString("valueType"))
                                }
                                else if(nodetype === TypeHelper.Input.toString()) {
-                                   shouldAccept = _mbackend.createInputNodeDrop(Qt.point(drop.x, drop.y),
+                                   shouldAccept = _mbackend.createInputNodeDrop(Qt.point(drop.x-30, drop.y-10),
                                                                  drop.getDataAsString("sourceDevice"),
                                                                  drop.getDataAsString("identifier"),
                                                                  drop.getDataAsString("valueType"))

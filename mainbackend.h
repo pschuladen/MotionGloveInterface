@@ -74,6 +74,9 @@ public:
     Q_INVOKABLE bool deleteSendConnectionsForObjectAtIdx(const QString uniqueID, int idx);
     Q_INVOKABLE bool deleteReceiveConnectionForObjectAtIdx(const QString uniqueID, int idx);
 
+    Q_INVOKABLE bool deleteOscOutputDeviceWithId(const QString uniqueID);
+    Q_INVOKABLE bool deleteOscInputDeviceWithId(const QString uniqueID);
+
 
     Q_INVOKABLE QString createUniqueId(TypeHelper::NodeType forNodeType);
 
@@ -275,6 +278,12 @@ public slots:
     void moveObjectToThread(QObject *objToMove, TypeHelper::NodeType nodeType);
     void moveSubprocessorToProcessThread(ProcessNode* processor);
 
+    void slot_deleteOscOutputView(QString outDevice, int idx);
+    void slot_deleteOscOutputViewsForDevice(QString outDevice);
+    void slot_deleteOscInputViewsForDevice(QString inDevice);
+
+signals:
+    void sig_deleteOscInputDeviceWithId(QString deviceID);
 
 
     //connection related

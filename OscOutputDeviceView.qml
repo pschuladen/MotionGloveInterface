@@ -30,6 +30,24 @@ Item {
             color: "burlywood"
             width: 1
         }
+
+        Rectangle {
+            width: 8
+            height: 8
+            anchors {
+                right: parent.right
+                top: parent.top
+            }
+            color:  "red"
+            opacity: 0.5
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onClicked: contextMenu.popup()
+            }
+        }
+
         Column {
             id: settingcolumne
             width: parent.width
@@ -69,7 +87,7 @@ Item {
                     id: ipinputfield
                     anchors {fill: parent; margins: 2 }
                     color: "black"
-                    text: "127.0.0.1"
+                    text: oscviewcontrol.destIp
                     font.pixelSize: 10
                     horizontalAlignment: Text.AlignRight
 
@@ -79,12 +97,12 @@ Item {
                     }
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text: oscviewcontrol.ipAddress
+                        text: oscviewcontrol.destIp
                         focus = false
                     }
-                    onEditingFinished: oscviewcontrol.destIpChanged(text)
+                    onEditingFinished: oscviewcontrol.sig_changeIp(text)
                     onFocusChanged: {
-                        if(!focus) { text: oscviewcontrol.ipAddress}
+                        if(!focus) { text: oscviewcontrol.destIp}
                     }
                     selectByMouse: true
 
@@ -113,19 +131,19 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 2
                     color: "black"
-                    text: "55211"
+                    text: oscviewcontrol.destPort
                     font.pixelSize: 10
                     horizontalAlignment: Text.AlignRight
                     //                    anchors.leftMargin: 273
                     validator: IntValidator {bottom: 1025;top: 65535}
                     Keys.onReturnPressed: focus=false
                     Keys.onEscapePressed: {
-                        text: oscviewcontrol.port
+                        text: oscviewcontrol.destPort
                         focus=false
                     }
-                    onEditingFinished: oscviewcontrol.destPortChanged(text)
+                    onEditingFinished: oscviewcontrol.sig_changePort(text)
                     onFocusChanged: {
-                        if(!focus) { text: oscviewcontrol.port}
+                        if(!focus) { text: oscviewcontrol.destPort}
                     }
                     selectByMouse: true
 
@@ -164,6 +182,15 @@ Item {
             onClicked: oscviewcontrol.sig_addOscPath();
         }
     }
+
+    Menu {
+        width: 110
+        id: contextMenu
+        MenuItem {text: "delete device"
+            onClicked: _mbackend.deleteOscOutputDeviceWithId(root.uniqueID)
+        }
+    }
+
 }
 
 

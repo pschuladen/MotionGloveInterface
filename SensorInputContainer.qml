@@ -6,6 +6,7 @@ import MotionGloveInterface
 Item {
     id: root
     property string deviceName: "setthisvalue"
+    property string uniqueID;
 
 //    signal connectButtonChanged(connect: bool, deviceN: string);
 
@@ -17,6 +18,24 @@ Item {
         id: oscviewcontrol
         connectDevice: connectDeviceButton.checked
     }
+    Rectangle {
+        width: 8
+        height: 8
+        anchors {
+            right: parent.right
+            top: parent.top
+        }
+        z:1
+        color:  "red"
+        opacity: 0.5
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton
+            onClicked: contextMenu.popup()
+        }
+    }
+
 
     Rectangle {
         anchors {
@@ -175,5 +194,14 @@ Item {
             PropertyAction {
                 target: sensorViewCont; property: "clip"; value: false }
         }
+    }
+    Menu {
+        width: 110
+        id: contextMenu
+        MenuItem {text: "delete device"
+            onClicked: _mbackend.deleteOscInputDeviceWithId(root.uniqueID)
+        }
+//        MenuItem {text: "do something good"}
+
     }
 }

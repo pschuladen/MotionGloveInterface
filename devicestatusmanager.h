@@ -48,6 +48,7 @@ signals:
 
 public slots:
     void setIdForNamedDevice(QString deviceName, QString deviceId);
+    void deleteInputDevice(QString deviceId);
 
     void loadMotionDeviceFromDomElement(QDomElement element);
 

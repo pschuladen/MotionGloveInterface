@@ -11,6 +11,7 @@ class OscInputViewController : public QObject
 
     Q_PROPERTY(bool connectDevice READ connectDevice WRITE setConnectDevice NOTIFY connectDeviceChanged)
 
+
 public:
     explicit OscInputViewController(QObject *parent = nullptr);
 
