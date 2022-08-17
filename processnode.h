@@ -55,7 +55,7 @@ public:
     virtual bool connectToSubProcessorAtIndex(int index, TypeHelper::ValueType type, quint16 nValuesInList=0); //TODO: implement
 
     virtual ProcessNode* createProcessControl(QString objectname_id); //can be deleted maybe
-    virtual ProcessNode* createSubprocessor(QString objectname_id);
+    virtual ProcessNode* createSubprocessor(QString objectname_id) = 0;
 
     const QList<TypeHelper::ValueType> &connectedTypes() const;
     void appendToConnectedTypes(TypeHelper::ValueType appendType);

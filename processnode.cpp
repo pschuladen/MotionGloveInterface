@@ -54,10 +54,10 @@ ProcessNode *ProcessNode::createProcessControl(QString objectname_id)
     return nullptr;
 }
 
-ProcessNode *ProcessNode::createSubprocessor(QString objectname_id)
-{
-    return nullptr;
-}
+//ProcessNode *ProcessNode::createSubprocessor(QString objectname_id)
+//{
+//    return nullptr;
+//}
 
 void ProcessNode::slot_quatChanged(QQuaternion quat, int frame)
 {
@@ -174,10 +174,18 @@ void ProcessNode::deleteSubprocessorAtIdx(quint16 idx)
 
 void ProcessNode::initSaveData()
 {
+    QDomDocument _doc("tmpdoc");
+    QDomElement root = _doc.createElement("processor");
+    root.setAttribute("nSubprocessors", subProcessor.count());
+    _doc.appendChild(root);
+//    qDebug() << "send sumcom data";
+    connect(this, &ProcessNode::sendSubNodeTree, projManager::Instance(), &ProjectFileManager::addSubtree, Qt::SingleShotConnection);
+    emit sendSubNodeTree(identifier(), _doc);
 }
 
 void ProcessNode::loadDataFromQdomElement(QDomElement domElement)
 {
+        emit didFinishLoad(identifier());
 }
 TypeHelper::ProcessorType ProcessNode::processorType() const
 {

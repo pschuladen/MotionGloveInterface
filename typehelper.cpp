@@ -70,6 +70,12 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
 QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
 {
     switch(procType) {
+    case TypeHelper::DiffValue:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_DiffValueView.qml"));
+        break;
+    case TypeHelper::AbsValue:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_AbsValueView.qml"));
+        break;
     case TypeHelper::SumComponents:
         return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_SumComponentsView.qml"));
         break;

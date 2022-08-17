@@ -71,11 +71,19 @@ Item {
             id: createProcessModel
             ListElement {
                 name: "sum\ncomponents"
-                type: TypeHelper.SumComponents//ProcessNodeController.Scale
+                type: TypeHelper.SumComponents
             }
             ListElement {
                 name: "scale"
-                type: TypeHelper.Scale//1//ProcessNodeController.ViewOnly
+                type: TypeHelper.Scale
+            }
+            ListElement {
+                name: "absValue"
+                type: TypeHelper.AbsValue
+            }
+            ListElement {
+                name: "diffValue"
+                type: TypeHelper.DiffValue
             }
         }
     }

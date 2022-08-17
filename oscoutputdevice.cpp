@@ -33,7 +33,7 @@ bool OscOutputDevice::setViewControllerObject(OscOutputViewController *vc)
     connect(vc, &ovc::destIpChanged, this, &ood::setDestIp);
     connect(vc, &ovc::destPortChanged, this, &ood::setDestPort);
 //    connect(vc, &ovc::oscPathsChanged, this, &ood::setOscPaths);
-//    connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
+    connect(vc, &ovc::oscPathAtIndexChanged, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::oscPathAdded, this, &ood::setOscPathAtIndex);
 //    connect(vc, &ovc::valueTypesChanged, this, &ood::setValueTypes);
     connect(vc, &ovc::sig_addOscPath, this, &ood::slot_addOscPath);

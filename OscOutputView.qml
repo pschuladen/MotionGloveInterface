@@ -10,6 +10,10 @@ Item {
 
     property string oscAddress: controller.oscPaths[viewIdx]
     property OscOutputViewController controller: null
+//    controller.onOscPathAtIndexChanged: {
+
+//    }
+
 //    controller.onIndexHoveredChanged: {
 //        remoteHovered = controller.indexHovered == viewIdx
 //    }
@@ -46,12 +50,12 @@ Item {
             selectByMouse: true
             Keys.onReturnPressed: focus=false
             Keys.onEscapePressed: {
-                text = root.controller.oscPaths[root.viewIdx]
+                text: root.oscAddress//.controller.oscPaths[root.viewIdx]
                 focus = false
             }
             onEditingFinished: root.controller.oscPathAtIndexChanged(text, root.viewIdx)//root.ipAddress = text
             onFocusChanged: {
-                if(!focus) {text = root.controller.oscPaths[root.viewIdx]}
+                if(!focus) {text: root.oscAddress}//= root.controller.oscPaths[root.viewIdx]}
             }
         }
         Rectangle {

@@ -40,7 +40,7 @@ public:
     Q_ENUM(NodeType);
 
     enum ProcessorType {
-        GenericProcessor, Scale, SumComponents
+        GenericProcessor, Scale, SumComponents, AbsValue, DiffValue
     };
     Q_ENUM(ProcessorType);
 
