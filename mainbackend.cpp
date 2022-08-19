@@ -752,11 +752,15 @@ void MainBackend::createSensorViewsForMotionDevice(const QString sendername, con
     for(QList<OscInputDevice::OscSensorInputStruct>::const_iterator sensor = sensors.cbegin(), end = sensors.cend(); sensor != end; ++sensor) {
 
         QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", sensor->sensType},
-                                                                                                   {"identifier", sensor->identifier},
-                                                                                                   {"sourceObjectId", sendername},
-                                                                                                   {"oscInputPath", sendername}}));
+                                                                                                   {"identifier", sensor->identifier}
+//                                                                                                   ,{"sourceObjectId", sendername}
+//                                                                                                   ,{"oscInputPath", sendername}
+                                                                                                  }));
+//        connect();
 
         InputValueViewController *viewBackend = newValDevice->findChild<InputValueViewController*>("valuebackend");
+        viewBackend->setSourceObjectID(sendername);
+        connect(oscInputDevices[sendername].oscReceiver, &OscInputDevice::uniqueIdChanged, viewBackend, &InputValueViewController::setSourceObjectID);
         oscInputDevices[sendername].inputViewController[sensor->identifier] = viewBackend;//.insert(sensor->identifier, viewBackend);
         _inputViewController.insert(sensor->identifier, viewBackend);
         viewBackend->setSourceNotifier(sensor->oscHandler);

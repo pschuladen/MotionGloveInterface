@@ -102,7 +102,7 @@ void ValueNotifierClass::callValuesChanged(const QList<float> values, int frame)
 int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList)
 {
     if(type == TypeHelper::Undefined) return -1;
-    if(connectedValueType() != TypeHelper::Undefined) return -1;
+    if(connectedValueType() != type && connectedValueType() != TypeHelper::Undefined) return -1;
 
     setConnectedValueType(type);
     connectValueTypeSignalToSlot(sender, this, type);

@@ -60,12 +60,14 @@ void DeviceStatusManager::loadMotionDeviceFromDomElement(QDomElement element)
 
     if(!oscInputDevices.contains(_name.toUtf8())) {
 
+
         OscInputDevice *newMotionDevice = new OscInputDevice(_name, this);
         oscInputDevices.insert(_name.toUtf8(), newMotionDevice);
         setIdForNamedDevice(_name, _id);
         emit newOscInputDevice(_name, newMotionDevice, _id);
     }
     else {
+
         setIdForNamedDevice(_name, _id);
     }
 

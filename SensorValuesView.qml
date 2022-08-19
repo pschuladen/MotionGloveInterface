@@ -11,11 +11,12 @@ Item {
     objectName: identifier
     property alias viewmode: backend.viewmode
     property string identifier: "ientifier not set!!"
+//    onIdentifierChanged: console.log("sensor view ID", identifier);
     property alias backendObject: backend
 
     property bool globalBool_valuesHidden: parent ? parent.valuesHiddenBool : false
     property bool viewCollapsed: true
-    property string sourceObjectId: "unknown"
+    property string sourceObjectId: backend.sourceObjectID//parent ? parent.root.uniqueID : "";
 
     property int valueType: _typehelper.valueTypeForSensor(backend.viewmode)
     property string oscInputPath: identifier
@@ -29,6 +30,7 @@ Item {
         objectName: "valuebackend"
         emitvalues: !root.viewCollapsed && !root.globalBool_valuesHidden
         identifier: root.identifier
+
 
     }
 
@@ -212,7 +214,7 @@ Item {
             Drag.dragType: Drag.Automatic
             Drag.mimeData: {"text/plain": root.identifier,
             "sourceDevice": root.sourceObjectId,
-                "identifier": root.identifier,
+                "oscInputPath": root.identifier,
             "nodeType": TypeHelper.Input,
             "valueType": root.valueType}
         }

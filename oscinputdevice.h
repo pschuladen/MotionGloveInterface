@@ -115,7 +115,7 @@ signals:
     void sendSensorStructList(const QString myId, const QList<OscInputDevice::OscSensorInputStruct>);
     void requestViewCreation(QString deviceName);
 
-    void uniqueIdChanged();
+    void uniqueIdChanged(QString uniqueID);
 
 public slots:
 

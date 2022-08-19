@@ -12,6 +12,8 @@ Item {
     property bool useOutputType: false
     property int outputType: TypeHelper.Undefined
 
+    property bool showFirstInOnly: false
+
     property int numConnections: connectedTypes.length
     required property string uniqueID
     required property NodeViewController viewControl
@@ -30,8 +32,6 @@ Item {
         anchors.bottomMargin: 5
         anchors.topMargin: _topMar
         spacing: 0
-
-
 
         Repeater {
 
@@ -78,7 +78,7 @@ Item {
                         verticalCenter: connectorPair.verticalCenter
                         horizontalCenter: connectorPair.left
                     }
-                    dropAreaEnabled: connectorPair.lastInModel
+//                    dropAreaEnabled: connectorPair.lastInModel
                 }
 
                 OutputConnector {

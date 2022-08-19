@@ -1,4 +1,4 @@
-simport QtQuick
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
@@ -13,7 +13,7 @@ NodeViewController {
     width: outerShape.implicitWidth
     height: outerShape.implicitHeight
 
-    PN_SumComponents {
+    PN_AbsValue {
         id: backend
         objectName: root.uniqueID+"-viewcontroller"
         identifier: root.uniqueID
@@ -54,7 +54,7 @@ NodeViewController {
 
         Text {
             id: processingTitleLabel
-            text: "Sum Comps"
+            text: "abs"
             anchors {
                 top: outerShape.top
                 left: outerShape.left
@@ -77,8 +77,8 @@ NodeViewController {
         connectedTypes: backend.connectedTypes
         viewControl: root
 
-        useOutputType: true
-        outputType: TypeHelper.SingleValue
+//        useOutputType: true
+//        outputType: TypeHelper.SingleValue
     }
 
     Menu {

@@ -40,6 +40,7 @@ qt_add_executable(appMotionGloveInterface
     pn_sumcomponents.h pn_sumcomponents.cpp
     pn_absvalue.h pn_absvalue.cpp
     pn_diffvalue.h pn_diffvalue.cpp
+
 )
 
 
@@ -66,6 +67,8 @@ qt_add_qml_module(appMotionGloveInterface
                 Pn_SumComponentsView.qml
                 Pn_AbsValueView.qml
                 Pn_DiffValueView.qml
+                Pn_SplitValuesView.qml
+                Pn_SplitComponentsView.qml
 )
 
 

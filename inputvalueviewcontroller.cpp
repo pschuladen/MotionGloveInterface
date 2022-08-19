@@ -243,3 +243,16 @@ void InputValueViewController::setCanDragInput(bool newCanDragInput)
     m_canDragInput = newCanDragInput;
     emit canDragInputChanged();
 }
+
+const QString &InputValueViewController::sourceObjectID() const
+{
+    return m_sourceObjectID;
+}
+
+void InputValueViewController::setSourceObjectID(const QString &newSourceObjectID)
+{
+    if (m_sourceObjectID == newSourceObjectID)
+        return;
+    m_sourceObjectID = newSourceObjectID;
+    emit sourceObjectIDChanged();
+}

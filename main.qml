@@ -71,7 +71,7 @@ Window {
                                else if(nodetype === TypeHelper.Input.toString()) {
                                    shouldAccept = _mbackend.createInputNodeDrop(Qt.point(drop.x-30, drop.y-10),
                                                                  drop.getDataAsString("sourceDevice"),
-                                                                 drop.getDataAsString("identifier"),
+                                                                 drop.getDataAsString("oscInputPath"),
                                                                  drop.getDataAsString("valueType"))
                                }
 

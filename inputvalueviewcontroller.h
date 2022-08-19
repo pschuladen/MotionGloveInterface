@@ -39,6 +39,9 @@ class InputValueViewController : public ValueNotifierClass
     Q_PROPERTY(bool mouseHover READ mouseHover WRITE setMouseHover NOTIFY mouseHoverChanged)
     Q_PROPERTY(bool canDragInput READ canDragInput WRITE setCanDragInput NOTIFY canDragInputChanged)
 
+    Q_PROPERTY(QString sourceObjectID READ sourceObjectID WRITE setSourceObjectID NOTIFY sourceObjectIDChanged)
+
+
 public:
     explicit InputValueViewController(QObject *parent = nullptr);
 
@@ -81,6 +84,9 @@ public:
     bool canDragInput() const;
     void setCanDragInput(bool newCanDragInput);
 
+    const QString &sourceObjectID() const;
+    void setSourceObjectID(const QString &newSourceObjectID);
+
 public slots:
 
     void setMouseHover(bool newMouseHover);
@@ -118,6 +124,8 @@ private:
 
     bool m_canDragInput = true;
 
+    QString m_sourceObjectID;
+
 signals:
 
     void viewmodeChanged();
@@ -135,6 +143,7 @@ signals:
     // ValueNotifierClass interface
     void mouseHoverChanged(bool mouseHover);
     void canDragInputChanged();
+    void sourceObjectIDChanged();
 };
 
 #endif // INPUTVALUEVIEWCONTROLLER_H

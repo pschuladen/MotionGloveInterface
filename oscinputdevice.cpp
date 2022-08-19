@@ -20,7 +20,7 @@ OscInputDevice::OscInputDevice(QString deviceName, QObject *parent)
     quint16 _trials = 0;
     bool bindSuccess = false;
     while(!bindSuccess && _trials < _maxtry) {
-        bindSuccess = m_socket->bind(QHostAddress::Any, 51002);
+        bindSuccess = m_socket->bind(QHostAddress::Any, 51002+_trials);
         _trials++;
     }
     m_rcvPort = m_socket->localPort();//_trials+_baseport;
@@ -47,6 +47,7 @@ ValueNotifierClass *OscInputDevice::getNotifier(SensType sensType, int sensIndex
 
 ValueNotifierClass *OscInputDevice::getNotifierForOsc(QByteArray oscAddress) const
 {
+
     return oscInputParser.value(oscAddress);
 }
 
@@ -271,7 +272,7 @@ void OscInputDevice::setUniqueId(const QString &newUniqueId)
     if (m_uniqueId == newUniqueId)
         return;
     m_uniqueId = newUniqueId;
-    emit uniqueIdChanged();
+    emit uniqueIdChanged(m_uniqueId);
 }
 
 
