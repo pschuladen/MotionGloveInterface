@@ -23,6 +23,8 @@ public:
     Q_INVOKABLE static const TypeHelper::ValueType valueTypeForSensor(const TypeHelper::SensorType styp);
     Q_INVOKABLE static const QColor getColorForValueType(const TypeHelper::ValueType vtype);
     Q_INVOKABLE static const QString getStringForValueType(const TypeHelper::ValueType vtype);
+    Q_INVOKABLE static size_t getSizeForValueType(const TypeHelper::ValueType vType);
+    Q_INVOKABLE static QString getNameForValueComponent(TypeHelper::ValueType vType, int idx=0);
 
     enum NodeConnectionType: quint8 {
         InputToProcess,
@@ -40,15 +42,13 @@ public:
     Q_ENUM(NodeType);
 
     enum ProcessorType {
-        GenericProcessor, Scale, SumComponents, AbsValue, DiffValue
+        GenericProcessor, Scale, SumComponents, AbsValue, DiffValue, SplitComponents
     };
     Q_ENUM(ProcessorType);
 
     static QUrl getQmlUrlForProcessorType(ProcessorType procType);
 
     static QString getPrefixForNodetype(NodeType nodeType);
-
-    static size_t getSizeForValueType(const TypeHelper::ValueType vType);
 
     static QString getProtoStrForSensor(const TypeHelper::SensorType sensType);
 

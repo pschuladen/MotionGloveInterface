@@ -85,6 +85,10 @@ Item {
                 name: "diffValue"
                 type: TypeHelper.DiffValue
             }
+            ListElement {
+                name: "splitCompos"
+                type: TypeHelper.SplitComponents
+            }
         }
     }
 }

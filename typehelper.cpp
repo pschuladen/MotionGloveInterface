@@ -70,6 +70,9 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
 QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
 {
     switch(procType) {
+    case TypeHelper::SplitComponents:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_SplitComponentsView.qml"));
+        break;
     case TypeHelper::DiffValue:
         return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_DiffValueView.qml"));
         break;
@@ -85,8 +88,9 @@ QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
     case TypeHelper::Scale:
         return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_ScaleView.qml"));
         break;
-
-}
+    default:
+        return QUrl("");
+    }
 }
 
 QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
@@ -132,6 +136,56 @@ size_t TypeHelper::getSizeForValueType(const ValueType vType)
         return 1;
     case TypeHelper::Trigger:
         return 1;
+    }
+}
+
+QString TypeHelper::getNameForValueComponent(ValueType vType, int idx)
+{
+    switch (vType) {
+    case TypeHelper::Undefined:
+        return "undef";
+        break;
+    case TypeHelper::Vector:
+        switch(idx) {
+        case 0:
+            return "x";
+        case 1:
+            return "y";
+        case 2:
+            return "z";
+        default:
+            return "vec";
+        }
+        break;
+    case TypeHelper::Quat:
+        switch(idx) {
+        case 0:
+            return "x";
+        case 1:
+            return "y";
+        case 2:
+            return "z";
+        case 3:
+            return "w";
+        default:
+            return "qu";
+        }
+        break;
+    case TypeHelper::List:
+        return "v"+ QString::number(idx);
+        break;
+    case TypeHelper::SingleValue:
+        return "val";
+        break;
+    case TypeHelper::BoolValue:
+        return "b";
+        break;
+    case TypeHelper::Trigger:
+        return "t";
+        break;
+    default:
+        return "v";
+        break;
     }
 }
 

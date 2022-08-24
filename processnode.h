@@ -67,6 +67,8 @@ public:
     TypeHelper::ProcessorType processorType() const;
     void setProcessorType(TypeHelper::ProcessorType newProcessorType);
 
+    ProcessNode *getSubProcessor(int idx);
+
 protected:
     QList<ProcessNode*> subProcessor;
     TypeHelper::ProcessorType m_processorType;

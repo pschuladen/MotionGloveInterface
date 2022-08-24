@@ -224,6 +224,11 @@ private:
 
 
     void errorWarningCreate(QString id, TypeHelper::NodeType ntype);
+
+    bool connectableObjectHasConnection(QString objId);
+    bool connectableObjectHasConnection(ConnectableObject &conObj);
+    bool connectableObjectIsProcessorOfType(QString objId, TypeHelper::ProcessorType type);
+//    bool processingNodeIsType(ProcessingNode &procObj, TypeHelper::ProcessorType type);
 //    QMetaObject::Connection *pendingRequestConnection;
 
 
@@ -246,6 +251,8 @@ private:
     QPoint getCreatePosition(QDomElement element);
     QString getAttributeFromViewNode(QDomElement element, QString attr);
     bool categoryPending = false;
+
+
 
 
 

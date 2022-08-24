@@ -69,10 +69,12 @@ public:
     bool autoEmit() const;
     void setAutoEmit(bool newAutoEmit);
 
+
+
 protected:
     TypeHelper::ValueType m_connectedValueType = TypeHelper::Undefined;
     void unimplementedValueTypeWarning(TypeHelper::ValueType valType, QString extraMsg="");
-
+    bool m_supportsSubValues = false;
 
 
 private:
@@ -85,7 +87,8 @@ private:
 
     quint16 m_valueNumber;
 
-    bool m_supportsSubValues = false;
+
+
 
     QByteArray m_identifier;
 

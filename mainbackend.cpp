@@ -260,11 +260,26 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
     const ValueConnection &_co = allConnections.value(uniqueID);
     ConnectableObject &_sendObj = allConnectableObjects[_co.sourceId];
     ConnectableObject &_rcvObj = allConnectableObjects[_co.receiverId];
+    ValueNotifierClass *_rcvNotifier;
+    if(_rcvObj.nodeType==TypeHelper::Process) {// && processingNodes[_co.receiverId].procType == TypeHelper::SplitComponents) {
+        _rcvNotifier = processingNodes[_co.receiverId].controller->getSubProcessor(_co.receiverIdx);
+    }
+    else {
+        _rcvNotifier = _rcvObj.notifier->getNotifier(_co.receiverIdx);
+    }
+
+    //    int _rcvIdx = _co.receiverIdx;
+    //    if(_rcvObj.nodeType==TypeHelper::Process) {
+    //       if( processingNodes[_co.receiverId].procType == TypeHelper::SplitComponents) {
+    //           _rcvIdx = -1;
+    //       }
+    //    }
 
     if(_sendObj.notifier->getNotifier(_co.sourceIdx) && _rcvObj.notifier->getNotifier(_co.receiverIdx))
     {
         ValueNotifierClass::disconnectValueTypeSignalToSlot(_sendObj.notifier->getNotifier(_co.sourceIdx),
-                                                            _rcvObj.notifier->getNotifier(_co.receiverIdx),
+                                                            //                                                            _rcvObj.notifier->getNotifier(_co.receiverIdx),
+                                                            _rcvNotifier,
                                                             _co.valType);
     }
 
@@ -276,12 +291,18 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
     qDebug() << "removed receive";
     if(_sendObj.nodeType == TypeHelper::Process) {
         if(_sendCon.isEmpty() && _sendObj.receivingConnections.value(_co.sourceIdx, "") == "") {
-            qDebug() << "remove stuff at sendobject";
-            _sendObj.receivingConnections.removeAt(_co.sourceIdx);
-            _sendObj.sendConnections.removeAt(_co.sourceIdx);
+            if(processingNodes[_co.sourceId].procType != TypeHelper::SplitComponents) {
+                qDebug() << "remove stuff at sendobject";
+                _sendObj.receivingConnections.removeAt(_co.sourceIdx);
+                _sendObj.sendConnections.removeAt(_co.sourceIdx);
 
-            updateConnectionIndices(_sendObj, _co.sourceIdx);
-            qobject_cast<ProcessNode*>(_sendObj.notifier)->deleteSubprocessorAtIdx(_co.sourceIdx);
+                updateConnectionIndices(_sendObj, _co.sourceIdx);
+                qobject_cast<ProcessNode*>(_sendObj.notifier)->deleteSubprocessorAtIdx(_co.sourceIdx);
+            }
+            else {
+
+            }
+
         }
     }
 
@@ -292,9 +313,15 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
             _rcvObj.sendConnections.removeAt(_co.receiverIdx);
             _rcvObj.receivingConnections.removeAt(_co.receiverIdx);
             qDebug() << "rcvObj rcvConnections" << _rcvObj.receivingConnections;
-
-            updateConnectionIndices(_rcvObj, _co.receiverIdx);
-            qobject_cast<ProcessNode*>(_rcvObj.notifier)->deleteSubprocessorAtIdx(_co.receiverIdx);
+            //            if(processingNodes[_co.receiverId].procType != TypeHelper::SplitComponents) {
+            if(!connectableObjectIsProcessorOfType(_co.receiverId, TypeHelper::SplitComponents)) {
+                updateConnectionIndices(_rcvObj, _co.receiverIdx);
+                qobject_cast<ProcessNode*>(_rcvObj.notifier)->deleteSubprocessorAtIdx(_co.receiverIdx);
+            }
+            //            }
+            //            else{
+            //                ValueNotifierClass::disconnectValueTypeSignalToSlot(_sendObj.notifier)
+            //            }
         }
     }
     if(_rcvObj.nodeType == TypeHelper::Output) {
@@ -303,6 +330,13 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
             connect(this, &MainBackend::sig_connectionDisconnected, _rcvObj.notifier, &ValueNotifierClass::inputsDisconnected, Qt::SingleShotConnection);
             emit sig_connectionDisconnected();
         }
+    }
+    if(connectableObjectIsProcessorOfType(_co.receiverId, TypeHelper::SplitComponents) && !connectableObjectHasConnection(_rcvObj)) {
+        qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
+    }
+    if(connectableObjectIsProcessorOfType(_co.sourceId, TypeHelper::SplitComponents) && !connectableObjectHasConnection(_sendObj)) {
+        qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
+//        qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
     }
 
     _co.connectionView->deleteLater();
@@ -364,7 +398,7 @@ bool MainBackend::deleteOscInputDeviceWithId(const QString uniqueID)
     OscInDeviceStruct &del_dev = oscInputDevices[uniqueID];
     del_dev.view->deleteLater();
     del_dev.viewController->deleteLater();
-//    del_dev.oscReceiver->deleteLater();
+    //    del_dev.oscReceiver->deleteLater();
     slot_deleteOscInputViewsForDevice(uniqueID);
 
     emit sig_deleteOscInputDeviceWithId(uniqueID);
@@ -384,7 +418,6 @@ bool MainBackend::connectionRequest(const QString senderNodeId,int sourceValueId
         qWarning() << "no objects found for connection";
         return false;
     }
-
 
     ConnectableObject &_srcObj = allConnectableObjects[senderNodeId];
     ConnectableObject &_rcvObj = allConnectableObjects[receiverNodeId];
@@ -492,10 +525,7 @@ void MainBackend::newConnectionEstablished(QString connectionId, bool accepted, 
 
             qDebug() << "final insert connection in map" << connectionId;
             allConnections.insert(connectionId, ValueConnection(_newCon));
-
-
         }
-
         pendingConnectionRequests.remove(connectionId);
     }
 }
@@ -642,6 +672,41 @@ void MainBackend::errorWarningCreate(QString id, TypeHelper::NodeType ntype)
     qWarning() << "error while creating" << TypeHelper::getPrefixForNodetype(ntype) << id;
 }
 
+bool MainBackend::connectableObjectHasConnection(QString objId)
+{
+    if(!allConnectableObjects.contains(objId)) {
+        qWarning() << "No Object find for ID" << objId;
+        return false;
+    }
+    ConnectableObject &_co = allConnectableObjects[objId];
+    return connectableObjectHasConnection(_co);
+}
+
+bool MainBackend::connectableObjectHasConnection(ConnectableObject &conObj)
+{
+    bool _hasCons = false;
+    for(const QString &_cid: conObj.receivingConnections) {
+        if(_cid != "") _hasCons = true;
+    }
+    for(const QSet<QString> &_rcons: conObj.sendConnections) {
+        if(!_rcons.isEmpty()) _hasCons = true;
+    }
+    return _hasCons;
+}
+
+bool MainBackend::connectableObjectIsProcessorOfType(QString objId, TypeHelper::ProcessorType type)
+{
+    if(allConnectableObjects.contains(objId) && processingNodes.contains(objId)) {
+        return processingNodes[objId].procType == type;
+    }
+    else return false;
+}
+
+//bool MainBackend::processingNodeIsType(ProcessingNode &procObj, TypeHelper::ProcessorType type)
+//{
+//    return procObj.procType == type;
+//}
+
 
 QString MainBackend::createUniqueId(TypeHelper::NodeType nodeType)
 {
@@ -753,10 +818,10 @@ void MainBackend::createSensorViewsForMotionDevice(const QString sendername, con
 
         QQuickItem *newValDevice = qobject_cast<QQuickItem*>(newInput.createWithInitialProperties({{"viewmode", sensor->sensType},
                                                                                                    {"identifier", sensor->identifier}
-//                                                                                                   ,{"sourceObjectId", sendername}
-//                                                                                                   ,{"oscInputPath", sendername}
+                                                                                                   //                                                                                                   ,{"sourceObjectId", sendername}
+                                                                                                   //                                                                                                   ,{"oscInputPath", sendername}
                                                                                                   }));
-//        connect();
+        //        connect();
 
         InputValueViewController *viewBackend = newValDevice->findChild<InputValueViewController*>("valuebackend");
         viewBackend->setSourceObjectID(sendername);
@@ -988,13 +1053,13 @@ void MainBackend::qDomElementFromFile(QDomElement element, TypeHelper::NodeType 
             QString devName = element.attribute("deviceName", "");
             bool _deviceExists = false;
             QString _foundKey = "";
-//            QMutableMapIterator<QString, OscInDeviceStruct> mutIt(oscInputDevices);
-//            while(mutIt.hasNext()) {
-//                mutIt.next();
-//                if(mutIt.value().deviceName == devName) {
+            //            QMutableMapIterator<QString, OscInDeviceStruct> mutIt(oscInputDevices);
+            //            while(mutIt.hasNext()) {
+            //                mutIt.next();
+            //                if(mutIt.value().deviceName == devName) {
 
-//                }
-//            }
+            //                }
+            //            }
             for(auto iter = oscInputDevices.constBegin(); iter != oscInputDevices.constEnd(); ++iter) {
                 if(iter->deviceName == devName) {
                     _deviceExists = true;

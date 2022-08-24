@@ -3,7 +3,6 @@
 PN_AbsValue::PN_AbsValue(QObject *parent)
     : ProcessNode{parent}
 {
-
 }
 
 PN_AbsValue::PN_AbsValue(QByteArray identifier, int idxInControlller, PN_AbsValue *controller, TypeHelper::ValueType type, quint16 valueNumber, QObject *parent)
@@ -31,5 +30,26 @@ ProcessNode *PN_AbsValue::createSubprocessor(QString objectname_id)
 
 float PN_AbsValue::process(float value)
 {
+
     return qAbs(value);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

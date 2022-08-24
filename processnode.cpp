@@ -156,7 +156,6 @@ ValueNotifierClass *ProcessNode::getNotifier(int idx)
         }
         return subProcessor.value(idx, nullptr);
     }
-
     return nullptr;
 }
 
@@ -198,6 +197,11 @@ void ProcessNode::setProcessorType(TypeHelper::ProcessorType newProcessorType)
         return;
     m_processorType = newProcessorType;
     emit processorTypeChanged();
+}
+
+ProcessNode *ProcessNode::getSubProcessor(int idx)
+{
+    return subProcessor.at(idx);
 }
 
 
