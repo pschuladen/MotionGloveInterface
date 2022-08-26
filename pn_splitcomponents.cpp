@@ -5,6 +5,10 @@ PN_SplitComponents::PN_SplitComponents(QObject *parent)
 {
     processRole = ViewController;
     subProcessor.append(PN_SplitComponents::createSubprocessor(identifier()));
+//    connect(subProcessor[0], &PN_SplitComponents::valueNumberChanged, this, &PN_SplitComponents::setValueNumber);
+    connect(subProcessor[0], &PN_SplitComponents::connectedValueTypeChanged, this, &PN_SplitComponents::setConnectedValueType);
+    connect(this, &PN_SplitComponents::connectedValueTypeChanged, subProcessor[0], &PN_SplitComponents::setConnectedValueType);
+    connect(subProcessor[0], &PN_SplitComponents::valueNumberChanged, this, &PN_SplitComponents::setValueNumber);
     appendToConnectedTypes(TypeHelper::Undefined);
 }
 

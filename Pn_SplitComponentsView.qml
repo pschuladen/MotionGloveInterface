@@ -98,7 +98,7 @@ NodeViewController {
 //        implicitHeight: height
 
         Repeater {
-            model: _typehelper.getSizeForValueType(root.conType)
+            model: backend.valueNumber//_typehelper.getSizeForValueType(root.conType)
             delegate:
                 Item {
                 id:delegItem

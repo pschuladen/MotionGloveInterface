@@ -42,6 +42,8 @@ const QColor TypeHelper::getColorForValueType(const TypeHelper::ValueType vtype)
         return QColor("deepskyblue");
     case TypeHelper::Trigger:
         return QColor("darkred");
+    case TypeHelper::BoolList:
+        return QColor("pink");
     }
     return QColor();
 
@@ -64,12 +66,17 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
         return QString("bool");
     case TypeHelper::Trigger:
         return QString("trig");
+    case TypeHelper::BoolList:
+        return QString("boolList");
     }
 }
 
 QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
 {
     switch(procType) {
+    case TypeHelper::TouchRecognizer:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_TouchRecognizerView.qml"));
+        break;
     case TypeHelper::SplitComponents:
         return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_SplitComponentsView.qml"));
         break;
@@ -136,6 +143,8 @@ size_t TypeHelper::getSizeForValueType(const ValueType vType)
         return 1;
     case TypeHelper::Trigger:
         return 1;
+    case TypeHelper::BoolList:
+        return 6;
     }
 }
 

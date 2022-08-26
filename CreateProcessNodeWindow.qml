@@ -29,6 +29,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: model.name
+                horizontalAlignment: Text.Center
             }
             MouseArea {
                 id: moAr
@@ -70,7 +71,7 @@ Item {
         ListModel {
             id: createProcessModel
             ListElement {
-                name: "sum\ncomponents"
+                name: "sum\ncomps"
                 type: TypeHelper.SumComponents
             }
             ListElement {
@@ -86,8 +87,12 @@ Item {
                 type: TypeHelper.DiffValue
             }
             ListElement {
-                name: "splitCompos"
+                name: "split\nComp"
                 type: TypeHelper.SplitComponents
+            }
+            ListElement {
+                name: "Touch\nRecog"
+                type: TypeHelper.TouchRecognizer
             }
         }
     }

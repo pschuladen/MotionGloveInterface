@@ -133,6 +133,7 @@ void ProcessNode::setConnectedTypes(const QList<TypeHelper::ValueType> &newConne
 void ProcessNode::setConnectedTypesAtIdx(int idx, TypeHelper::ValueType valType)
 {
     if(idx < connectedTypes().size()) {
+//        if(subProcessor.value(idx, nullptr)) subProcessor.at(idx).setconnec
         m_connectedTypes[idx] = valType;
         emit connectedTypesChanged(m_connectedTypes);
     }
@@ -210,6 +211,9 @@ void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QStrin
     qDebug() << "connection request" << this << identifier() << connectionId << connectToIdx;
 
     if(!acceptsInputType(type)) {
+        emit connectionAccepted(connectionId, false);
+    }
+    if(processorType() == TypeHelper::TouchRecognizer && sender->valueNumber() != 6) {
         emit connectionAccepted(connectionId, false);
     }
     if(connectToIdx < 0) {connectToIdx = subProcessor.size();}

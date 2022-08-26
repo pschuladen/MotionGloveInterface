@@ -41,6 +41,7 @@ qt_add_executable(appMotionGloveInterface
     pn_absvalue.h pn_absvalue.cpp
     pn_diffvalue.h pn_diffvalue.cpp
     pn_splitcomponents.h pn_splitcomponents.cpp
+    pn_touchrecognizer.h pn_touchrecognizer.cpp
 
 )
 
@@ -69,6 +70,7 @@ qt_add_qml_module(appMotionGloveInterface
                 Pn_AbsValueView.qml
                 Pn_DiffValueView.qml
                 Pn_SplitComponentsView.qml
+                Pn_TouchRecognizerView.qml
 )
 
 

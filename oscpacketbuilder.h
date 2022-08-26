@@ -41,7 +41,7 @@ private:
 
 
 
-    size_t valueListSize = 0;
+    size_t valueListSize = 6;
 
     // ValueNotifierClass interface
 public:
@@ -61,6 +61,7 @@ public slots:
     void slot_singleValueChanged(float value, int frame) override;
     void slot_boolValueChanged(bool value, int frame) override;
     void slot_trigger(int frame) override;
+    void slot_boolListChanged(QList<bool> boolList, int frame) override;
 
     int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList) override;
     void inputsDisconnected() override;

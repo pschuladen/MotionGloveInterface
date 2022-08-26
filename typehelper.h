@@ -16,7 +16,7 @@ public:
 
     enum ValueType: quint8 { // TODO: add touchvalues as type?
         Undefined, Vector, Quat, List,
-        SingleValue, BoolValue, Trigger
+        SingleValue, BoolValue, Trigger, BoolList
     };
     Q_ENUM(ValueType);
 
@@ -42,7 +42,7 @@ public:
     Q_ENUM(NodeType);
 
     enum ProcessorType {
-        GenericProcessor, Scale, SumComponents, AbsValue, DiffValue, SplitComponents
+        GenericProcessor, Scale, SumComponents, AbsValue, DiffValue, SplitComponents, TouchRecognizer
     };
     Q_ENUM(ProcessorType);
 

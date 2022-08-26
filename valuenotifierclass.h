@@ -100,12 +100,13 @@ signals:
      void singleValueChanged(float value, int frame=-1);
      void boolValueChanged(bool value, int frame=-1);
      void triggerActivated(int frame=-1);
+     void boolListChanged(QList<bool> boolList, int frame=-1);
      //     void valueChanged()
      void connectedValueTypeChanged(TypeHelper::ValueType vType);
 
      void indexInObjectChanged();
 
-     void valueNumberChanged();
+     void valueNumberChanged(quint16 nVals);
 
      void supportsSubValuesChanged();
 
@@ -127,6 +128,7 @@ public slots:
      virtual void slot_singleValueChanged(float value, int frame=-1);
      virtual void slot_boolValueChanged(bool value, int frame=-1);
      virtual void slot_trigger(int frame=-1);
+     virtual void slot_boolListChanged(QList<bool> boolList, int frame=-1);
 
      virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
      virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx=0, quint16 nValuesInList=0);

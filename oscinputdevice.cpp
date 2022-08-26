@@ -80,7 +80,6 @@ void OscInputDevice::handleOscPacket(const OSCPP::Server::Packet &packet)
 
 void OscInputDevice::handleOscMessage(const OSCPP::Server::Message &message)
 {
-
     oscInputParser.value(message.address(), unmappedOscHandler)->handleOscArgs(OSCPP::Server::ArgStream(message.args()), 0);
 }
 

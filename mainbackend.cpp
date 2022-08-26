@@ -275,7 +275,7 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
     //       }
     //    }
 
-    if(_sendObj.notifier->getNotifier(_co.sourceIdx) && _rcvObj.notifier->getNotifier(_co.receiverIdx))
+    if(_sendObj.notifier->getNotifier(_co.sourceIdx) && _rcvNotifier) //_rcvObj.notifier->getNotifier(_co.receiverIdx))
     {
         ValueNotifierClass::disconnectValueTypeSignalToSlot(_sendObj.notifier->getNotifier(_co.sourceIdx),
                                                             //                                                            _rcvObj.notifier->getNotifier(_co.receiverIdx),
@@ -333,10 +333,12 @@ bool MainBackend::deleteConnectionWithId(const QString uniqueID)
     }
     if(connectableObjectIsProcessorOfType(_co.receiverId, TypeHelper::SplitComponents) && !connectableObjectHasConnection(_rcvObj)) {
         qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
+       _rcvObj.notifier->setConnectedValueType(TypeHelper::Undefined);
     }
     if(connectableObjectIsProcessorOfType(_co.sourceId, TypeHelper::SplitComponents) && !connectableObjectHasConnection(_sendObj)) {
-        qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
+        qobject_cast<ProcessNode*>(_sendObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
 //        qobject_cast<ProcessNode*>(_rcvObj.notifier)->setConnectedTypesAtIdx(0, TypeHelper::Undefined);
+        _sendObj.notifier->setConnectedValueType(TypeHelper::Undefined);
     }
 
     _co.connectionView->deleteLater();
@@ -603,10 +605,11 @@ bool MainBackend::createInputNodeDrop(QPoint atPoint, QString sourceDevice, QStr
         return false;
     }
 
-    ValueNotifierClass *inNodeNoti = new ValueNotifierClass(id.toUtf8(), -1, valType);
+    ValueNotifierClass *_oscParser  = oscInputDevices.value(sourceDevice).oscReceiver->getNotifierForOsc(inputPath.toUtf8());
+    ValueNotifierClass *inNodeNoti = new ValueNotifierClass(id.toUtf8(), -1, valType, _oscParser->valueNumber());
     inNodeNoti->setAutoEmit(true);
 
-    if(!ValueNotifierClass::connectValueTypeSignalToSlot(oscInputDevices.value(sourceDevice).oscReceiver->getNotifierForOsc(inputPath.toUtf8()),
+    if(!ValueNotifierClass::connectValueTypeSignalToSlot(_oscParser,
                                                          inNodeNoti, valType))
     {
         inputNodeViewCtrl->deleteLater();

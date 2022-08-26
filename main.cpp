@@ -11,6 +11,7 @@
 #include "pn_absvalue.h"
 #include "pn_diffvalue.h"
 #include "pn_splitcomponents.h"
+#include "pn_touchrecognizer.h"
 //#include "oscoutputviewcontroller.h"
 //#include "oscinputviewcontroller.h"
 
@@ -57,6 +58,7 @@ void registerQmlTypes(QQmlApplicationEngine *engine) {
     qmlRegisterType<PN_AbsValue>("MotionGloveInterface", 1, 0, "PN_AbsValue");
     qmlRegisterType<PN_DiffValue>("MotionGloveInterface", 1, 0, "PN_DiffValue");
     qmlRegisterType<PN_SplitComponents>("MotionGloveInterface", 1, 0, "PN_SplitComponents");
+    qmlRegisterType<PN_TouchRecognizer>("MotionGloveInterface", 1, 0, "PN_TouchRecognizer");
 
     qmlRegisterUncreatableType<TypeHelper>("MotionGloveInterface", 1, 0, "TypeHelper", "enum-value types only");
     qmlRegisterType<OscOutputViewController>("MotionGloveInterface", 1, 0, "OscOutputViewController");

@@ -51,6 +51,9 @@ void ValueNotifierClass::setConnectedValueType(const TypeHelper::ValueType &newC
 
     m_connectedValueType = newConnectedValueType;
 
+   if(newConnectedValueType != TypeHelper::List && newConnectedValueType != TypeHelper::BoolList)
+       setValueNumber(TypeHelper::getSizeForValueType(newConnectedValueType));
+
     if(supportsSubValues())
         createSubnotifierForValueType(newConnectedValueType, valueNumber());
 
@@ -105,6 +108,9 @@ int ValueNotifierClass::newConnectionFromSender(ValueNotifierClass *sender, Type
     if(connectedValueType() != type && connectedValueType() != TypeHelper::Undefined) return -1;
 
     setConnectedValueType(type);
+    if(type == TypeHelper::List || type == TypeHelper::BoolList) {
+        setValueNumber(sender->valueNumber());
+    }
     connectValueTypeSignalToSlot(sender, this, type);
 
     return 0;
@@ -165,12 +171,17 @@ void ValueNotifierClass::slot_singleValueChanged(float value, int frame)
 
 void ValueNotifierClass::slot_boolValueChanged(bool value, int frame)
 {
-    //TODO: implement
+    if(m_autoEmit) emit boolValueChanged(value, frame);
 }
 
 void ValueNotifierClass::slot_trigger(int frame)
 {
-    //TODO: implement
+    if(m_autoEmit) emit triggerActivated(frame);
+}
+
+void ValueNotifierClass::slot_boolListChanged(QList<bool> boolList, int frame)
+{
+    if(m_autoEmit) emit boolListChanged(boolList, frame);
 }
 
 const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
@@ -189,6 +200,7 @@ bool ValueNotifierClass::completeConnectValueNotifier(const ValueNotifierClass *
     connect(sender, &_vc::singleValueChanged, receiver, &_vc::slot_singleValueChanged);
     connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
     connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
+    connect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
 
     connect(sender, &_vc::connectedValueTypeChanged, receiver, &_vc::setConnectedValueType);
 
@@ -222,6 +234,8 @@ bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *
     case TypeHelper::Trigger:
         _co = connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
         break;
+    case TypeHelper::BoolList:
+        _co = connect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
     }
     return true;
 }
@@ -251,6 +265,9 @@ bool ValueNotifierClass::disconnectValueTypeSignalToSlot(const ValueNotifierClas
     case TypeHelper::Trigger:
         return disconnect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
         break;
+    case TypeHelper::BoolList:
+        return disconnect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
+        break;
     }
     return false;
 }
@@ -275,10 +292,11 @@ quint16 ValueNotifierClass::valueNumber() const
 
 void ValueNotifierClass::setValueNumber(quint16 newValueNumber)
 {
+//    qDebug() << "valueList Number" << newValueNumber;
     if (m_valueNumber == newValueNumber)
         return;
     m_valueNumber = newValueNumber;
-    emit valueNumberChanged();
+    emit valueNumberChanged(newValueNumber);
 }
 
 void ValueNotifierClass::unimplementedValueTypeWarning(TypeHelper::ValueType valType, QString extraMsg)

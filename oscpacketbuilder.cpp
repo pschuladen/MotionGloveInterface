@@ -54,7 +54,7 @@ void OscPacketBuilder::setMsgBufferSize()
     //TODO: implement different list sizes
     qsizetype _addrSize = m_oscAddress.size();
     qsizetype _size = _addrSize + TypeHelper::getSizeForValueType(connectedValueType())*4 + 60 + valueListSize; //+10 as safety.. TODO: das macht noch nicht so viel Sinn
-    if(connectedValueType() == TypeHelper::List) m_nValuesInMsg = valueListSize;
+    if(connectedValueType() == TypeHelper::List || connectedValueType() == TypeHelper::BoolList) m_nValuesInMsg = valueListSize;
     else m_nValuesInMsg = TypeHelper::getSizeForValueType(connectedValueType());
     m_msgBuffer.resize(_size);
     m_reservedSize = _size;
@@ -79,9 +79,12 @@ int OscPacketBuilder::newConnectionFromSender(ValueNotifierClass *sender, TypeHe
 
 
 
-    setConnectedValueType(type);
+    if(type == TypeHelper::List || type == TypeHelper::BoolList) {
+        setValueNumber(sender->valueNumber());
+    }
     valueInputConnected = true;
-    valueListSize = nValuesInList;
+    valueListSize = valueNumber();
+    setConnectedValueType(type);
 //    setMsgBufferSize();
 
     emit gotNewConnectionWithType(oscMessIdx(), type);
@@ -169,6 +172,17 @@ void OscPacketBuilder::slot_trigger(int frame)
 {
     //TODO: implement
     unimplementedValueTypeWarning(TypeHelper::Trigger);
+}
+
+void OscPacketBuilder::slot_boolListChanged(QList<bool> boolList, int frame)
+{
+    m_oscPacket.reset();
+    m_oscPacket.openMessage(oscAddress(), nValuesInMsg());
+    for(bool &_b: boolList) {
+        m_oscPacket.int32(_b);
+    }
+    m_oscPacket.closeMessage();
+    emit oscMessageBufferReady(m_msgBuffer, m_oscPacket.size(), frame);
 }
 
 

@@ -229,17 +229,6 @@ void PN_Scale::initSaveData()
 
 void PN_Scale::loadDataFromQdomElement(QDomElement domElement)
 {
-//    qDebug() << "pn_scale: loading data from file";
-//qDebug() << "pn_scale: number childnodes" << domElement.childNodes().count();
-//qDebug() << "pn_scale: nSubprocessors" << domElement.attribute("nSubprocessors", "-2");
-//QDomNodeList nodes = domElement.childNodes();
-
-//for(int i = 0; i< nodes.count(); i++) {
-//    QDomNode xn = nodes.at(i);
-//    qDebug() << "nodename " << i << " " << xn.nodeName();
-//}
-//QDomElement _procNode = domElement.firstChildElement("processor");
-//if(!_procNode.isNull()) {
 
     QDomElement _paras = domElement.firstChildElement("parameter");
     if(!_paras.isNull()) {

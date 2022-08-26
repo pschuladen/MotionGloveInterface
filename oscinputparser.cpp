@@ -27,6 +27,7 @@ OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::SensorType sen
         break;
     case TypeHelper::Touch:
         m_valueList.resize(6);
+        setValueNumber(6);
         m_oscHandle = &OscInputParser::oscR_touchType;
         break;
     }
@@ -55,6 +56,8 @@ OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::ValueType valT
     case TypeHelper::BoolValue:
         break;
     case TypeHelper::Trigger:
+        break;
+    case TypeHelper::BoolList:
         break;
     }
 }
@@ -94,7 +97,8 @@ void OscInputParser::oscR_quatType(OSCPP::Server::ArgStream *args)
 void OscInputParser::oscR_touchType(OSCPP::Server::ArgStream *args)
 {
     setFloatListFromIntArgs(args);
-    callTouchChanged(m_valueList, m_frame);
+//    callTouchChanged(m_valueList, m_frame);
+    callValuesChanged(m_valueList, m_frame);
 }
 
 void OscInputParser::oscR_floatListType(OSCPP::Server::ArgStream *args)
