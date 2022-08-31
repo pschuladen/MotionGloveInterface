@@ -85,7 +85,7 @@ private:
     void createSubnotifierForValueType(TypeHelper::ValueType valType, int nVals=0);
 //    void createSubnotifier();
 
-    quint16 m_valueNumber;
+    quint16 m_valueNumber = 0;
 
 
 
@@ -101,6 +101,7 @@ signals:
      void boolValueChanged(bool value, int frame=-1);
      void triggerActivated(int frame=-1);
      void boolListChanged(QList<bool> boolList, int frame=-1);
+     void intValueChanged(int value, int frame=-1);
      //     void valueChanged()
      void connectedValueTypeChanged(TypeHelper::ValueType vType);
 
@@ -129,6 +130,7 @@ public slots:
      virtual void slot_boolValueChanged(bool value, int frame=-1);
      virtual void slot_trigger(int frame=-1);
      virtual void slot_boolListChanged(QList<bool> boolList, int frame=-1);
+     virtual void slot_intValueChanged(int value, int frame=-1);
 
      virtual void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType);
      virtual int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx=0, quint16 nValuesInList=0);

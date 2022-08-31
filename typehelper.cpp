@@ -28,6 +28,8 @@ const QColor TypeHelper::getColorForValueType(const TypeHelper::ValueType vtype)
 {
 
     switch (vtype) {
+    case TypeHelper::IntValue:
+        return QColor("lime");
     case TypeHelper::Undefined:
         return QColor("white");
     case TypeHelper::Vector:
@@ -52,6 +54,8 @@ const QColor TypeHelper::getColorForValueType(const TypeHelper::ValueType vtype)
 const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtype)
 {
     switch(vtype) {
+    case TypeHelper::IntValue:
+        return QString("intvalue");
     case TypeHelper::Undefined:
         return QString("undef");
     case TypeHelper::Vector:
@@ -74,6 +78,8 @@ const QString TypeHelper::getStringForValueType(const TypeHelper::ValueType vtyp
 QUrl TypeHelper::getQmlUrlForProcessorType(ProcessorType procType)
 {
     switch(procType) {
+    case TypeHelper::NoteSelector:
+        return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_NoteSelectorView.qml"));
     case TypeHelper::TouchRecognizer:
         return QUrl(QStringLiteral("qrc:/MotionGloveInterface/Pn_TouchRecognizerView.qml"));
         break;
@@ -129,6 +135,8 @@ QString TypeHelper::getPrefixForNodetype(NodeType nodeType)
 size_t TypeHelper::getSizeForValueType(const ValueType vType)
 {
     switch(vType) {
+    case TypeHelper::IntValue:
+        return 1;
     case TypeHelper::Undefined:
         return 0;
     case TypeHelper::Vector:

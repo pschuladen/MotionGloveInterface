@@ -186,6 +186,16 @@ void OscPacketBuilder::slot_boolListChanged(QList<bool> boolList, int frame)
 }
 
 
+
+void OscPacketBuilder::slot_intValueChanged(int value, int frame)
+{
+    m_oscPacket.reset();
+    m_oscPacket.openMessage(oscAddress(), nValuesInMsg())
+            .int32(value).closeMessage();
+    emit oscMessageBufferReady(m_msgBuffer, m_oscPacket.size(), frame);
+}
+
+
 bool OscPacketBuilder::acceptsInputType(TypeHelper::ValueType typ, int atIdx) const
 {
     return !valueInputConnected;
@@ -203,3 +213,4 @@ void OscPacketBuilder::setConnectedValueType(const TypeHelper::ValueType &newCon
 
     emit connectedValueTypeChanged(newConnectedValueType);
 }
+

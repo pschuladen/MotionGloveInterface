@@ -59,6 +59,8 @@ OscInputParser::OscInputParser(QByteArray identifier, TypeHelper::ValueType valT
         break;
     case TypeHelper::BoolList:
         break;
+    case TypeHelper::IntValue:
+        break;
     }
 }
 

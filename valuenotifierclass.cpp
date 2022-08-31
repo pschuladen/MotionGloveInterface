@@ -184,6 +184,11 @@ void ValueNotifierClass::slot_boolListChanged(QList<bool> boolList, int frame)
     if(m_autoEmit) emit boolListChanged(boolList, frame);
 }
 
+void ValueNotifierClass::slot_intValueChanged(int value, int frame)
+{
+    if(m_autoEmit) emit intValueChanged(value, frame);
+}
+
 const TypeHelper::ValueType &ValueNotifierClass::connectedValueType() const
 {
     return m_connectedValueType;
@@ -201,7 +206,7 @@ bool ValueNotifierClass::completeConnectValueNotifier(const ValueNotifierClass *
     connect(sender, &_vc::boolValueChanged, receiver, &_vc::slot_boolValueChanged);
     connect(sender, &_vc::triggerActivated, receiver, &_vc::slot_trigger);
     connect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
-
+    connect(sender, &_vc::intValueChanged, receiver, &_vc::slot_intValueChanged);
     connect(sender, &_vc::connectedValueTypeChanged, receiver, &_vc::setConnectedValueType);
 
     return true;
@@ -236,6 +241,10 @@ bool ValueNotifierClass::connectValueTypeSignalToSlot(const ValueNotifierClass *
         break;
     case TypeHelper::BoolList:
         _co = connect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
+        break;
+    case TypeHelper::IntValue:
+        _co = connect(sender, &_vc::intValueChanged, receiver, &_vc::slot_intValueChanged);
+        break;
     }
     return true;
 }
@@ -267,6 +276,9 @@ bool ValueNotifierClass::disconnectValueTypeSignalToSlot(const ValueNotifierClas
         break;
     case TypeHelper::BoolList:
         return disconnect(sender, &_vc::boolListChanged, receiver, &_vc::slot_boolListChanged);
+        break;
+    case TypeHelper::IntValue:
+        return disconnect(sender, &_vc::intValueChanged, receiver, &_vc::slot_intValueChanged);
         break;
     }
     return false;

@@ -62,6 +62,7 @@ public slots:
     void slot_boolValueChanged(bool value, int frame) override;
     void slot_trigger(int frame) override;
     void slot_boolListChanged(QList<bool> boolList, int frame) override;
+    void slot_intValueChanged(int value, int frame) override;
 
     int newConnectionFromSender(ValueNotifierClass *sender, TypeHelper::ValueType type, int atIdx, quint16 nValuesInList) override;
     void inputsDisconnected() override;
@@ -80,6 +81,7 @@ protected:
     // ValueNotifierClass interface
 public slots:
     void setConnectedValueType(const TypeHelper::ValueType &newConnectedValueType) override;
+
 };
 
 #endif // OSCPACKETBUILDER_H

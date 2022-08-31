@@ -54,9 +54,6 @@ NodeViewController {
         Image {
             id: testImage
             anchors {
-//                top: parent.top
-//                bottom: parent.bottom
-//                horizontalCenter: parent.horizontalCenter
                 fill: parent
             }
             fillMode: Image.PreserveAspectFit
@@ -64,8 +61,6 @@ NodeViewController {
 
             cache: true
             source: "qrc:/images/sym_sum.png"
-    //        source: "qrc:/MotionGloveInterface/images/images/sym_sum.png"
-            Component.onCompleted: console.log("imagesize", width, height, sourceSize)
         }
 
         Text {

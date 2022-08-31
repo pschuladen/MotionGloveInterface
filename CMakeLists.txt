@@ -75,7 +75,7 @@ qt_add_qml_module(appMotionGloveInterface
                 Pn_DiffValueView.qml
                 Pn_SplitComponentsView.qml
                 Pn_TouchRecognizerView.qml
-                Pn_ToneSelectorView.qml
+                Pn_NoteSelectorView.qml
 )
 
 

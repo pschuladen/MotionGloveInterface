@@ -3,6 +3,7 @@
 PN_AbsValue::PN_AbsValue(QObject *parent)
     : ProcessNode{parent}
 {
+    m_processorType = TypeHelper::AbsValue;
 }
 
 PN_AbsValue::PN_AbsValue(QByteArray identifier, int idxInControlller, PN_AbsValue *controller, TypeHelper::ValueType type, quint16 valueNumber, QObject *parent)

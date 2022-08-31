@@ -94,6 +94,10 @@ Item {
                 name: "Touch\nRecog"
                 type: TypeHelper.TouchRecognizer
             }
+            ListElement {
+                name: "Note\nSelector"
+                type: TypeHelper.NoteSelector
+            }
         }
     }
 }

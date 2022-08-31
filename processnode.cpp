@@ -212,9 +212,11 @@ void ProcessNode::connectionRequestFromSender(ValueNotifierClass *sender, QStrin
 
     if(!acceptsInputType(type)) {
         emit connectionAccepted(connectionId, false);
+        return;
     }
     if(processorType() == TypeHelper::TouchRecognizer && sender->valueNumber() != 6) {
         emit connectionAccepted(connectionId, false);
+        return;
     }
     if(connectToIdx < 0) {connectToIdx = subProcessor.size();}
     while(connectToIdx + 1 > subProcessor.size()) {
