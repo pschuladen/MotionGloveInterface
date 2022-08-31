@@ -84,8 +84,15 @@ int main(int argc, char *argv[])
     //    qputenv("QT_FATAL_WARNINGS","1");
     qInstallMessageHandler(myMessageOutput);
 
-    QGuiApplication app(argc, argv);
+    QGuiApplication::setApplicationDisplayName("moglin");
+    QGuiApplication::setApplicationName("moglin");
+    QGuiApplication::setDesktopFileName("moglin");
 
+//QGuiApplication::applicationPid()
+    QGuiApplication app(argc, argv);
+//    app.setApplicationDisplayName("moglin");
+//    app.setApplicationName("moglin");
+//    app.setDesktopFileName("moglin");
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/MotionGloveInterface/main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -51,15 +51,32 @@ NodeViewController {
             }
             drag.target: root
         }
+        Image {
+            id: testImage
+            anchors {
+//                top: parent.top
+//                bottom: parent.bottom
+//                horizontalCenter: parent.horizontalCenter
+                fill: parent
+            }
+            fillMode: Image.PreserveAspectFit
+            opacity: 0.35
+
+            cache: true
+            source: "qrc:/images/sym_sum.png"
+    //        source: "qrc:/MotionGloveInterface/images/images/sym_sum.png"
+            Component.onCompleted: console.log("imagesize", width, height, sourceSize)
+        }
 
         Text {
             id: processingTitleLabel
-            text: "Sum Comps"
+            text: "Sum\nComps"
             anchors {
                 top: outerShape.top
                 left: outerShape.left
                 margins: 7
             }
+            horizontalAlignment: Text.Center
         }
 
     }

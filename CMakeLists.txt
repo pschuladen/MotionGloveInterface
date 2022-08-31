@@ -8,8 +8,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON) #added from me
 
 find_package(Qt6 6.2 COMPONENTS Quick Qml Xml REQUIRED)
 
+set(CMAKE_AUTORCC ON)
+
 qt_add_executable(appMotionGloveInterface
     main.cpp
+    images.qrc
 #    devicestatuscontroller.h devicestatuscontroller.cpp
     devicestatusmanager.h devicestatusmanager.cpp
 #    devicedatainput.h devicedatainput.cpp
@@ -42,6 +45,7 @@ qt_add_executable(appMotionGloveInterface
     pn_diffvalue.h pn_diffvalue.cpp
     pn_splitcomponents.h pn_splitcomponents.cpp
     pn_touchrecognizer.h pn_touchrecognizer.cpp
+    pn_noteselector.h pn_noteselector.cpp
 
 )
 
@@ -71,16 +75,19 @@ qt_add_qml_module(appMotionGloveInterface
                 Pn_DiffValueView.qml
                 Pn_SplitComponentsView.qml
                 Pn_TouchRecognizerView.qml
+                Pn_ToneSelectorView.qml
 )
 
 
 
 set_target_properties(appMotionGloveInterface PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_GUI_IDENTIFIER xyz.psch.moglin
+    MACOSX_BUNDLE_BUNDLE_NAME "MoGlIn"
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+#    OUTPUT_NAME "your name"
 )
 
 target_compile_definitions(appMotionGloveInterface

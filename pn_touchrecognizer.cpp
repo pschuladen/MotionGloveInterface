@@ -187,7 +187,7 @@ void PN_TouchRecognizer::slot_valuesChanged(QList<float> values, int frame)
     }
     bool _didChange = false;
     for(int i = 0; i < 6; i++) {
-        bool _touch = values[i] < m_touchThresholds[i];
+        bool _touch = values[i] > 0 && values[i] < m_touchThresholds[i];
         _didChange = _didChange || _touch != touchedBoolList[i];
         touchedBoolList[i] = _touch;
     }

@@ -31,6 +31,7 @@ Window {
             property color bgColor: "#FFA8A8A8"
             color: dropa.containsDrag ? bgColor.lighter(1.1) :  bgColor
 
+
 //                layer.enabled: true
 //                layer.smooth: true
 //                layer.samples: 4
